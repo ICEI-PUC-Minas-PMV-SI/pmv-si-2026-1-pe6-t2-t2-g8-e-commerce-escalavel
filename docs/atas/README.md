@@ -28,6 +28,7 @@ Cada ATA contém um **Registro de Atividades Semanais** com 18 semanas:
 | Aluno 4 | [aluno4.md](aluno4.md) |
 | Aluno 5 | [aluno5.md](aluno5.md) |
 | Aluno 6 | [aluno6.md](aluno6.md) |
+| Aluno 7 | [aluno7.md](aluno7.md) |
 
 ## Como Preencher
 
