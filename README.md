@@ -1,4 +1,4 @@
-# TÍTULO DO PROJETO
+# E-Commerce Escalável
 
 `CURSO: Sistemas de Informação`
 
@@ -6,11 +6,13 @@
 
 `SEMESTRE: 6º`
 
-Descrever resumidamente, em um ou dois parágrafos, o projeto que está sendo desenvolvido.
+O presente projeto consiste no desenvolvimento de uma plataforma de e-commerce robusta e escalável, projetada para operar em ambientes distribuídos com interfaces específicas para web e dispositivos móveis. O objetivo central é implementar um sistema capaz de gerenciar volumes elevados de transações e controle de estoque de forma descentralizada, distribuindo a carga de processamento e o armazenamento de dados entre múltiplos servidores para assegurar a alta disponibilidade e a tolerância a falhas.
+
+A arquitetura será fundamentada em princípios de sistemas distribuídos, utilizando APIs e serviços modulares para integrar as funcionalidades de front-end e back-end. Focando na escalabilidade horizontal, a solução busca otimizar o tempo de resposta e garantir a integridade das informações de pedidos em tempo real, proporcionando uma experiência de usuário fluida e segura, independentemente da oscilação na demanda de acessos ou da complexidade das operações logísticas envolvidas.
 
 ## Integrantes
 
-* [Nome completo do aluno 1](docs/atas/aluno1.md)
+* [Hugo Freitas da Cruz](docs/atas/aluno1.md)
 * [Nome completo do aluno 2](docs/atas/aluno2.md)
 * [Nome completo do aluno 3](docs/atas/aluno3.md)
 * [Nome completo do aluno 4](docs/atas/aluno4.md)
@@ -19,7 +21,7 @@ Descrever resumidamente, em um ou dois parágrafos, o projeto que está sendo de
 
 ## Orientador
 
-* Nome completo do professor 1
+* Kleber Jacques Ferreira de Souza
 
 ## 📊 Relatório de Contribuições
 
