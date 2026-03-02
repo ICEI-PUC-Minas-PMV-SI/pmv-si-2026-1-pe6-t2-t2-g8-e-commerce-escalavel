@@ -13,11 +13,12 @@ A arquitetura será fundamentada em princípios de sistemas distribuídos, utili
 ## Integrantes
 
 * [Hugo Freitas da Cruz](docs/atas/aluno1.md)
-* [Nome completo do aluno 2](docs/atas/aluno2.md)
-* [Nome completo do aluno 3](docs/atas/aluno3.md)
-* [Nome completo do aluno 4](docs/atas/aluno4.md)
-* [Nome completo do aluno 5](docs/atas/aluno5.md)
-* [Nome completo do aluno 6](docs/atas/aluno6.md)
+* [Carlos Alberto Morais Junior](docs/atas/aluno2.md)
+* [Gabriel Freitas Cambraia](docs/atas/aluno3.md)
+* [João Gabriel Perez Monteiro](docs/atas/aluno4.md)
+* [Marcos Vinício Araújo Almeida](docs/atas/aluno5.md)
+* [Nicolas Pontes Borges](docs/atas/aluno6.md)
+* [Vitor Gabriel Linas](docs/atas/aluno7.md)
 
 ## Orientador
 
