@@ -16,12 +16,17 @@ Nesse momento, o grupo pode optar por fazer uso  de ferramentas como Design Thin
 
 ## Objetivos
 
-Aqui você deve descrever os objetivos do trabalho indicando que o objetivo geral é desenvolver um software para solucionar o problema apresentado acima. 
+Objetivo geral
 
-Apresente também alguns (pelo menos 2) objetivos específicos dependendo de onde você vai querer concentrar a sua prática investigativa, ou como você vai aprofundar no seu trabalho.
- 
-> **Links Úteis**:
-> - [Objetivo geral e objetivo específico: como fazer e quais verbos utilizar](https://blog.mettzer.com/diferenca-entre-objetivo-geral-e-objetivo-especifico/)
+Temos como objetivo geral desenvolver um sistema de e-commerce escalável e distribuído, visando solucionar as limitações de infraestrutura e disponibilidade apresentadas anteriormente, garantindo uma plataforma de alta performance capaz de suportar grandes volumes de acessos simultâneos com estabilidade e segurança.
+
+Objetivos específicos
+
+- Otimizar o desempenho e o tempo de resposta: Implementar técnicas de arquitetura que proporcionem uma experiência de navegação fluida, intuitiva e de baixa latência para o usuário final.
+
+- Prover ferramentas de gestão e monitoramento: Desenvolver um painel administrativo que assegure a precisão dos relatórios e a visibilidade total dos processos de venda e estoque em tempo real.
+
+- Implementar funcionalidades essenciais de operação: Construir os módulos fundamentais de navegação, cadastro de clientes, listagem dinâmica de produtos e gerenciamento de pedidos, garantindo a integridade do ciclo de uso.
 
 ## Justificativa
 
