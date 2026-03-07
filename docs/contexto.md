@@ -24,8 +24,6 @@ Objetivos específicos
 
 - Otimizar o desempenho e o tempo de resposta: Implementar técnicas de arquitetura que proporcionem uma experiência de navegação fluida, intuitiva e de baixa latência para o usuário final.
 
-- Prover ferramentas de gestão e monitoramento: Desenvolver um painel administrativo que assegure a precisão dos relatórios e a visibilidade total dos processos de venda e estoque em tempo real.
-
 - Implementar funcionalidades essenciais de operação: Construir os módulos fundamentais de navegação, cadastro de clientes, listagem dinâmica de produtos e gerenciamento de pedidos, garantindo a integridade do ciclo de uso.
 
 ## Justificativa
