@@ -28,25 +28,42 @@ Objetivos específicos
 
 ## Justificativa
 
-Descreva a importância ou a motivação para trabalhar com esta aplicação que você escolheu. Indique as razões pelas quais você escolheu seus objetivos específicos ou as razões para aprofundar em certos aspectos do software.
+O avanço contínuo do comércio eletrônico expôs um desafio técnico crítico: a necessidade de plataformas capazes de escalar sob demanda sem perder performance. Arquiteturas monolíticas tradicionais frequentemente apresentam gargalos de lentidão e indisponibilidade em cenários de alto tráfego. A motivação central deste projeto nasce da necessidade de superar essas limitações estruturais, aplicando na prática conceitos de alta disponibilidade e resiliência.
 
-O grupo de trabalho pode fazer uso de questionários, entrevistas e dados estatísticos, que podem ser apresentados, com o objetivo de esclarecer detalhes do problema que será abordado pelo grupo.
+Para solucionar esse problema, o projeto propõe o desenvolvimento de um sistema de e-commerce escalável e distribuído, estruturado em microsserviços. A aplicação orquestra todo o fluxo de compras — desde a exibição do catálogo e reserva de estoque até o pagamento e notificação — utilizando mensageria assíncrona (RabbitMQ) e roteamento eficiente (API Gateway) para garantir um tempo de resposta máximo de 3 segundos.
 
-> **Links Úteis**:
-> - [Como montar a justificativa](https://guiadamonografia.com.br/como-montar-justificativa-do-tcc/)
+A plataforma é direcionada a dois perfis principais: consumidores finais (B2C), que exigem uma experiência de navegação mobile rápida e sem interrupções para finalizar suas compras, e lojistas/administradores (B2B), que dependem de dados consistentes e em tempo real para a gestão de estoque e pedidos.
+
+O desenvolvimento deste trabalho apoia-se nos fundamentos acadêmicos voltados para a tecnologia em banco de dados e arquitetura de sistemas, focando especialmente no isolamento lógico de dados (PostgreSQL) para microsserviços. Além disso, fundamenta-se nas melhores práticas de mercado e documentações oficiais das tecnologias adotadas (Docker, React, .NET e Node.js), bem como na premissa estatística do comércio digital de que a baixa latência e a estabilidade da infraestrutura estão diretamente correlacionadas com a retenção de usuários e a conversão de vendas.
 
 ## Público-Alvo
 
-Descreva quem serão as pessoas que usarão a sua aplicação indicando os diferentes perfis. O objetivo aqui não é definir quem serão os clientes ou quais serão os papéis dos usuários na aplicação. A ideia é, dentro do possível, conhecer um pouco mais sobre o perfil dos usuários: conhecimentos prévios, relação com a tecnologia, relações
-hierárquicas, etc.
+O ecossistema desta plataforma de e-commerce é projetado para atender a dois espectros distintos de usuários, cujas necessidades justificam a escolha por uma arquitetura distribuída e de alta disponibilidade. A complexidade do processamento em microsserviços e da mensageria assíncrona atua nos bastidores para atender às demandas de performance do consumidor e às exigências de consistência de dados da gestão.
 
-Adicione informações sobre o público-alvo por meio de uma descrição textual, diagramas de personas e mapa de stakeholders.
+### 1. Descrição Textual dos Perfis e Personas
 
-> **Links Úteis**:
-> - [Público-alvo](https://blog.hotmart.com/pt-br/publico-alvo/)
-> - [Como definir o público alvo](https://exame.com/pme/5-dicas-essenciais-para-definir-o-publico-alvo-do-seu-negocio/)
-> - [Público-alvo: o que é, tipos, como definir seu público e exemplos](https://klickpages.com.br/blog/publico-alvo-o-que-e/)
-> - [Qual a diferença entre público-alvo e persona?](https://rockcontent.com/blog/diferenca-publico-alvo-e-persona/)
+**Perfil A: Consumidor Final (B2C)**
+São os usuários que interagem exclusivamente com o frontend (React). Buscam conveniência, fluidez e segurança ao realizar compras. 
+* **Relação com a tecnologia:** Variada, indo do básico ao avançado, com predominância do uso de dispositivos móveis.
+* **Comportamento esperado:** Baixa tolerância a falhas ou lentidão. A exigência desse grupo dita o requisito não funcional de tempo de resposta inferior a 3 segundos.
+* **Persona de Referência (Lucas Andrade, 24 anos):** Estudante universitário que faz compras por impulso ou conveniência pelo smartphone entre uma atividade e outra. Abandona o carrinho caso a página demore a carregar ou o processamento do pagamento não forneça feedback imediato.
+
+**Perfil B: Lojista e Administrador de Operações (B2B)**
+Composto pelos profissionais de backoffice que gerenciam o catálogo de produtos, controlam o estoque e monitoram o fluxo de pedidos.
+* **Relação com a tecnologia:** Intermediária a avançada. Possuem familiaridade com painéis administrativos e sistemas de gestão corporativa.
+* **Comportamento esperado:** Necessitam de dados íntegros e em tempo real. A exigência desse grupo valida a arquitetura de bancos de dados isolados (PostgreSQL) por serviço e a orquestração via RabbitMQ, evitando que uma falha no serviço de pagamento, por exemplo, corrompa o inventário.
+* **Persona de Referência (Mariana Ribas, 41 anos):** Gerente de operações comerciais. Acessa o sistema majoritariamente via desktop. Sua principal dor é a discrepância entre o estoque virtual e o físico; logo, precisa confiar que os dados refletidos no painel são exatos e atualizados em tempo real.
+
+### 2. Mapa de Stakeholders
+
+O projeto também envolve partes interessadas acadêmicas e técnicas, cujo envolvimento dita os critérios de sucesso e a infraestrutura de hospedagem da aplicação.
+
+| Stakeholder | Categoria | Nível de Influência | Interesses Principais no Projeto |
+| :--- | :--- | :--- | :--- |
+| **Professores e Avaliadores** | Interno (Acadêmico) | Alto | Comprovação prática da estruturação de microsserviços, modelagem correta e isolamento lógico no banco de dados, e hospedagem bem-sucedida na rede institucional. |
+| **Equipe de Desenvolvimento** | Interno (Técnico) | Alto | Entrega do MVP no prazo estipulado, aplicação de tecnologias modernas (.NET, Node.js, Docker) e versionamento eficiente. |
+| **Administradores / Lojistas** | Externo (Simulado) | Alto | Plataforma estável, segurança no tráfego de dados e consistência transacional entre estoque e pedidos. |
+| **Consumidores Finais** | Externo (Simulado) | Médio | Interface responsiva, clareza nas notificações de status de compra e latência mínima. |
 
 # Especificações do Projeto
 
