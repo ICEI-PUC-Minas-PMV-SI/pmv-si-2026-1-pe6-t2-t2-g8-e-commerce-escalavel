@@ -1,6 +1,8 @@
 # Introdução
 
-Texto descritivo com a visão geral do projeto abordado. Inclui o contexto, o problema, os objetivos, a justificativa e o público-alvo do projeto.
+Este projeto aborda o desenvolvimento de uma loja virtual de roupas voltada ao público em geral com foco na oferta de peças em diferentes tamanhos, incluindo numerações plus size. A proposta surge a partir da percepção de que, no comércio online de moda, muitos consumidores ainda enfrentam dificuldades para encontrar roupas adequadas ao seu corpo, o que torna a experiência de compra mais limitada e pouco inclusiva. Nesse contexto, o problema identificado está na dificuldade de atender de forma acessível e organizada pessoas com diferentes perfis e necessidades de vestimenta dentro de um ambiente digital. 
+
+Diante disso, o objetivo do projeto é estruturar uma solução capaz de contribuir para uma experiência de compra mais inclusiva, considerando a diversidade de tamanhos e a necessidade de atender melhor o público. A justificativa para o desenvolvimento desse projeto está na importância de ampliar a acessibilidade no setor de moda online, reduzindo barreiras que ainda afetam parte dos consumidores e promovendo uma relação mais eficiente entre loja e cliente. Assim, o público-alvo do projeto é formado por consumidores em geral que buscam comprar roupas pela internet, especialmente aqueles que valorizam maior variedade de tamanhos e mais facilidade para encontrar peças adequadas. 
 
 ## Problema
 Nesse momento você deve apresentar o problema que a sua aplicação deve  resolver. No entanto, não é a hora de comentar sobre a aplicação.
@@ -65,65 +67,435 @@ O projeto também envolve partes interessadas acadêmicas e técnicas, cujo envo
 | **Administradores / Lojistas** | Externo (Simulado) | Alto | Plataforma estável, segurança no tráfego de dados e consistência transacional entre estoque e pedidos. |
 | **Consumidores Finais** | Externo (Simulado) | Médio | Interface responsiva, clareza nas notificações de status de compra e latência mínima. |
 
-# Especificações do Projeto
+# 1. Especificação do Projeto
 
-## Requisitos
+Esta seção apresenta a especificação detalhada do projeto de e-commerce distribuído, incluindo as histórias de usuário que fundamentaram os requisitos, os requisitos funcionais e não funcionais levantados, a técnica de priorização aplicada e as restrições identificadas para o desenvolvimento da solução.
 
-As tabelas que se seguem apresentam os requisitos funcionais e não funcionais que detalham o escopo do projeto. Para determinar a prioridade de requisitos, aplicar uma técnica de priorização de requisitos e detalhar como a técnica foi aplicada.
+---
 
-### Requisitos Funcionais
+# 1.1 Histórias de Usuário
 
-|ID    | Descrição do Requisito  | Prioridade |
-|------|-----------------------------------------|----|
-|RF-001| Permitir que o usuário cadastre tarefas | ALTA | 
-|RF-002| Emitir um relatório de tarefas no mês   | MÉDIA |
+As histórias de usuário foram elaboradas a partir das perspectivas dos dois perfis de usuário identificados: o cliente final e o administrador da loja. Elas descrevem as necessidades e expectativas de cada perfil de forma objetiva e orientada ao valor entregue.
 
-### Requisitos não Funcionais
+## Perfil: Cliente
 
-|ID     | Descrição do Requisito  |Prioridade |
-|-------|-------------------------|----|
-|RNF-001| O sistema deve ser responsivo para rodar em um dispositivos móvel | MÉDIA | 
-|RNF-002| Deve processar requisições do usuário em no máximo 3s |  BAIXA | 
+| ID | História de Usuário |
+|----|---------------------|
+| HU-01 | Como cliente, quero me cadastrar na plataforma informando nome, e-mail e senha, para ter acesso às funcionalidades de compra. |
+| HU-02 | Como cliente, quero fazer login com meu e-mail e senha, para acessar minha conta com segurança. |
+| HU-03 | Como cliente, quero visualizar o catálogo de produtos com filtros por categoria, nome e faixa de preço, para encontrar o que procuro com facilidade. |
+| HU-04 | Como cliente, quero visualizar os detalhes de um produto (nome, descrição, preço e imagem), para tomar uma decisão de compra informada. |
+| HU-05 | Como cliente, quero adicionar produtos a um carrinho antes de finalizar a compra, para organizar minha seleção. |
+| HU-06 | Como cliente, quero finalizar um pedido com os itens do meu carrinho, para realizar a compra. |
+| HU-07 | Como cliente, quero acompanhar o status dos meus pedidos, para saber em que etapa minha compra se encontra. |
+| HU-08 | Como cliente, quero cancelar um pedido ainda pendente, para desistir de uma compra quando necessário. |
+| HU-09 | Como cliente, quero receber uma notificação por e-mail ao confirmar meu pedido, para ter a comprovação da compra. |
+| HU-10 | Como cliente, quero ser notificado caso meu pagamento seja recusado, para poder tomar uma ação alternativa. |
 
-Com base nas Histórias de Usuário, enumere os requisitos da sua solução. Classifique esses requisitos em dois grupos:
+## Perfil: Administrador
 
-- [Requisitos Funcionais
- (RF)](https://pt.wikipedia.org/wiki/Requisito_funcional):
- correspondem a uma funcionalidade que deve estar presente na
-  plataforma (ex: cadastro de usuário).
-- [Requisitos Não Funcionais
-  (RNF)](https://pt.wikipedia.org/wiki/Requisito_n%C3%A3o_funcional):
-  correspondem a uma característica técnica, seja de usabilidade,
-  desempenho, confiabilidade, segurança ou outro (ex: suporte a
-  dispositivos iOS e Android).
-Lembre-se que cada requisito deve corresponder à uma e somente uma
-característica alvo da sua solução. Além disso, certifique-se de que
-todos os aspectos capturados nas Histórias de Usuário foram cobertos.
+| ID | História de Usuário |
+|----|---------------------|
+| HU-11 | Como administrador, quero cadastrar novos produtos com nome, descrição, preço e imagem, para manter o catálogo atualizado. |
+| HU-12 | Como administrador, quero editar e remover produtos do catálogo, para manter as informações precisas. |
+| HU-13 | Como administrador, quero gerenciar o estoque de cada produto, para evitar vendas de itens indisponíveis. |
+| HU-14 | Como administrador, quero visualizar todos os pedidos realizados na plataforma, para monitorar as operações da loja. |
+| HU-15 | Como administrador, quero solicitar o estorno de um pagamento aprovado, para tratar situações de reembolso. |
 
-## Restrições
+---
 
-O projeto está restrito pelos itens apresentados na tabela a seguir.
+# 1.2 Técnica de Priorização de Requisitos
 
-|ID| Restrição                                             |
-|--|-------------------------------------------------------|
-|01| O projeto deverá ser entregue até o final do semestre |
-|02| Não pode ser desenvolvido um módulo de backend        |
+Para a priorização dos requisitos, foi utilizada a técnica MoSCoW, amplamente adotada em projetos ágeis e de desenvolvimento de software. A técnica classifica os requisitos em quatro categorias:
 
-Enumere as restrições à sua solução. Lembre-se de que as restrições geralmente limitam a solução candidata.
+| Categoria | Significado |
+|----------|-------------|
+| Must Have (ALTA) | Requisito essencial — sem ele o sistema não funciona ou não entrega valor mínimo. |
+| Should Have (MÉDIA) | Requisito importante — agrega valor significativo mas pode ser entregue em iteração posterior. |
+| Could Have (BAIXA) | Requisito desejável — melhora a experiência mas tem impacto mínimo se ausente. |
+| Won't Have | Requisito fora do escopo desta entrega — pode ser considerado em versões futuras. |
 
-> **Links Úteis**:
-> - [O que são Requisitos Funcionais e Requisitos Não Funcionais?](https://codificar.com.br/requisitos-funcionais-nao-funcionais/)
-> - [O que são requisitos funcionais e requisitos não funcionais?](https://analisederequisitos.com.br/requisitos-funcionais-e-requisitos-nao-funcionais-o-que-sao/)
+A classificação foi feita com base no impacto de cada requisito no fluxo principal da plataforma — o ciclo completo de compra: cadastro, navegação, pedido, pagamento e notificação. Requisitos que bloqueiam esse fluxo foram classificados como ALTA. Requisitos que melhoram a experiência ou a operação foram classificados como MÉDIA ou BAIXA.
+
+---
+
+# 1.3 Requisitos Funcionais
+
+Os requisitos funcionais descrevem as funcionalidades que a plataforma deve oferecer para atender às histórias de usuário levantadas.
+
+| ID | Descrição | HU Relacionada | Prioridade |
+|----|-----------|---------------|-----------|
+| RF-001 | O sistema deve permitir o cadastro de novos usuários com nome, e-mail e senha. | HU-01 | ALTA |
+| RF-002 | O sistema deve autenticar usuários via e-mail e senha, retornando um token JWT. | HU-02 | ALTA |
+| RF-003 | O sistema deve permitir a listagem de produtos com filtros por categoria, nome e faixa de preço. | HU-03 | ALTA |
+| RF-004 | O sistema deve exibir os detalhes de um produto específico. | HU-04 | ALTA |
+| RF-005 | O sistema deve permitir que o usuário monte um carrinho de compras antes de finalizar o pedido. | HU-05 | ALTA |
+| RF-006 | O sistema deve permitir que usuários autenticados criem pedidos a partir do carrinho. | HU-06 | ALTA |
+| RF-007 | O sistema deve verificar a disponibilidade de estoque ao criar um pedido. | HU-06 | ALTA |
+| RF-008 | O sistema deve processar o pagamento do pedido e retornar o resultado da transação. | HU-06 | ALTA |
+| RF-009 | O sistema deve permitir que o usuário consulte o status e histórico dos seus pedidos. | HU-07 | ALTA |
+| RF-010 | O sistema deve permitir o cancelamento de pedidos com status pendente. | HU-08 | ALTA |
+| RF-011 | O sistema deve enviar notificação ao usuário ao confirmar um pedido. | HU-09 | ALTA |
+| RF-012 | O sistema deve notificar o usuário em caso de pagamento recusado. | HU-10 | ALTA |
+| RF-013 | O sistema deve permitir que administradores cadastrem, editem e removam produtos. | HU-11, HU-12 | ALTA |
+| RF-014 | O sistema deve permitir que administradores gerenciem o estoque de cada produto. | HU-13 | ALTA |
+
+---
+
+# 1.4 Requisitos Não Funcionais
+
+Os requisitos não funcionais descrevem as características técnicas e de qualidade que a plataforma deve atender, independentemente das funcionalidades específicas.
+
+| ID | Descrição | Categoria | Prioridade |
+|----|-----------|----------|-----------|
+| RNF-001 | Cada serviço deve responder a requisições em até 500ms em condições normais de carga. | Desempenho | ALTA |
+| RNF-002 | Todas as rotas protegidas devem exigir autenticação via token JWT. | Segurança | ALTA |
+| RNF-003 | As senhas dos usuários devem ser armazenadas com hash BCrypt, nunca em texto puro. | Segurança | ALTA |
+| RNF-004 | A comunicação entre serviços deve ser feita exclusivamente via API Gateway, nunca por chamadas diretas do frontend. | Segurança | ALTA |
+| RNF-005 | A falha de um serviço não deve causar indisponibilidade dos demais serviços. | Disponibilidade | ALTA |
+| RNF-006 | O sistema deve ser executável em qualquer ambiente com Docker instalado. | Portabilidade | ALTA |
+| RNF-007 | A comunicação entre serviços deve seguir o padrão REST com payloads em JSON. | Interoperabilidade | ALTA |
+| RNF-008 | O NotificationService deve processar eventos de forma assíncrona, sem bloquear o fluxo principal de pedidos. | Desempenho | ALTA |
+| RNF-009 | Cada serviço deve ter sua própria base de código, Dockerfile e documentação de API (Swagger). | Manutenibilidade | MÉDIA |
+| RNF-010 | O banco de dados deve ser organizado com schemas separados por domínio de serviço. | Manutenibilidade | MÉDIA |
+| RNF-011 | Os serviços devem ser containerizados e passíveis de escalabilidade horizontal independente. | Escalabilidade | MÉDIA |
+| RNF-012 | O sistema deve expor apenas o API Gateway para o cliente; as portas internas dos serviços não devem ser acessíveis em produção. | Segurança | MÉDIA |
+| RNF-013 | Variáveis sensíveis (senhas, chaves JWT) devem ser configuradas via variáveis de ambiente, nunca hardcoded. | Segurança | MÉDIA |
+| RNF-014 | O frontend deve ser responsivo e funcionar em dispositivos móveis e desktop. | Usabilidade | BAIXA |
+
+---
+
+# 1.5 Restrições
+
+As restrições definem as limitações que condicionam o desenvolvimento e a entrega da solução, independentemente das decisões técnicas da equipe.
+
+| ID | Restrição |
+|----|----------|
+| R-01 | O projeto deverá ser entregue até o final do semestre letivo vigente, conforme cronograma definido pela instituição. |
+| R-02 | O sistema será executado localmente via Docker Compose, sem obrigatoriedade de ambiente de produção real. |
+| R-03 | O gateway de pagamento será simulado, sem integração com provedores financeiros reais. |
+| R-04 | Serão utilizadas apenas ferramentas e tecnologias de código aberto ou com licença gratuita para fins acadêmicos. |
+| R-05 | A arquitetura deve seguir o modelo SOA (Service-Oriented Architecture), com serviços independentes comunicando-se via REST e mensageria. |
+| R-06 | Cada serviço deverá ser desenvolvido e mantido por no máximo dois integrantes da equipe. |
+| R-07 | Não será implementado um sistema de autenticação multifator (MFA) nesta versão. |
 
 # Catálogo de Serviços
 
-Descreva aqui todos os serviços que serão disponibilizados pelo seu projeto, detalhando suas características e funcionalidades.
+## Visão Geral
+
+| Serviço | Tecnologia | Tipo | Porta |
+|--------|------------|------|------|
+| UserService | A definir | API REST | 5001 |
+| CatalogService |  | API REST | 5002 |
+| StockService |  | API REST | 5003 |
+| OrderService |  | API REST | 5004 |
+| PaymentService |  | API REST | 5005 |
+| NotificationService |  | Worker | — |
+
+---
+
+# UserService
+
+Responsável por tudo que envolve identidade no sistema. É o único serviço que conhece as credenciais dos usuários e o único autorizado a emitir tokens JWT. Todos os demais serviços confiam na identidade que este serviço válida.
+
+## Responsabilidades:
+
+- Cadastrar novos usuários com validação de e-mail único e força de senha mínima.
+- Autenticar usuários comparando a senha com o hash BCrypt armazenado.
+- Gerar e assinar tokens JWT contendo userId, email, role e tempo de expiração.
+- Permitir consulta e atualização de dados de perfil.
+- Gerenciar dois níveis de acesso: customer e admin.
+
+## Schema do banco (schema: users):
+
+```
+users
+├── id            UUID (PK)
+├── name          VARCHAR
+├── email         VARCHAR (único)
+├── password_hash VARCHAR
+├── role          ENUM (customer | admin)
+├── created_at    TIMESTAMP
+└── active        BOOLEAN
+```
+
+## Endpoints
+
+| Método | Rota | Descrição | Auth |
+|------|------|------|------|
+| POST | /auth/register | Cadastra usuário, retorna JWT | Não |
+| POST | /auth/login | Autentica, retorna JWT | Não |
+| GET | /users/{id} | Retorna dados do perfil | Sim |
+| PUT | /users/{id} | Atualiza nome, e-mail, endereço | Sim |
+| PUT | /users/{id}/password | Troca a senha | Sim |
+| DELETE | /users/{id} | Desativa a conta do usuário | Sim |
+
+---
+
+# CatalogService
+
+Responsável por todos os dados descritivos dos produtos disponíveis na loja. Não tem conhecimento sobre disponibilidade de estoque — responde apenas perguntas sobre o que o produto é, como é descrito e qual seu preço.
+
+## Responsabilidades:
+
+- Manter o cadastro de produtos com nome, descrição, preço e imagem.
+- Organizar produtos em categorias hierárquicas.
+- Permitir busca e filtragem por nome, categoria e faixa de preço.
+- Permitir que administradores cadastrem, editem e removam produtos e categorias.
+
+## Endpoints:
+
+| Método | Rota | Descrição | Auth |
+|------|------|------|------|
+| GET | /products | Lista produtos com filtros opcionais | Não |
+| GET | /products/{id} | Detalhe de um produto | Não |
+| POST | /products | Cadastra novo produto | Admin |
+| PUT | /products/{id} | Atualiza produto existente | Admin |
+| DELETE | /products/{id} | Remove produto (soft delete) | Admin |
+| GET | /categories | Lista todas as categorias | Não |
+| POST | /categories | Cadastra nova categoria | Admin |
+
+## Schema do banco (schema: catalog):
+
+```
+products
+├── id          UUID (PK)
+├── name        VARCHAR
+├── description TEXT
+├── price       DECIMAL
+├── category_id UUID (FK)
+├── image_url   VARCHAR
+├── active      BOOLEAN
+└── created_at  TIMESTAMP
+
+categories
+├── id   UUID (PK)
+└── name VARCHAR
+```
+
+---
+
+# StockService
+
+Guardião da quantidade disponível de cada produto. Trabalha com o conceito de reserva temporária: ao iniciar um pedido, unidades são reservadas mas não baixadas definitivamente — a baixa só ocorre após confirmação de pagamento, garantindo consistência transacional.
+
+## Responsabilidades:
+
+- Informar a quantidade disponível de qualquer produto.
+- Reservar unidades quando um pedido é iniciado, prevenindo venda duplicada.
+- Liberar reservas em caso de cancelamento ou falha no pagamento.
+- Confirmar a baixa definitiva de estoque após pagamento aprovado.
+- Registrar o histórico completo de movimentações para auditoria.
+
+## Endpoints:
+
+| Método | Rota | Descrição | Auth |
+|------|------|------|------|
+| GET | /stock/{productId} | Quantidade disponível | Não |
+| POST | /stock/{productId} | Define estoque inicial | Admin |
+| PUT | /stock/{productId}/reserve | Reserva unidades (pedido) | Sim |
+| PUT | /stock/{productId}/release | Libera reserva (cancelamento) | Sim |
+| PUT | /stock/{productId}/confirm | Baixa definitiva (pós pagto.) | Sim |
+| GET | /stock/{productId}/history | Histórico de movimentações | Admin |
+
+## Schema do banco (schema: stock):
+
+```
+stock_items
+├── id                 UUID (PK)
+├── product_id         UUID (único)
+├── quantity_available INTEGER
+└── quantity_reserved  INTEGER
+
+stock_movements
+├── id         UUID (PK)
+├── product_id UUID (FK)
+├── order_id   UUID
+├── type       ENUM (reserve | release | confirm | restock)
+├── quantity   INTEGER
+└── created_at TIMESTAMP
+```
+
+---
+
+# OrderService
+
+É o serviço central e orquestrador do sistema. Coordena o fluxo de compra chamando StockService, PaymentService e publicando eventos no RabbitMQ para o NotificationService. Mantém o ciclo de vida completo dos pedidos.
+
+## Responsabilidades:
+
+- Criar pedidos a partir dos itens enviados pelo frontend.
+- Orquestrar o fluxo: verificar estoque, processar pagamento, confirmar ou cancelar.
+- Manter o histórico de pedidos e seus status ao longo do tempo.
+- Publicar eventos no RabbitMQ para notificação assíncrona do usuário.
+- Permitir cancelamento de pedidos ainda pendentes.
+
+## Endpoints:
+
+| Método | Rota | Descrição | Auth |
+|------|------|------|------|
+| POST | /orders | Cria novo pedido | Sim |
+| GET | /orders/{id} | Detalhe do pedido | Sim |
+| GET | /orders/user/{userId} | Pedidos do usuário autenticado | Sim |
+| PUT | /orders/{id}/cancel | Cancela pedido pendente | Sim |
+| GET | /orders | Lista todos os pedidos | Admin |
+
+## Schema do banco (schema: orders):
+
+```
+orders
+├── id           UUID (PK)
+├── user_id      UUID
+├── status       ENUM (draft|pending|confirmed|cancelled|failed)
+├── total_amount DECIMAL
+└── created_at   TIMESTAMP
+
+order_items
+├── id           UUID (PK)
+├── order_id     UUID (FK)
+├── product_id   UUID
+├── product_name VARCHAR
+├── unit_price   DECIMAL
+└── quantity     INTEGER
+```
+
+## Fluxo interno de criação de pedido:
+
+1. Cria pedido com status 'draft'
+2. Para cada item: chama StockService → reserva estoque
+3. Se estoque insuficiente: cancela tudo, retorna erro 422
+4. Muda status para 'pending'
+5. Chama PaymentService
+6a. Aprovado: status 'confirmed' + StockService/confirm + publica ORDER_CONFIRMED
+6b. Recusado: status 'failed'  + StockService/release  + publica PAYMENT_REFUSED
+
+---
+
+# PaymentService
+
+Responsável por processar transações financeiras. No contexto deste projeto, simula a integração com um gateway de pagamento externo, retornando o resultado da transação sem comunicação real com operadoras de pagamento.
+
+## Responsabilidades:
+
+- Receber solicitações de pagamento com valor e identificação do pedido.
+- Simular o processamento e retornar o status da transação.
+- Registrar todas as transações com seu resultado para histórico e auditoria.
+- Permitir solicitação de estorno por administradores.
+
+## Endpoints:
+
+| Método | Rota | Descrição | Auth |
+|------|------|------|------|
+| POST | /payments | Processa pagamento de um pedido | Sim |
+| GET | /payments/{orderId} | Consulta status do pagamento | Sim |
+| POST | /payments/{id}/refund | Solicita estorno | Admin |
+
+## Schema do banco (schema: payments):
+
+```
+payments
+├── id             UUID (PK)
+├── order_id       UUID (único)
+├── amount         DECIMAL
+├── status         ENUM (pending | approved | refused | refunded)
+├── transaction_id VARCHAR
+└── created_at     TIMESTAMP
+```
+
+---
+
+# NotificationService (Worker)
+
+Diferentemente dos demais serviços, o NotificationService não é uma API REST — é um worker assíncrono que fica em execução contínua escutando filas do RabbitMQ. Ao receber um evento, monta e envia a notificação adequada ao usuário sem bloquear nenhum outro serviço.
+
+## Responsabilidades:
+
+- Escutar continuamente as filas do RabbitMQ aguardando eventos do OrderService.
+- Identificar o tipo de evento e montar a mensagem correspondente.
+- Enviar notificação por e-mail (via SendGrid ou simulado) ao usuário afetado.
+- Registrar o histórico de notificações enviadas, incluindo falhas.
+- Tentar reenvio automático em caso de falha (até 3 tentativas).
+
+## Eventos consumidos da fila RabbitMQ:
+
+| Evento | Publicado por | Ação do NotificationService |
+|------|------|------|
+| ORDER_CONFIRMED | OrderService | Envia e-mail: pedido confirmado com resumo dos itens |
+| PAYMENT_REFUSED | OrderService | Envia e-mail: falha no pagamento, sugere nova tentativa |
+| ORDER_CANCELLED | OrderService | Envia e-mail: pedido cancelado com motivo |
+
+## Schema do banco (schema: notifications):
+
+```
+notifications
+├── id         UUID (PK)
+├── user_id    UUID
+├── order_id   UUID
+├── type       VARCHAR (ORDER_CONFIRMED | PAYMENT_REFUSED | ORDER_CANCELLED)
+├── message    TEXT
+├── status     ENUM (sent | failed)
+└── sent_at    TIMESTAMP
+```
+
+---
+
+# Diagrama de Comunicação entre Serviços
+
+O único serviço que chama outros serviços diretamente é o OrderService, que age como orquestrador. Todos os demais são independentes e não se conhecem entre si.
+
+```
+Frontend (React)
+  └─► API Gateway (Nginx)
+        ├─► UserService    ← login, cadastro, perfil
+        ├─► CatalogService ← listagem e busca de produtos
+        └─► OrderService   ← criação e consulta de pedidos
+              ├─► StockService    (reserva / libera / confirma estoque)
+              ├─► PaymentService  (processa transação)
+              └─► RabbitMQ        (publica evento)
+                      └─► NotificationService (envia e-mail)
+```
+
+---
 
 # Arquitetura da Solução
 
-Definição de como o software é estruturado em termos dos componentes que fazem parte da solução e do ambiente de hospedagem da aplicação.
+## Visao Geral
 
-![arq](https://github.com/user-attachments/assets/b9402e05-8445-47c3-9d47-f11696e38a3d)
+<li><a href="img/ecom-arq.png"> Diagrama Arq</a></li>
+
+A plataforma adota a Arquitetura Orientada a Serviços (SOA), na qual as funcionalidades do sistema são decompostas em serviços autônomos e coesos. Cada serviço é responsável por um domínio específico de negócio, possui sua própria lógica de aplicação e expõe uma API REST para comunicação com os demais.
+
+Um API Gateway (Nginx) atua como ponto de entrada único para todos os clientes, sendo responsável pelo roteamento das requisições ao serviço correspondente e pela validação do token JWT. O banco de dados PostgreSQL é compartilhado, porém organizado em schemas distintos por domínio, garantindo isolamento lógico sem a complexidade operacional de múltiplos bancos.
+
+Para o fluxo de notificações, o sistema adota comunicação assíncrona via RabbitMQ, onde o Serviço de Pedidos publica eventos em filas e o Serviço de Notificação os consome de forma independente, sem bloquear o fluxo principal de compra.
+
+Camada de Apresentação: cliente web React que se comunica exclusivamente com o API Gateway.
+
+Camada de Gateway: Nginx responsável por roteamento, validação JWT e CORS.
+
+Camada de Serviços: seis serviços REST independentes desenvolvidos em .NET, Node.js e Python.
+
+Camada de Mensageria: RabbitMQ para comunicação assíncrona entre OrderService e NotificationService.
+
+Camada de Dados: PostgreSQL com schemas segregados por serviço.
+
+---
+
+## Portas dos Componentes
+
+| Componente | Porta |
+|------|------|
+| Frontend | 3000 |
+| API Gateway | 8080 |
+| UserService | 5001 |
+| CatalogService | 5002 |
+| StockService | 5003 |
+| OrderService | 5004 |
+| PaymentService | 5005 |
+| NotificationService | — |
+| Banco de Dados | 5432 |
+| Mensageria | 5672 / 15672 |
+
 
 
 ## Tecnologias Utilizadas
@@ -163,177 +535,5 @@ O projeto será desenvolvido utilizando um conjunto de tecnologias modernas para
 
   >> RabbitMQ – mensageria assíncrona entre OrderService e NotificationService. 
 
-  <br>
+  >> Docker
 
-> 3. Serviços Web e APIs 
-
-  >> APIs REST: todos os serviços backend expõem endpoints REST para comunicação interna e com o frontend. 
-  
-  >> API Gateway (Nginx): roteamento, validação de tokens JWT e controle de CORS. 
-
-   <br>
-
-> 4. Banco de Dados 
-
-  >> PostgreSQL: banco relacional, organizado em schemas separados por serviço, garantindo isolamento lógico e consistência. 
-
-  <br>
-
-> 5. Ferramentas e IDEs 
-
-  >> Visual Studio / Visual Studio Code – desenvolvimento de backend e frontend. 
-  
-  >> Postman / Insomnia – testes de APIs REST. 
-  
-  >> Docker – containerização dos serviços para facilitar deploy e testes. 
-  
-  >> Git / GitHub – controle de versão. 
-
-  <br>
-
-> 6. Fluxo de Interação do Usuário 
-
-  >> O fluxo de interação entre usuário e sistema segue o seguinte caminho: 
-  
-  >> O usuário acessa o frontend React (porta 3000). 
-  
-  >> As requisições são enviadas ao API Gateway (Nginx) (porta 8080), que valida o token JWT e roteia para o serviço correspondente: 
-  
-  >> UserService (5001) → cadastro, login e perfil. 
-  
-  >> CatalogService (5002) → listagem e busca de produtos. 
-  
-  >> OrderService (5004) → criação e consulta de pedidos. 
-  
-  >> O OrderService orquestra os processos de: 
-  
-  >> StockService (5003) → reserva e confirmação de estoque. 
-  
-  >> PaymentService (5005) → processamento de pagamento simulado. 
-  
-  >> Eventos gerados pelo OrderService são enviados para o NotificationService via RabbitMQ (5672 / 15672), que envia notificações por e-mail ao usuário. 
-
-  >> A resposta final é enviada ao frontend, que exibe informações atualizadas sobre produtos, pedidos e status de pagamento. 
-
- 
-
- 
-
-                                    Usuário (Browser/React) 
-                                    
-                                           │ 
-                                    
-                                           ▼ 
-                                    
-                                      Frontend (React) 
-                                    
-                                           │ 
-                                    
-                                           ▼ 
-                                    
-                                       API Gateway (Nginx) ──────────────┐ 
-                                    
-                                           │                             │ 
-                                    
-                                           ▼                             │ 
-                                    
-                                    ┌──────────────┐                ┌───────────────┐ 
-                                    
-                                    │  UserService │                │ CatalogService│ 
-                                    
-                                    │    (5001)    │                │    (5002)     │ 
-                                    
-                                    └──────────────┘                └───────────────┘ 
-                                    
-                                           │                             │ 
-                                    
-                                           ▼                             ▼ 
-                                    
-                                    ┌──────────────┐ 
-                                    
-                                    │ OrderService │ 
-                                    
-                                    │    (5004)    │ 
-                                    
-                                    └──────────────┘ 
-                                    
-                                       │       │       │ 
-                                    
-                                       ▼       ▼       ▼ 
-                                    
-                                    StockService PaymentService RabbitMQ 
-                                    
-                                       (5003)     (5005)      │ 
-                                    
-                                                             ▼ 
-                                    
-                                                   NotificationService 
-                                                              
-                                                                                    
-
-
-## Hospedagem
-
-A plataforma será hospedada em um ambiente institucional da PUC Minas e também gerenciada via GitHub, garantindo controle de versão, facilidade de acesso e testes dentro da rede da universidade. 
-
-<br>
-
-> 1. Hospedagem do Frontend 
-
-  >> O frontend React será hospedado no GitHub, utilizando GitHub Pages ou outro serviço interno da PUC Minas que permita servir a interface web. 
-  
-  >> Isso permite que a equipe faça atualizações contínuas do frontend, com integração direta ao repositório, facilitando manutenção e versionamento. 
-
-<br>
-
-> 2. Hospedagem do Backend 
-
-  >> Os serviços backend (UserService, CatalogService, StockService, OrderService, PaymentService) serão hospedados no portão da PUC Minas, dentro da rede institucional. 
-  
-  >> Cada serviço será executado em containers Docker ou máquinas virtuais, garantindo isolamento e facilidade de configuração, mesmo em ambiente local ou restrito à rede da universidade. 
-
-<br>
-
-> 3. Banco de Dados 
-
-  >> O PostgreSQL será hospedado dentro da infraestrutura da PUC Minas, garantindo acesso controlado apenas aos serviços da plataforma. 
-  
-  >> Os dados serão organizados em schemas separados por serviço, mantendo segurança e isolamento lógico. 
-
-<br>
-
-> 4. Mensageria 
-
-  >> O RabbitMQ também será hospedado dentro do ambiente da universidade, permitindo comunicação assíncrona entre o OrderService e o NotificationService. 
-  
-  >> Isso garante que notificações e eventos de pedidos funcionem corretamente mesmo em ambiente local ou restrito à rede da PUC Minas. 
-
-<br>
-
-> 5. API Gateway e Segurança 
-
-  >> O Nginx funcionará como API Gateway dentro da rede da PUC Minas, roteando requisições do frontend para os serviços corretos, validando JWT e aplicando regras de CORS. 
-
-<br>
-
-> 6. Lançamento da Plataforma 
-
-  >> O lançamento será feito seguindo estas etapas: 
-  
-  >> Desenvolvimento e Versionamento: Todos os serviços e frontend são versionados no GitHub, permitindo integração contínua e colaboração entre os membros do grupo. 
-  
-  >> Testes Internos: A plataforma será testada dentro da rede da PUC Minas, simulando acesso real de usuários da universidade. 
-  
-  >> Deploy Interno: Serviços backend, banco de dados e mensageria serão disponibilizados no portão da PUC Minas, permitindo acesso seguro e controlado. 
-  
-  >> Atualizações Contínuas: Alterações no código podem ser integradas via GitHub, facilitando correções e melhorias sem afetar o ambiente de produção. 
-
-<br>
-
-> 7. Benefícios da Estratégia 
-
-  >> Acesso controlado: Apenas usuários dentro da rede da PUC Minas podem acessar a plataforma, garantindo segurança. 
-  
-  >> Versionamento: O uso do GitHub permite histórico completo de alterações e colaboração entre o grupo. 
-  
-  >> Facilidade de deploy e testes: Ambiente interno e containers Docker facilitam testes integrados antes do lançamento. 
