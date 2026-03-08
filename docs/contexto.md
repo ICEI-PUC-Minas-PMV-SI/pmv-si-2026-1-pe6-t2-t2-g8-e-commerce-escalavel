@@ -111,184 +111,212 @@ Definição de como o software é estruturado em termos dos componentes que faze
 
 ## Tecnologias Utilizadas
 
+
 O projeto será desenvolvido utilizando um conjunto de tecnologias modernas para frontend, backend, banco de dados e mensageria, garantindo escalabilidade, desempenho e experiência de usuário de alta qualidade. 
 
-1. Linguagens de Programação 
+<br>
 
-  JavaScript / TypeScript: Desenvolvimento do frontend com React, permitindo criação de interface web responsiva e interativa. 
+> 1. Linguagens de Programação 
 
-  C# (.NET): Backend de alguns serviços (ex.: UserService, OrderService), garantindo robustez e integração com APIs REST. 
+  >> JavaScript / TypeScript: Desenvolvimento do frontend com React, permitindo criação de interface web responsiva e interativa. 
 
-  Node.js (JavaScript/TypeScript): Backend de serviços como CatalogService ou PaymentService, facilitando comunicação assíncrona e rápido desenvolvimento de APIs. 
+  >> C# (.NET): Backend de alguns serviços (ex.: UserService, OrderService), garantindo robustez e integração com APIs REST. 
 
-  Python: Serviço de worker NotificationService para processamento assíncrono de eventos via RabbitMQ. 
+  >> Node.js (JavaScript/TypeScript): Backend de serviços como CatalogService ou PaymentService, facilitando comunicação assíncrona e rápido desenvolvimento de APIs. 
 
-  SQL (PostgreSQL): Persistência de dados, com schemas separados por serviço para isolamento lógico. 
+  >> Python: Serviço de worker NotificationService para processamento assíncrono de eventos via RabbitMQ. 
 
-2. Frameworks e Bibliotecas 
+  >> SQL (PostgreSQL): Persistência de dados, com schemas separados por serviço para isolamento lógico. 
 
-  React – construção do frontend. 
-  
-  .NET Core – criação de APIs REST e lógica de negócios para backend. 
-  
-  Express.js – framework Node.js para desenvolvimento de APIs REST. 
-  
-  BCrypt – hash de senhas no UserService. 
-  
-  JWT (JSON Web Token) – autenticação segura de usuários. 
-  
-  Axios / Fetch API – chamadas HTTP no frontend. 
+  <br>
 
-  RabbitMQ – mensageria assíncrona entre OrderService e NotificationService. 
+> 2. Frameworks e Bibliotecas 
 
-3. Serviços Web e APIs 
+  >> React – construção do frontend. 
+  
+  >> .NET Core – criação de APIs REST e lógica de negócios para backend. 
+  
+  >> Express.js – framework Node.js para desenvolvimento de APIs REST. 
+  
+  >> BCrypt – hash de senhas no UserService. 
+  
+  >> JWT (JSON Web Token) – autenticação segura de usuários. 
+  
+  >> Axios / Fetch API – chamadas HTTP no frontend. 
 
-  APIs REST: todos os serviços backend expõem endpoints REST para comunicação interna e com o frontend. 
-  
-  API Gateway (Nginx): roteamento, validação de tokens JWT e controle de CORS. 
+  >> RabbitMQ – mensageria assíncrona entre OrderService e NotificationService. 
 
-4. Banco de Dados 
+  <br>
 
-  PostgreSQL: banco relacional, organizado em schemas separados por serviço, garantindo isolamento lógico e consistência. 
+> 3. Serviços Web e APIs 
 
-5. Ferramentas e IDEs 
+  >> APIs REST: todos os serviços backend expõem endpoints REST para comunicação interna e com o frontend. 
+  
+  >> API Gateway (Nginx): roteamento, validação de tokens JWT e controle de CORS. 
 
-  Visual Studio / Visual Studio Code – desenvolvimento de backend e frontend. 
-  
-  Postman / Insomnia – testes de APIs REST. 
-  
-  Docker – containerização dos serviços para facilitar deploy e testes. 
-  
-  Git / GitHub – controle de versão. 
+   <br>
 
-6. Fluxo de Interação do Usuário 
+> 4. Banco de Dados 
 
-  O fluxo de interação entre usuário e sistema segue o seguinte caminho: 
-  
-  O usuário acessa o frontend React (porta 3000). 
-  
-  As requisições são enviadas ao API Gateway (Nginx) (porta 8080), que valida o token JWT e roteia para o serviço correspondente: 
-  
-  UserService (5001) → cadastro, login e perfil. 
-  
-  CatalogService (5002) → listagem e busca de produtos. 
-  
-  OrderService (5004) → criação e consulta de pedidos. 
-  
-  O OrderService orquestra os processos de: 
-  
-  StockService (5003) → reserva e confirmação de estoque. 
-  
-  PaymentService (5005) → processamento de pagamento simulado. 
-  
-  Eventos gerados pelo OrderService são enviados para o NotificationService via RabbitMQ (5672 / 15672), que envia notificações por e-mail ao usuário. 
+  >> PostgreSQL: banco relacional, organizado em schemas separados por serviço, garantindo isolamento lógico e consistência. 
 
-  A resposta final é enviada ao frontend, que exibe informações atualizadas sobre produtos, pedidos e status de pagamento. 
+  <br>
+
+> 5. Ferramentas e IDEs 
+
+  >> Visual Studio / Visual Studio Code – desenvolvimento de backend e frontend. 
+  
+  >> Postman / Insomnia – testes de APIs REST. 
+  
+  >> Docker – containerização dos serviços para facilitar deploy e testes. 
+  
+  >> Git / GitHub – controle de versão. 
+
+  <br>
+
+> 6. Fluxo de Interação do Usuário 
+
+  >> O fluxo de interação entre usuário e sistema segue o seguinte caminho: 
+  
+  >> O usuário acessa o frontend React (porta 3000). 
+  
+  >> As requisições são enviadas ao API Gateway (Nginx) (porta 8080), que valida o token JWT e roteia para o serviço correspondente: 
+  
+  >> UserService (5001) → cadastro, login e perfil. 
+  
+  >> CatalogService (5002) → listagem e busca de produtos. 
+  
+  >> OrderService (5004) → criação e consulta de pedidos. 
+  
+  >> O OrderService orquestra os processos de: 
+  
+  >> StockService (5003) → reserva e confirmação de estoque. 
+  
+  >> PaymentService (5005) → processamento de pagamento simulado. 
+  
+  >> Eventos gerados pelo OrderService são enviados para o NotificationService via RabbitMQ (5672 / 15672), que envia notificações por e-mail ao usuário. 
+
+  >> A resposta final é enviada ao frontend, que exibe informações atualizadas sobre produtos, pedidos e status de pagamento. 
 
  
 
  
 
-                                                                     Usuário (Browser/React) 
-                                                                     
-                                                                            │ 
-                                                                     
-                                                                            ▼ 
-                                                                     
-                                                                       Frontend (React) 
-                                                                     
-                                                                            │ 
-                                                                     
-                                                                            ▼ 
-                                                                     
-                                                                        API Gateway (Nginx) ──────────────┐ 
-                                                                     
-                                                                            │                             │ 
-                                                                     
-                                                                            ▼                             │ 
-                                                                     
-                                                                     ┌──────────────┐                ┌───────────────┐ 
-                                                                     
-                                                                     │  UserService │                │ CatalogService│ 
-                                                                     
-                                                                     │    (5001)    │                │    (5002)     │ 
-                                                                     
-                                                                     └──────────────┘                └───────────────┘ 
-                                                                     
-                                                                            │                             │ 
-                                                                     
-                                                                            ▼                             ▼ 
-                                                                     
-                                                                     ┌──────────────┐ 
-                                                                     
-                                                                     │ OrderService │ 
-                                                                     
-                                                                     │    (5004)    │ 
-                                                                     
-                                                                     └──────────────┘ 
-                                                                     
-                                                                        │       │       │ 
-                                                                     
-                                                                        ▼       ▼       ▼ 
-                                                                     
-                                                                     StockService PaymentService RabbitMQ 
-                                                                     
-                                                                        (5003)     (5005)      │ 
-                                                                     
-                                                                                              ▼ 
-                                                                     
-                                                                                    NotificationService 
-                                                                     
+                                    Usuário (Browser/React) 
+                                    
+                                           │ 
+                                    
+                                           ▼ 
+                                    
+                                      Frontend (React) 
+                                    
+                                           │ 
+                                    
+                                           ▼ 
+                                    
+                                       API Gateway (Nginx) ──────────────┐ 
+                                    
+                                           │                             │ 
+                                    
+                                           ▼                             │ 
+                                    
+                                    ┌──────────────┐                ┌───────────────┐ 
+                                    
+                                    │  UserService │                │ CatalogService│ 
+                                    
+                                    │    (5001)    │                │    (5002)     │ 
+                                    
+                                    └──────────────┘                └───────────────┘ 
+                                    
+                                           │                             │ 
+                                    
+                                           ▼                             ▼ 
+                                    
+                                    ┌──────────────┐ 
+                                    
+                                    │ OrderService │ 
+                                    
+                                    │    (5004)    │ 
+                                    
+                                    └──────────────┘ 
+                                    
+                                       │       │       │ 
+                                    
+                                       ▼       ▼       ▼ 
+                                    
+                                    StockService PaymentService RabbitMQ 
+                                    
+                                       (5003)     (5005)      │ 
+                                    
+                                                             ▼ 
+                                    
+                                                   NotificationService 
+                                                              
                                                                                     
+
 
 ## Hospedagem
 
 A plataforma será hospedada em um ambiente institucional da PUC Minas e também gerenciada via GitHub, garantindo controle de versão, facilidade de acesso e testes dentro da rede da universidade. 
 
-1. Hospedagem do Frontend 
+<br>
 
-  O frontend React será hospedado no GitHub, utilizando GitHub Pages ou outro serviço interno da PUC Minas que permita servir a interface web. 
+> 1. Hospedagem do Frontend 
+
+  >> O frontend React será hospedado no GitHub, utilizando GitHub Pages ou outro serviço interno da PUC Minas que permita servir a interface web. 
   
-  Isso permite que a equipe faça atualizações contínuas do frontend, com integração direta ao repositório, facilitando manutenção e versionamento. 
+  >> Isso permite que a equipe faça atualizações contínuas do frontend, com integração direta ao repositório, facilitando manutenção e versionamento. 
 
-2. Hospedagem do Backend 
+<br>
 
-  Os serviços backend (UserService, CatalogService, StockService, OrderService, PaymentService) serão hospedados no portão da PUC Minas, dentro da rede institucional. 
+> 2. Hospedagem do Backend 
+
+  >> Os serviços backend (UserService, CatalogService, StockService, OrderService, PaymentService) serão hospedados no portão da PUC Minas, dentro da rede institucional. 
   
-  Cada serviço será executado em containers Docker ou máquinas virtuais, garantindo isolamento e facilidade de configuração, mesmo em ambiente local ou restrito à rede da universidade. 
+  >> Cada serviço será executado em containers Docker ou máquinas virtuais, garantindo isolamento e facilidade de configuração, mesmo em ambiente local ou restrito à rede da universidade. 
 
-3. Banco de Dados 
+<br>
 
-  O PostgreSQL será hospedado dentro da infraestrutura da PUC Minas, garantindo acesso controlado apenas aos serviços da plataforma. 
+> 3. Banco de Dados 
+
+  >> O PostgreSQL será hospedado dentro da infraestrutura da PUC Minas, garantindo acesso controlado apenas aos serviços da plataforma. 
   
-  Os dados serão organizados em schemas separados por serviço, mantendo segurança e isolamento lógico. 
+  >> Os dados serão organizados em schemas separados por serviço, mantendo segurança e isolamento lógico. 
 
-4. Mensageria 
+<br>
 
-  O RabbitMQ também será hospedado dentro do ambiente da universidade, permitindo comunicação assíncrona entre o OrderService e o NotificationService. 
+> 4. Mensageria 
+
+  >> O RabbitMQ também será hospedado dentro do ambiente da universidade, permitindo comunicação assíncrona entre o OrderService e o NotificationService. 
   
-  Isso garante que notificações e eventos de pedidos funcionem corretamente mesmo em ambiente local ou restrito à rede da PUC Minas. 
+  >> Isso garante que notificações e eventos de pedidos funcionem corretamente mesmo em ambiente local ou restrito à rede da PUC Minas. 
 
-5. API Gateway e Segurança 
+<br>
 
-  O Nginx funcionará como API Gateway dentro da rede da PUC Minas, roteando requisições do frontend para os serviços corretos, validando JWT e aplicando regras de CORS. 
+> 5. API Gateway e Segurança 
 
-6. Lançamento da Plataforma 
+  >> O Nginx funcionará como API Gateway dentro da rede da PUC Minas, roteando requisições do frontend para os serviços corretos, validando JWT e aplicando regras de CORS. 
 
-  O lançamento será feito seguindo estas etapas: 
-  
-  Desenvolvimento e Versionamento: Todos os serviços e frontend são versionados no GitHub, permitindo integração contínua e colaboração entre os membros do grupo. 
-  
-  Testes Internos: A plataforma será testada dentro da rede da PUC Minas, simulando acesso real de usuários da universidade. 
-  
-  Deploy Interno: Serviços backend, banco de dados e mensageria serão disponibilizados no portão da PUC Minas, permitindo acesso seguro e controlado. 
-  
-  Atualizações Contínuas: Alterações no código podem ser integradas via GitHub, facilitando correções e melhorias sem afetar o ambiente de produção. 
+<br>
 
-7. Benefícios da Estratégia 
+> 6. Lançamento da Plataforma 
 
-  Acesso controlado: Apenas usuários dentro da rede da PUC Minas podem acessar a plataforma, garantindo segurança. 
+  >> O lançamento será feito seguindo estas etapas: 
   
-  Versionamento: O uso do GitHub permite histórico completo de alterações e colaboração entre o grupo. 
+  >> Desenvolvimento e Versionamento: Todos os serviços e frontend são versionados no GitHub, permitindo integração contínua e colaboração entre os membros do grupo. 
   
-  Facilidade de deploy e testes: Ambiente interno e containers Docker facilitam testes integrados antes do lançamento. 
+  >> Testes Internos: A plataforma será testada dentro da rede da PUC Minas, simulando acesso real de usuários da universidade. 
+  
+  >> Deploy Interno: Serviços backend, banco de dados e mensageria serão disponibilizados no portão da PUC Minas, permitindo acesso seguro e controlado. 
+  
+  >> Atualizações Contínuas: Alterações no código podem ser integradas via GitHub, facilitando correções e melhorias sem afetar o ambiente de produção. 
+
+<br>
+
+> 7. Benefícios da Estratégia 
+
+  >> Acesso controlado: Apenas usuários dentro da rede da PUC Minas podem acessar a plataforma, garantindo segurança. 
+  
+  >> Versionamento: O uso do GitHub permite histórico completo de alterações e colaboração entre o grupo. 
+  
+  >> Facilidade de deploy e testes: Ambiente interno e containers Docker facilitam testes integrados antes do lançamento. 
