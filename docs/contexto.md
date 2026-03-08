@@ -58,13 +58,13 @@ O projeto também envolve partes interessadas acadêmicas e técnicas, cujo envo
 | **Administradores / Lojistas** | Externo (Simulado) | Alto | Plataforma estável, segurança no tráfego de dados e consistência transacional entre estoque e pedidos. |
 | **Consumidores Finais** | Externo (Simulado) | Médio | Interface responsiva, clareza nas notificações de status de compra e latência mínima. |
 
-# 1. Especificação do Projeto
+# Especificação do Projeto
 
 Esta seção apresenta a especificação detalhada do projeto de e-commerce distribuído, incluindo as histórias de usuário que fundamentaram os requisitos, os requisitos funcionais e não funcionais levantados, a técnica de priorização aplicada e as restrições identificadas para o desenvolvimento da solução.
 
 ---
 
-# 1.1 Histórias de Usuário
+# Histórias de Usuário
 
 As histórias de usuário foram elaboradas a partir das perspectivas dos dois perfis de usuário identificados: o cliente final e o administrador da loja. Elas descrevem as necessidades e expectativas de cada perfil de forma objetiva e orientada ao valor entregue.
 
@@ -95,7 +95,7 @@ As histórias de usuário foram elaboradas a partir das perspectivas dos dois pe
 
 ---
 
-# 1.2 Técnica de Priorização de Requisitos
+# Técnica de Priorização de Requisitos
 
 Para a priorização dos requisitos, foi utilizada a técnica MoSCoW, amplamente adotada em projetos ágeis e de desenvolvimento de software. A técnica classifica os requisitos em quatro categorias:
 
@@ -110,7 +110,7 @@ A classificação foi feita com base no impacto de cada requisito no fluxo princ
 
 ---
 
-# 1.3 Requisitos Funcionais
+# Requisitos Funcionais
 
 Os requisitos funcionais descrevem as funcionalidades que a plataforma deve oferecer para atender às histórias de usuário levantadas.
 
@@ -133,7 +133,7 @@ Os requisitos funcionais descrevem as funcionalidades que a plataforma deve ofer
 
 ---
 
-# 1.4 Requisitos Não Funcionais
+# Requisitos Não Funcionais
 
 Os requisitos não funcionais descrevem as características técnicas e de qualidade que a plataforma deve atender, independentemente das funcionalidades específicas.
 
@@ -156,7 +156,7 @@ Os requisitos não funcionais descrevem as características técnicas e de quali
 
 ---
 
-# 1.5 Restrições
+# Restrições
 
 As restrições definem as limitações que condicionam o desenvolvimento e a entrega da solução, independentemente das decisões técnicas da equipe.
 
