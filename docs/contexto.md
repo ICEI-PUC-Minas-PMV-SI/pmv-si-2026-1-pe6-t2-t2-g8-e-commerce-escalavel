@@ -489,12 +489,12 @@ Camada de Dados: PostgreSQL com schemas segregados por serviço.
 
 
 
-## Tecnologias Utilizadas
+# Tecnologias Utilizadas
 
 
 O projeto será desenvolvido utilizando um conjunto de tecnologias modernas para frontend, backend, banco de dados e mensageria, garantindo escalabilidade, desempenho e experiência de usuário de alta qualidade. 
 
-1. Linguagens de Programação 
+## 1. Linguagens de Programação 
 
   - JavaScript / TypeScript: Desenvolvimento do frontend com React, permitindo criação de interface web responsiva e interativa. 
 
@@ -508,7 +508,7 @@ O projeto será desenvolvido utilizando um conjunto de tecnologias modernas para
 
  ---
 
-2. Frameworks e Bibliotecas 
+## 2. Frameworks e Bibliotecas 
 
   - React – construção do frontend. 
   
