@@ -526,3 +526,37 @@ O projeto será desenvolvido utilizando um conjunto de tecnologias modernas para
 
     Docker
 
+## 3. Serviços Web e APIs
+
+- **APIs REST:** todos os serviços backend expõem endpoints REST para comunicação interna e com o frontend.
+- **API Gateway (Nginx):** responsável pelo roteamento, validação de tokens JWT e controle de CORS.
+
+## 4. Banco de Dados
+
+- **PostgreSQL:** banco relacional organizado em schemas separados por serviço, garantindo isolamento lógico e consistência.
+
+## 5. Ferramentas e IDEs
+
+- **Visual Studio / Visual Studio Code** – desenvolvimento de backend e frontend.  
+- **Postman / Insomnia** – testes de APIs REST.  
+- **Docker** – containerização dos serviços para facilitar deploy e testes.  
+- **Git / GitHub** – controle de versão.
+
+## 6. Fluxo de Interação do Usuário
+
+O fluxo de interação do usuário com o sistema segue o seguinte caminho:
+
+  1. O usuário acessa o **frontend React** (porta 3000).
+
+  2. As requisições são enviadas ao **API Gateway (Nginx)** (porta 8080), que valida o token JWT e roteia para o serviço correspondente:
+   - **UserService (5001)** → cadastro, login e perfil.  
+   - **CatalogService (5002)** → listagem e busca de produtos.  
+   - **OrderService (5004)** → criação e consulta de pedidos.
+
+  3. O **OrderService** orquestra os processos de:
+   - **StockService (5003)** → reserva e confirmação de estoque.  
+   - **PaymentService (5005)** → processamento de pagamento simulado.
+
+  4. Eventos gerados pelo **OrderService** são enviados para o **NotificationService** via **RabbitMQ** (5672 / 15672), que envia notificações por e-mail ao usuário.
+
+  5. A resposta final ao usuário é enviada ao **frontend**, que exibe informações atualizadas sobre produtos, pedidos e status de pagamento.
