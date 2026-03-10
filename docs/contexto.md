@@ -494,37 +494,35 @@ Camada de Dados: PostgreSQL com schemas segregados por serviço.
 
 O projeto será desenvolvido utilizando um conjunto de tecnologias modernas para frontend, backend, banco de dados e mensageria, garantindo escalabilidade, desempenho e experiência de usuário de alta qualidade. 
 
-<br>
+1. Linguagens de Programação 
 
-> 1. Linguagens de Programação 
+  - JavaScript / TypeScript: Desenvolvimento do frontend com React, permitindo criação de interface web responsiva e interativa. 
 
-  >> JavaScript / TypeScript: Desenvolvimento do frontend com React, permitindo criação de interface web responsiva e interativa. 
+  - C# (.NET): Backend de alguns serviços (ex.: UserService, OrderService), garantindo robustez e integração com APIs REST. 
 
-  >> C# (.NET): Backend de alguns serviços (ex.: UserService, OrderService), garantindo robustez e integração com APIs REST. 
+  - Node.js (JavaScript/TypeScript): Backend de serviços como CatalogService ou PaymentService, facilitando comunicação assíncrona e rápido desenvolvimento de APIs. 
 
-  >> Node.js (JavaScript/TypeScript): Backend de serviços como CatalogService ou PaymentService, facilitando comunicação assíncrona e rápido desenvolvimento de APIs. 
+  - Python: Serviço de worker NotificationService para processamento assíncrono de eventos via RabbitMQ. 
 
-  >> Python: Serviço de worker NotificationService para processamento assíncrono de eventos via RabbitMQ. 
+  - SQL (PostgreSQL): Persistência de dados, com schemas separados por serviço para isolamento lógico. 
 
-  >> SQL (PostgreSQL): Persistência de dados, com schemas separados por serviço para isolamento lógico. 
+ ---
 
-  <br>
+2. Frameworks e Bibliotecas 
 
-> 2. Frameworks e Bibliotecas 
-
-  >> React – construção do frontend. 
+  - React – construção do frontend. 
   
-  >> .NET Core – criação de APIs REST e lógica de negócios para backend. 
+  - .NET Core – criação de APIs REST e lógica de negócios para backend. 
   
-  >> Express.js – framework Node.js para desenvolvimento de APIs REST. 
+  - Express.js – framework Node.js para desenvolvimento de APIs REST. 
   
-  >> BCrypt – hash de senhas no UserService. 
+  - BCrypt – hash de senhas no UserService. 
   
-  >> JWT (JSON Web Token) – autenticação segura de usuários. 
+  - JWT (JSON Web Token) – autenticação segura de usuários. 
   
-  >> Axios / Fetch API – chamadas HTTP no frontend. 
+  - Axios / Fetch API – chamadas HTTP no frontend. 
 
-  >> RabbitMQ – mensageria assíncrona entre OrderService e NotificationService. 
+  - RabbitMQ – mensageria assíncrona entre OrderService e NotificationService. 
 
-  >> Docker
+  - Docker
 
