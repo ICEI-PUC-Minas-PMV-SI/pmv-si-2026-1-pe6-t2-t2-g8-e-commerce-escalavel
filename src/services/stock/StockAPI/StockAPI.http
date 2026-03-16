@@ -1,0 +1,11 @@
+@StockAPI_HostAddress = http://localhost:5003
+
+GET {{StockAPI_HostAddress}}/health
+Accept: application/json
+
+###
+
+GET {{StockAPI_HostAddress}}/stock
+Accept: application/json
+
+###
