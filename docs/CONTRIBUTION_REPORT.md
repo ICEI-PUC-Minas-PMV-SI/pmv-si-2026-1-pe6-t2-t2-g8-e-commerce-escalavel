@@ -1,57 +1,55 @@
 # 📊 Relatório de Contribuições do Projeto
 
-**Última atualização:** Aguardando primeira execução automática
+**Última atualização:** 16/03/2026 23:47
 
 ---
 
 ## 📈 Resumo Geral de Contribuições
 
-Este relatório é gerado automaticamente toda segunda-feira e rastreia as contribuições individuais de cada membro da equipe.
+| Aluno                 |   Commits |   Linhas+ |   Linhas- |   Arquivos |   Docs Commits |   Docs Arquivos |
+|-----------------------|-----------|-----------|-----------|------------|----------------|-----------------|
+| Carlos Morais         |         1 |         1 |        10 |          1 |              1 |               1 |
+| Dev-Vinicio           |         9 |       476 |       275 |          3 |              9 |               3 |
+| Hugo Freitas          |        12 |        73 |        26 |          7 |             11 |               5 |
+| João Gabriel Perez    |         2 |       666 |         5 |         12 |              1 |               1 |
+| Nicolas               |         3 |       412 |       212 |         20 |              1 |               1 |
+| gabrielcambraia       |         4 |        15 |        12 |          2 |              4 |               2 |
+| github-classroom[bot] |         1 |      2152 |         0 |         45 |              1 |              13 |
+| nicolaspborges96      |         9 |      1687 |       271 |         52 |              5 |               2 |
 
-| Aluno | Commits | Linhas+ | Linhas- | Arquivos | Docs Commits | Docs Arquivos |
-| --- | --- | --- | --- | --- | --- | --- |
-| _Aguardando dados..._ | - | - | - | - | - | - |
 
-## 📅 Contribuições Semanais 
+## 📅 Contribuições Semanais (Todo o Semestre)
 
-_Os dados semanais serão atualizados automaticamente após a primeira execução. O sistema rastreia as últimas 24 semanas (aproximadamente 6 meses = 1 semestre)._
+**2026-03-09**: Dev-Vinicio: 3, Hugo Freitas: 1, João Gabriel Perez: 2, nicolaspborges96: 4
+
+**2026-03-02**: Carlos Morais: 1, Dev-Vinicio: 4, Hugo Freitas: 3, Nicolas: 3, gabrielcambraia: 4, nicolaspborges96: 5
+
+**2026-02-23**: Dev-Vinicio: 2, Hugo Freitas: 8
+
+**2026-02-16**: github-classroom[bot]: 1
+
+
 
 ## 📊 Visualização Gráfica
 
-_Os gráficos serão gerados automaticamente após commits serem feitos no projeto._
+![Contribuições Semanais](img/contribution-weekly.png)
+
+
 
 ## ℹ️ Observações
 
 - **Commits**: Número total de commits realizados
+
 - **Linhas+**: Linhas de código adicionadas
+
 - **Linhas-**: Linhas de código removidas
+
 - **Arquivos**: Número de arquivos únicos modificados
+
 - **Docs Commits**: Commits em arquivos de documentação
+
 - **Docs Arquivos**: Arquivos de documentação modificados
 
-### Como funciona?
-
-O relatório de contribuições é atualizado automaticamente através de GitHub Actions:
-
-1. **Execução Automática**: Toda segunda-feira às 00:00 UTC
-2. **Execução Manual**: Pode ser executada manualmente na aba "Actions" do GitHub
-3. **Execução por Push**: Também executa quando há commits em `src/` ou `docs/`
-
-### Métricas Rastreadas
-
-- ✅ Commits por autor e por semana
-- ✅ Linhas de código adicionadas/removidas
-- ✅ Arquivos modificados
-- ✅ Contribuições específicas em documentação
-- ✅ Visualizações gráficas (linha e pizza)
-
-### Para Professores
-
-Este relatório facilita a avaliação individual dos alunos, mostrando:
-- Distribuição do trabalho entre os membros
-- Consistência de contribuições ao longo do tempo
-- Participação em documentação vs. código
-- Padrões de atividade semanal
 
 ---
 
