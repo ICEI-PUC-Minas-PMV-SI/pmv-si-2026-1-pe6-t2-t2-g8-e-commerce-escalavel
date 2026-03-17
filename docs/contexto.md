@@ -174,277 +174,78 @@ As restrições definem as limitações que condicionam o desenvolvimento e a en
 
 ## Visão Geral
 
-| Serviço | Tecnologia | Tipo | Porta |
-|--------|------------|------|------|
-| UserService | A definir | API REST | 5001 |
-| CatalogService |  | API REST | 5002 |
-| StockService |  | API REST | 5003 |
-| OrderService |  | API REST | 5004 |
-| PaymentService |  | API REST | 5005 |
-| NotificationService |  | Worker | — |
+No contexto de gestão de TI, o conjunto completo de serviços da organização compõe o Portfólio de Serviços. Esse portfólio inclui serviços em criação, em operação e serviços desativados (obsoletos). O Catálogo de Serviços é o recorte do portfólio que contém os serviços ativos e disponíveis para solicitação e uso pelos clientes internos e externos.
 
----
+Para este projeto, o catálogo abaixo representa os serviços de TI atualmente em operação no e-commerce distribuído, com foco no valor entregue ao negócio.
 
-# UserService
+| Serviço de TI | Status no Portfólio | Valor para o Negócio | Público Consumidor |
+|--------|--------|--------|--------|
+| UserService | Em operação | Gestão de identidade, autenticação e perfis de acesso | Clientes e administradores |
+| CatalogService | Em operação | Disponibilização e busca de produtos | Clientes e administradores |
+| StockService | Em operação | Controle de disponibilidade e reserva de itens | OrderService e administradores |
+| OrderService | Em operação | Orquestração do ciclo de compra | Clientes e administradores |
+| PaymentService | Em operação | Processamento de pagamentos e estornos | OrderService e administradores |
+| NotificationService | Em operação | Comunicação assíncrona de eventos com usuários | Serviços internos e clientes |
 
-Responsável por tudo que envolve identidade no sistema. É o único serviço que conhece as credenciais dos usuários e o único autorizado a emitir tokens JWT. Todos os demais serviços confiam na identidade que este serviço válida.
+## Descrição Detalhada dos Serviços
 
-## Responsabilidades:
+A seguir, os serviços são apresentados agrupados por domínio de negócio, detalhando suas responsabilidades, público consumidor e capacidades oferecidas.
 
-- Cadastrar novos usuários com validação de e-mail único e força de senha mínima.
-- Autenticar usuários comparando a senha com o hash BCrypt armazenado.
-- Gerar e assinar tokens JWT contendo userId, email, role e tempo de expiração.
-- Permitir consulta e atualização de dados de perfil.
-- Gerenciar dois níveis de acesso: customer e admin.
+### 1. Serviços de Identidade e Acesso
 
-## Schema do banco (schema: users):
+Serviços focados na segurança, autenticação e gestão de usuários da plataforma.
 
-```
-users
-├── id            UUID (PK)
-├── name          VARCHAR
-├── email         VARCHAR (único)
-├── password_hash VARCHAR
-├── role          ENUM (customer | admin)
-├── created_at    TIMESTAMP
-└── active        BOOLEAN
-```
+**Serviço de Gestão de Usuários e Autenticação (UserService)**
 
-## Endpoints
+- **O que faz:** Único serviço autorizado a validar identidades e emitir credenciais de acesso (tokens JWT). Gerencia o ciclo de vida das contas de clientes e administradores.
+- **Quem pode usar:** Frontend público (para cadastro e login) e aplicações autenticadas (para consulta e edição de perfil).
+- **Capacidades oferecidas:** Cadastro de novas contas, login, gestão de perfil (endereço, e-mail) e troca de senha.
 
-| Método | Rota | Descrição | Auth |
-|------|------|------|------|
-| POST | /auth/register | Cadastra usuário, retorna JWT | Não |
-| POST | /auth/login | Autentica, retorna JWT | Não |
-| GET | /users/{id} | Retorna dados do perfil | Sim |
-| PUT | /users/{id} | Atualiza nome, e-mail, endereço | Sim |
-| PUT | /users/{id}/password | Troca a senha | Sim |
-| DELETE | /users/{id} | Desativa a conta do usuário | Sim |
+### 2. Serviços de Vitrine e Exibição
 
----
+Serviços focados na entrega de conteúdo descritivo e comercial para o cliente final.
 
-# CatalogService
+**Serviço de Catálogo de Produtos (CatalogService)**
 
-Responsável por todos os dados descritivos dos produtos disponíveis na loja. Não tem conhecimento sobre disponibilidade de estoque — responde apenas perguntas sobre o que o produto é, como é descrito e qual seu preço.
+- **O que faz:** Fornece todas as informações descritivas dos produtos (fotos, preços, descrições) e a organização hierárquica da loja (categorias). Não lida com disponibilidade de estoque.
+- **Quem pode usar:** Frontend público (clientes navegando na loja) e Painel Administrativo (cadastradores de produtos).
+- **Capacidades oferecidas:** Busca de produtos, filtragem por categorias e preços, detalhamento de itens e gestão do portfólio de produtos (CRUD).
 
-## Responsabilidades:
+### 3. Serviços de Operação de Vendas e Orquestração
 
-- Manter o cadastro de produtos com nome, descrição, preço e imagem.
-- Organizar produtos em categorias hierárquicas.
-- Permitir busca e filtragem por nome, categoria e faixa de preço.
-- Permitir que administradores cadastrem, editem e removam produtos e categorias.
+Serviços responsáveis por coordenar a jornada de compra e garantir a consistência das regras de negócio.
 
-## Endpoints:
+**Serviço de Gestão de Pedidos (OrderService)**
 
-| Método | Rota | Descrição | Auth |
-|------|------|------|------|
-| GET | /products | Lista produtos com filtros opcionais | Não |
-| GET | /products/{id} | Detalhe de um produto | Não |
-| POST | /products | Cadastra novo produto | Admin |
-| PUT | /products/{id} | Atualiza produto existente | Admin |
-| DELETE | /products/{id} | Remove produto (soft delete) | Admin |
-| GET | /categories | Lista todas as categorias | Não |
-| POST | /categories | Cadastra nova categoria | Admin |
+- **O que faz:** É o serviço orquestrador do sistema de vendas. Transforma o carrinho do cliente em um pedido formal e coordena as comunicações com estoque e pagamento para concluir a venda.
+- **Quem pode usar:** Frontend (clientes autenticados realizando checkout) e Painel Administrativo.
+- **Capacidades oferecidas:** Criação de novos pedidos, consulta de histórico de compras, acompanhamento de status do pedido e cancelamento.
 
-## Schema do banco (schema: catalog):
+**Serviço de Controle de Estoque (StockService)**
 
-```
-products
-├── id          UUID (PK)
-├── name        VARCHAR
-├── description TEXT
-├── price       DECIMAL
-├── category_id UUID (FK)
-├── image_url   VARCHAR
-├── active      BOOLEAN
-└── created_at  TIMESTAMP
+- **O que faz:** Guardião da disponibilidade física dos itens. Evita vendas duplicadas por meio de um sistema de reservas temporárias atreladas aos pedidos em andamento.
+- **Quem pode usar:** Sistema interno (acionado majoritariamente pelo OrderService) e Painel Administrativo (para auditoria e reposição).
+- **Capacidades oferecidas:** Consulta de saldo disponível, reserva de itens, confirmação de baixa de estoque e liberação de itens (quando vendas falham).
 
-categories
-├── id   UUID (PK)
-└── name VARCHAR
-```
+### 4. Serviços Financeiros
 
----
+Serviços dedicados ao processamento monetário e comunicação com gateways de pagamento.
 
-# StockService
+**Serviço de Processamento de Pagamentos (PaymentService)**
 
-Guardião da quantidade disponível de cada produto. Trabalha com o conceito de reserva temporária: ao iniciar um pedido, unidades são reservadas mas não baixadas definitivamente — a baixa só ocorre após confirmação de pagamento, garantindo consistência transacional.
+- **O que faz:** Centraliza as requisições de cobrança, simulando a aprovação ou recusa de transações financeiras referentes aos pedidos.
+- **Quem pode usar:** Sistema interno (acionado pelo OrderService) e Painel Administrativo (para estornos).
+- **Capacidades oferecidas:** Processamento de pagamentos, consulta de status transacional e solicitação de estorno.
 
-## Responsabilidades:
+### 5. Serviços de Relacionamento e Mensageria
 
-- Informar a quantidade disponível de qualquer produto.
-- Reservar unidades quando um pedido é iniciado, prevenindo venda duplicada.
-- Liberar reservas em caso de cancelamento ou falha no pagamento.
-- Confirmar a baixa definitiva de estoque após pagamento aprovado.
-- Registrar o histórico completo de movimentações para auditoria.
+Serviços focados em manter o cliente final informado sobre suas interações com a plataforma.
 
-## Endpoints:
+**Serviço de Notificação ao Cliente (NotificationService)**
 
-| Método | Rota | Descrição | Auth |
-|------|------|------|------|
-| GET | /stock/{productId} | Quantidade disponível | Não |
-| POST | /stock/{productId} | Define estoque inicial | Admin |
-| PUT | /stock/{productId}/reserve | Reserva unidades (pedido) | Sim |
-| PUT | /stock/{productId}/release | Libera reserva (cancelamento) | Sim |
-| PUT | /stock/{productId}/confirm | Baixa definitiva (pós pagto.) | Sim |
-| GET | /stock/{productId}/history | Histórico de movimentações | Admin |
-
-## Schema do banco (schema: stock):
-
-```
-stock_items
-├── id                 UUID (PK)
-├── product_id         UUID (único)
-├── quantity_available INTEGER
-└── quantity_reserved  INTEGER
-
-stock_movements
-├── id         UUID (PK)
-├── product_id UUID (FK)
-├── order_id   UUID
-├── type       ENUM (reserve | release | confirm | restock)
-├── quantity   INTEGER
-└── created_at TIMESTAMP
-```
-
----
-
-# OrderService
-
-É o serviço central e orquestrador do sistema. Coordena o fluxo de compra chamando StockService, PaymentService e publicando eventos no RabbitMQ para o NotificationService. Mantém o ciclo de vida completo dos pedidos.
-
-## Responsabilidades:
-
-- Criar pedidos a partir dos itens enviados pelo frontend.
-- Orquestrar o fluxo: verificar estoque, processar pagamento, confirmar ou cancelar.
-- Manter o histórico de pedidos e seus status ao longo do tempo.
-- Publicar eventos no RabbitMQ para notificação assíncrona do usuário.
-- Permitir cancelamento de pedidos ainda pendentes.
-
-## Endpoints:
-
-| Método | Rota | Descrição | Auth |
-|------|------|------|------|
-| POST | /orders | Cria novo pedido | Sim |
-| GET | /orders/{id} | Detalhe do pedido | Sim |
-| GET | /orders/user/{userId} | Pedidos do usuário autenticado | Sim |
-| PUT | /orders/{id}/cancel | Cancela pedido pendente | Sim |
-| GET | /orders | Lista todos os pedidos | Admin |
-
-## Schema do banco (schema: orders):
-
-```
-orders
-├── id           UUID (PK)
-├── user_id      UUID
-├── status       ENUM (draft|pending|confirmed|cancelled|failed)
-├── total_amount DECIMAL
-└── created_at   TIMESTAMP
-
-order_items
-├── id           UUID (PK)
-├── order_id     UUID (FK)
-├── product_id   UUID
-├── product_name VARCHAR
-├── unit_price   DECIMAL
-└── quantity     INTEGER
-```
-
-## Fluxo interno de criação de pedido:
-
-1. Cria pedido com status 'draft'
-2. Para cada item: chama StockService → reserva estoque
-3. Se estoque insuficiente: cancela tudo, retorna erro 422
-4. Muda status para 'pending'
-5. Chama PaymentService
-6a. Aprovado: status 'confirmed' + StockService/confirm + publica ORDER_CONFIRMED
-6b. Recusado: status 'failed'  + StockService/release  + publica PAYMENT_REFUSED
-
----
-
-# PaymentService
-
-Responsável por processar transações financeiras. No contexto deste projeto, simula a integração com um gateway de pagamento externo, retornando o resultado da transação sem comunicação real com operadoras de pagamento.
-
-## Responsabilidades:
-
-- Receber solicitações de pagamento com valor e identificação do pedido.
-- Simular o processamento e retornar o status da transação.
-- Registrar todas as transações com seu resultado para histórico e auditoria.
-- Permitir solicitação de estorno por administradores.
-
-## Endpoints:
-
-| Método | Rota | Descrição | Auth |
-|------|------|------|------|
-| POST | /payments | Processa pagamento de um pedido | Sim |
-| GET | /payments/{orderId} | Consulta status do pagamento | Sim |
-| POST | /payments/{id}/refund | Solicita estorno | Admin |
-
-## Schema do banco (schema: payments):
-
-```
-payments
-├── id             UUID (PK)
-├── order_id       UUID (único)
-├── amount         DECIMAL
-├── status         ENUM (pending | approved | refused | refunded)
-├── transaction_id VARCHAR
-└── created_at     TIMESTAMP
-```
-
----
-
-# NotificationService (Worker)
-
-Diferentemente dos demais serviços, o NotificationService não é uma API REST — é um worker assíncrono que fica em execução contínua escutando filas do RabbitMQ. Ao receber um evento, monta e envia a notificação adequada ao usuário sem bloquear nenhum outro serviço.
-
-## Responsabilidades:
-
-- Escutar continuamente as filas do RabbitMQ aguardando eventos do OrderService.
-- Identificar o tipo de evento e montar a mensagem correspondente.
-- Enviar notificação por e-mail (via SendGrid ou simulado) ao usuário afetado.
-- Registrar o histórico de notificações enviadas, incluindo falhas.
-- Tentar reenvio automático em caso de falha (até 3 tentativas).
-
-## Eventos consumidos da fila RabbitMQ:
-
-| Evento | Publicado por | Ação do NotificationService |
-|------|------|------|
-| ORDER_CONFIRMED | OrderService | Envia e-mail: pedido confirmado com resumo dos itens |
-| PAYMENT_REFUSED | OrderService | Envia e-mail: falha no pagamento, sugere nova tentativa |
-| ORDER_CANCELLED | OrderService | Envia e-mail: pedido cancelado com motivo |
-
-## Schema do banco (schema: notifications):
-
-```
-notifications
-├── id         UUID (PK)
-├── user_id    UUID
-├── order_id   UUID
-├── type       VARCHAR (ORDER_CONFIRMED | PAYMENT_REFUSED | ORDER_CANCELLED)
-├── message    TEXT
-├── status     ENUM (sent | failed)
-└── sent_at    TIMESTAMP
-```
-
----
-
-# Diagrama de Comunicação entre Serviços
-
-O único serviço que chama outros serviços diretamente é o OrderService, que age como orquestrador. Todos os demais são independentes e não se conhecem entre si.
-
-```
-Frontend (React)
-  └─► API Gateway (Nginx)
-        ├─► UserService    ← login, cadastro, perfil
-        ├─► CatalogService ← listagem e busca de produtos
-        └─► OrderService   ← criação e consulta de pedidos
-              ├─► StockService    (reserva / libera / confirma estoque)
-              ├─► PaymentService  (processa transação)
-              └─► RabbitMQ        (publica evento)
-                      └─► NotificationService (envia e-mail)
-```
+- **O que faz:** Opera de forma assíncrona, consumindo filas de eventos para disparar comunicações transacionais (e-mails) sem impactar a performance da loja.
+- **Quem pode usar:** Consome eventos gerados automaticamente pelo sistema via RabbitMQ.
+- **Capacidades oferecidas:** Disparo de e-mails de confirmação de pedido, falha no pagamento e cancelamento de pedido.
 
 ---
 
