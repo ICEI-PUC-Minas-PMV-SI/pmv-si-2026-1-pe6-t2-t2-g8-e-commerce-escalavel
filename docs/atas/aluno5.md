@@ -8,7 +8,7 @@
 | 16/02 - 22/02 | Gestão de Serviços de TI - Unidade 2 | ✅ | Organização do grupo e planejamento | Organização do grupo e planejamento |
 | 23/02 - 01/03 | Arquitetura de Software Distribuído - Unidade 1 e 2 | ✅ | Planejamento da Arquitetura do Sistema | Planejamento da Arquitetura do Sistema |
 | 02/03 - 08/03 | Arquitetura de Software Distribuído - Unidade 3 | ✅ |Atualização do conjunto de tecnologias utilizadas  | Atualização do conjunto de tecnologias utilizadas |
-| 09/03 - 15/03 | APIs e Web Services - Unidade 1 | ⬜ |  |  |
+| 09/03 - 15/03 | APIs e Web Services - Unidade 1 | ✅ | Estudar Microfundamento para elaborar API de integração do UserService | Estudo dos microfundamentos |
 | 16/03 - 22/03 | APIs e Web Services - Unidade 2 | ⬜ |  |  |
 | 23/03 - 29/03 | APIs e Web Services - Unidade 2 | ⬜ |  |  |
 | 30/03 - 05/04 | Recuperação de Informação na Web e Redes Sociais - Unidade 1 | ⬜ |  |  |
