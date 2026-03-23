@@ -408,4 +408,4 @@ Frontend (React)
                       └─► NotificationService (envia e-mail)
 ```
 
----
+---oblig

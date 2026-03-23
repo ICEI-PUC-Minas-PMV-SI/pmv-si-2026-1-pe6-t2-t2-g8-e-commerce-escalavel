@@ -45,7 +45,7 @@ services:
       stockapi:
         condition: service_healthy
     healthcheck:
-      test: ["CMD-SHELL", "wget -qO- http://localhost/api/auth/ || true"]
+      test: ["CMD-SHELL", "wget -qO- http://localhost/gateway/health >/dev/null 2>&1 || exit 1"]
       interval: 15s
       timeout: 5s
       retries: 3
