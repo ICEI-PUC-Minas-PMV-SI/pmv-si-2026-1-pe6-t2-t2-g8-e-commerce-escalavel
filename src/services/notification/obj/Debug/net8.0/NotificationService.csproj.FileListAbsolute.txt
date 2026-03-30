@@ -1,0 +1,6 @@
+C:\Users\Nicolas\Documents\Repos\Ecom\pmv-si-2026-1-pe6-t2-t2-g8-e-commerce-escalavel\src\services\notification\obj\Debug\net8.0\NotificationService.csproj.AssemblyReference.cache
+C:\Users\Nicolas\Documents\Repos\Ecom\pmv-si-2026-1-pe6-t2-t2-g8-e-commerce-escalavel\src\services\notification\obj\Debug\net8.0\NotificationService.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Nicolas\Documents\Repos\Ecom\pmv-si-2026-1-pe6-t2-t2-g8-e-commerce-escalavel\src\services\notification\obj\Debug\net8.0\NotificationService.AssemblyInfoInputs.cache
+C:\Users\Nicolas\Documents\Repos\Ecom\pmv-si-2026-1-pe6-t2-t2-g8-e-commerce-escalavel\src\services\notification\obj\Debug\net8.0\NotificationService.AssemblyInfo.cs
+C:\Users\Nicolas\Documents\Repos\Ecom\pmv-si-2026-1-pe6-t2-t2-g8-e-commerce-escalavel\src\services\notification\obj\Debug\net8.0\NotificationService.csproj.CoreCompileInputs.cache
+C:\Users\Nicolas\Documents\Repos\Ecom\pmv-si-2026-1-pe6-t2-t2-g8-e-commerce-escalavel\src\services\notification\obj\Debug\net8.0\NotificationService.sourcelink.json
