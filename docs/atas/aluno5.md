@@ -9,8 +9,8 @@
 | 23/02 - 01/03 | Arquitetura de Software Distribuído - Unidade 1 e 2 | ✅ | Planejamento da Arquitetura do Sistema | Planejamento da Arquitetura do Sistema |
 | 02/03 - 08/03 | Arquitetura de Software Distribuído - Unidade 3 | ✅ |Atualização do conjunto de tecnologias utilizadas  | Atualização do conjunto de tecnologias utilizadas |
 | 09/03 - 15/03 | APIs e Web Services - Unidade 1 | ✅ | Estudar Microfundamento para elaborar API de integração do UserService | Estudo dos microfundamentos |
-| 16/03 - 22/03 | APIs e Web Services - Unidade 2 | ⬜ |  |  |
-| 23/03 - 29/03 | APIs e Web Services - Unidade 2 | ⬜ |  |  |
+| 16/03 - 22/03 | APIs e Web Services - Unidade 2 | ✅ | Estudar Microfundamento para elaborar API de integração do UserService | Estudo dos microfundamentos |
+| 23/03 - 29/03 | APIs e Web Services - Unidade 2 | ✅ | Criação da API de Integração: Users – Criação e Gerenciamento de Usuários | Desenvolvimento |
 | 30/03 - 05/04 | Recuperação de Informação na Web e Redes Sociais - Unidade 1 | ⬜ |  |  |
 | 06/04 - 12/04 | Recuperação de Informação na Web e Redes Sociais - Unidade 2 | ⬜ |  |  |
 | 13/04 - 19/04 | Computação Ubíqua e Pervasiva e IoT - Unidade 1 | ⬜ |  |  |
