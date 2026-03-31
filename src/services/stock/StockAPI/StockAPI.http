@@ -1,4 +1,7 @@
 @StockAPI_HostAddress = http://localhost:5003
+@productId = REPLACE-WITH-CREATED-PRODUCT-ID
+@orderId = 22222222-2222-2222-2222-222222222222
+@unknownProductId = 99999999-9999-9999-9999-999999999999
 
 GET {{StockAPI_HostAddress}}/health
 Accept: application/json
@@ -7,5 +10,79 @@ Accept: application/json
 
 GET {{StockAPI_HostAddress}}/stock
 Accept: application/json
+
+###
+
+POST {{StockAPI_HostAddress}}/stock
+Content-Type: application/json
+
+{
+	"initialQuantity": 20
+}
+
+###
+
+GET {{StockAPI_HostAddress}}/stock/{{productId}}
+Accept: application/json
+
+###
+
+PUT {{StockAPI_HostAddress}}/stock/{{productId}}/reserve
+Content-Type: application/json
+
+{
+	"orderId": "{{orderId}}",
+	"quantity": 5
+}
+
+###
+
+PUT {{StockAPI_HostAddress}}/stock/{{productId}}/reserve
+Content-Type: application/json
+
+{
+	"orderId": "{{orderId}}",
+	"quantity": 999
+}
+
+###
+
+PUT {{StockAPI_HostAddress}}/stock/{{productId}}/release
+Content-Type: application/json
+
+{
+	"orderId": "{{orderId}}",
+	"quantity": 2
+}
+
+###
+
+PUT {{StockAPI_HostAddress}}/stock/{{productId}}/confirm
+Content-Type: application/json
+
+{
+	"orderId": "{{orderId}}",
+	"quantity": 2
+}
+
+###
+
+GET {{StockAPI_HostAddress}}/stock/{{productId}}/history
+Accept: application/json
+
+###
+
+GET {{StockAPI_HostAddress}}/stock/{{unknownProductId}}
+Accept: application/json
+
+###
+
+PUT {{StockAPI_HostAddress}}/stock/{{unknownProductId}}/reserve
+Content-Type: application/json
+
+{
+	"orderId": "{{orderId}}",
+	"quantity": 1
+}
 
 ###

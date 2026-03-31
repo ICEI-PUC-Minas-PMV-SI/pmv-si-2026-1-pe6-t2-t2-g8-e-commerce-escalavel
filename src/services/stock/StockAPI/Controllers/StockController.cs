@@ -16,6 +16,13 @@ public class StockController : ControllerBase
         _stockService = stockService;
     }
 
+    [HttpGet]
+    public async Task<IActionResult> GetAllStocks()
+    {
+        var result = await _stockService.GetAllAsync();
+        return Ok(result);
+    }
+
     [HttpGet("{productId:guid}")]
     public async Task<IActionResult> GetStock(Guid productId)
     {
@@ -23,18 +30,11 @@ public class StockController : ControllerBase
         return result is null ? NotFound() : Ok(result);
     }
 
-    [HttpPost("{productId:guid}")]
-    public async Task<IActionResult> CreateStock(Guid productId, [FromBody] CreateStockRequest request)
+    [HttpPost]
+    public async Task<IActionResult> CreateStock([FromBody] CreateStockRequest request)
     {
-        try
-        {
-            var result = await _stockService.CreateAsync(productId, request);
-            return CreatedAtAction(nameof(GetStock), new { productId }, result);
-        }
-        catch (StockAlreadyExistsException ex)
-        {
-            return Conflict(new { error = ex.Message });
-        }
+        var result = await _stockService.CreateAsync(request);
+        return CreatedAtAction(nameof(GetStock), new { productId = result.ProductId }, result);
     }
 
     [HttpPut("{productId:guid}/reserve")]
@@ -44,6 +44,10 @@ public class StockController : ControllerBase
         {
             var result = await _stockService.ReserveAsync(productId, request);
             return Ok(result);
+        }
+        catch (StockConcurrencyException ex)
+        {
+            return Conflict(new { error = ex.Message });
         }
         catch (StockNotFoundException)
         {
@@ -63,6 +67,10 @@ public class StockController : ControllerBase
             var result = await _stockService.ReleaseAsync(productId, request);
             return Ok(result);
         }
+        catch (StockConcurrencyException ex)
+        {
+            return Conflict(new { error = ex.Message });
+        }
         catch (StockNotFoundException)
         {
             return NotFound();
@@ -80,6 +88,10 @@ public class StockController : ControllerBase
         {
             var result = await _stockService.ConfirmAsync(productId, request);
             return Ok(result);
+        }
+        catch (StockConcurrencyException ex)
+        {
+            return Conflict(new { error = ex.Message });
         }
         catch (StockNotFoundException)
         {

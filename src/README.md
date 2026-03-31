@@ -245,7 +245,7 @@ Guardião da quantidade disponível de cada produto. Trabalha com o conceito de 
 | Método | Rota | Descrição | Auth |
 |------|------|------|------|
 | GET | /stock/{productId} | Quantidade disponível | Não |
-| POST | /stock/{productId} | Define estoque inicial | Admin |
+| POST | /stock | Define estoque inicial (productId gerado pelo banco) | Admin |
 | PUT | /stock/{productId}/reserve | Reserva unidades (pedido) | Sim |
 | PUT | /stock/{productId}/release | Libera reserva (cancelamento) | Sim |
 | PUT | /stock/{productId}/confirm | Baixa definitiva (pós pagto.) | Sim |

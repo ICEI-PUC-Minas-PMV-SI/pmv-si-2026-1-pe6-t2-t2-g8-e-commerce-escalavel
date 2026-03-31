@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using StockAPI.Domain.Exceptions;
 
 namespace StockAPI.Models;
@@ -9,12 +10,14 @@ public class StockItem
     public int QuantityAvailable { get; set; }
     public int QuantityReserved { get; set; }
 
-    public static StockItem Create(Guid productId, int initialQuantity)
+    [Timestamp]
+    public byte[] RowVersion { get; set; } = Array.Empty<byte>();
+
+    public static StockItem Create(int initialQuantity)
     {
         var item = new StockItem
         {
             Id = Guid.NewGuid(),
-            ProductId = productId,
             QuantityAvailable = initialQuantity,
             QuantityReserved = 0
         };

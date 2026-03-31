@@ -19,7 +19,14 @@ public class StockDbContext : DbContext
             e.ToTable("stock_items");
             e.HasKey(x => x.Id);
             e.HasIndex(x => x.ProductId).IsUnique();
-            e.Property(x => x.ProductId).IsRequired();
+            e.Property(x => x.ProductId)
+                .IsRequired()
+                .ValueGeneratedOnAdd()
+                .HasDefaultValueSql("gen_random_uuid()");
+            e.Property(x => x.RowVersion)
+                .HasColumnName("row_version")
+                .IsRowVersion()
+                .IsConcurrencyToken();
         });
 
         modelBuilder.Entity<StockMovement>(e =>

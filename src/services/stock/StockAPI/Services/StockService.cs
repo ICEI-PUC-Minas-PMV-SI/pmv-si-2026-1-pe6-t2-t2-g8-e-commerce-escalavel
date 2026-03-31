@@ -9,10 +9,25 @@ namespace StockAPI.Services;
 public class StockService : IStockService
 {
     private readonly StockDbContext _db;
+    private readonly ILogger<StockService> _logger;
 
-    public StockService(StockDbContext db)
+    public StockService(StockDbContext db, ILogger<StockService> logger)
     {
         _db = db;
+        _logger = logger;
+    }
+
+    public async Task<IEnumerable<StockItemResponse>> GetAllAsync()
+    {
+        return await _db.StockItems
+            .AsNoTracking()
+            .OrderBy(x => x.ProductId)
+            .Select(x => new StockItemResponse(
+                x.ProductId,
+                x.QuantityAvailable,
+                x.QuantityReserved
+            ))
+            .ToListAsync();
     }
 
     public async Task<StockItemResponse?> GetByProductIdAsync(Guid productId)
@@ -24,19 +39,25 @@ public class StockService : IStockService
         return item is null ? null : ToResponse(item);
     }
 
-    public async Task<StockItemResponse> CreateAsync(Guid productId, CreateStockRequest request)
+    public async Task<StockItemResponse> CreateAsync(CreateStockRequest request)
     {
-        var exists = await _db.StockItems.AnyAsync(x => x.ProductId == productId);
-        if (exists)
-            throw new StockAlreadyExistsException(productId);
+        var item = StockItem.Create(request.InitialQuantity);
 
-        var item = StockItem.Create(productId, request.InitialQuantity);
+        await using var transaction = await _db.Database.BeginTransactionAsync();
 
         _db.StockItems.Add(item);
+        await _db.SaveChangesAsync();
 
-        _db.StockMovements.Add(CreateStockMovement(productId, null, MovementType.Restock, request.InitialQuantity));
+        _db.StockMovements.Add(CreateStockMovement(item.ProductId, null, MovementType.Restock, request.InitialQuantity));
 
         await _db.SaveChangesAsync();
+        await transaction.CommitAsync();
+
+        _logger.LogInformation(
+            "Stock created for ProductId={ProductId} with InitialQuantity={InitialQuantity}",
+            item.ProductId,
+            request.InitialQuantity);
+
         return ToResponse(item);
     }
 
@@ -47,7 +68,15 @@ public class StockService : IStockService
 
         _db.StockMovements.Add(CreateStockMovement(productId, request.OrderId, MovementType.Reserve, request.Quantity));
 
-        await _db.SaveChangesAsync();
+        await SaveChangesWithConcurrencyHandlingAsync(productId);
+        _logger.LogInformation(
+            "Stock reserved for ProductId={ProductId}, OrderId={OrderId}, Quantity={Quantity}, Available={Available}, Reserved={Reserved}",
+            productId,
+            request.OrderId,
+            request.Quantity,
+            item.QuantityAvailable,
+            item.QuantityReserved);
+
         return ToResponse(item);
     }
 
@@ -58,7 +87,15 @@ public class StockService : IStockService
 
         _db.StockMovements.Add(CreateStockMovement(productId, request.OrderId, MovementType.Release, request.Quantity));
 
-        await _db.SaveChangesAsync();
+        await SaveChangesWithConcurrencyHandlingAsync(productId);
+        _logger.LogInformation(
+            "Stock released for ProductId={ProductId}, OrderId={OrderId}, Quantity={Quantity}, Available={Available}, Reserved={Reserved}",
+            productId,
+            request.OrderId,
+            request.Quantity,
+            item.QuantityAvailable,
+            item.QuantityReserved);
+
         return ToResponse(item);
     }
 
@@ -69,7 +106,15 @@ public class StockService : IStockService
 
         _db.StockMovements.Add(CreateStockMovement(productId, request.OrderId, MovementType.Confirm, request.Quantity));
 
-        await _db.SaveChangesAsync();
+        await SaveChangesWithConcurrencyHandlingAsync(productId);
+        _logger.LogInformation(
+            "Stock confirmed for ProductId={ProductId}, OrderId={OrderId}, Quantity={Quantity}, Available={Available}, Reserved={Reserved}",
+            productId,
+            request.OrderId,
+            request.Quantity,
+            item.QuantityAvailable,
+            item.QuantityReserved);
+
         return ToResponse(item);
     }
 
@@ -98,6 +143,22 @@ public class StockService : IStockService
     {
         return await _db.StockItems.FirstOrDefaultAsync(x => x.ProductId == productId)
             ?? throw new StockNotFoundException(productId);
+    }
+
+    private async Task SaveChangesWithConcurrencyHandlingAsync(Guid productId)
+    {
+        try
+        {
+            await _db.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException ex)
+        {
+            _logger.LogWarning(
+                ex,
+                "Concurrency conflict while updating stock for ProductId={ProductId}",
+                productId);
+            throw new StockConcurrencyException(productId);
+        }
     }
 
     private static StockItemResponse ToResponse(StockItem item)
