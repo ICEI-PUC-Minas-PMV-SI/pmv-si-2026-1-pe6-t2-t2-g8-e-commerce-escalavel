@@ -1,6 +1,6 @@
 # 📊 Relatório de Contribuições do Projeto
 
-**Última atualização:** 30/03/2026 14:26
+**Última atualização:** 31/03/2026 00:30
 
 ---
 
@@ -15,24 +15,24 @@
 | Nicolas               |         4 |      5243 |       212 |         25 |              1 |               1 |
 | Vitor Linas           |         8 |       138 |        72 |          5 |              2 |               1 |
 | gabrielcambraia       |         4 |        15 |        12 |          2 |              4 |               2 |
-| github-actions[bot]   |        14 |       110 |       106 |          3 |             14 |               1 |
+| github-actions[bot]   |        15 |       114 |       110 |          3 |             15 |               1 |
 | github-classroom[bot] |         1 |      2152 |         0 |         45 |              1 |              13 |
-| nicolaspborges96      |        14 |      7337 |       542 |         73 |              7 |               2 |
+| nicolaspborges96      |        17 |      9793 |       605 |        100 |              9 |               2 |
 
 
 ## 📅 Contribuições Semanais (Todo o Semestre)
 
-**2026-03-23**: Dev-Vinicio: 2, Nicolas: 1, Vitor Linas: 8, github-actions[bot]: 10, nicolaspborges96: 3
+**2026-03-24**: Dev-Vinicio: 2, Nicolas: 1, Vitor Linas: 8, github-actions[bot]: 10, nicolaspborges96: 5
 
-**2026-03-16**: Dev-Vinicio: 1, Hugo Freitas: 1, github-actions[bot]: 4, nicolaspborges96: 3
+**2026-03-17**: github-actions[bot]: 3, nicolaspborges96: 3
 
-**2026-03-09**: Dev-Vinicio: 3, João Gabriel Perez: 2, nicolaspborges96: 3
+**2026-03-10**: Dev-Vinicio: 4, Hugo Freitas: 1, João Gabriel Perez: 2, github-actions[bot]: 2, nicolaspborges96: 4
 
-**2026-03-02**: Carlos Morais: 1, Dev-Vinicio: 6, Hugo Freitas: 3, Nicolas: 3, gabrielcambraia: 4, nicolaspborges96: 5
+**2026-03-03**: Carlos Morais: 1, Dev-Vinicio: 4, Hugo Freitas: 3, Nicolas: 3, gabrielcambraia: 4, nicolaspborges96: 5
 
-**2026-02-23**: Hugo Freitas: 8
+**2026-02-24**: Dev-Vinicio: 2, Hugo Freitas: 8
 
-**2026-02-16**: github-classroom[bot]: 1
+**2026-02-17**: github-classroom[bot]: 1
 
 
 
