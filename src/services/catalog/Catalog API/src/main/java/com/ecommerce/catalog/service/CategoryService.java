@@ -2,11 +2,12 @@ package com.ecommerce.catalog.service;
 
 import com.ecommerce.catalog.model.Category;
 import com.ecommerce.catalog.repository.CategoryRepository;
+import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
+@Service
 public class CategoryService {
     private final CategoryRepository categoryRepository;
 

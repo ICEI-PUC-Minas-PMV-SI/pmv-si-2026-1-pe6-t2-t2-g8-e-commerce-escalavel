@@ -2,10 +2,12 @@ package com.ecommerce.catalog.service;
 
 import com.ecommerce.catalog.model.Product;
 import com.ecommerce.catalog.repository.ProductRepository;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.UUID;
 
+@Service
 public class ProductService {
     private final ProductRepository productRepository;
 
