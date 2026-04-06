@@ -1,13 +1,14 @@
-# ATA de Acompanhamento - Nome completo do aluno 2
+
+# ATA de Acompanhamento - Carlos Alberto Morais Junior
 
 ## Registro de Atividades Semanais
 
 | Período | Microfundamento | Estudou? | Atividade Prevista | Atividade Realizada |
 |:-------:|:---------------:|:--------:|:------------------:|:-------------------:|
-| 09/02 - 15/02 | Gestão de Serviços de TI - Unidade 1 | ⬜ |  |  |
-| 16/02 - 22/02 | Gestão de Serviços de TI - Unidade 2 | ⬜ |  |  |
-| 23/02 - 01/03 | Arquitetura de Software Distribuído - Unidade 1 e 2 | ⬜ |  |  |
-| 02/03 - 08/03 | Arquitetura de Software Distribuído - Unidade 3 | ⬜ |  |  |
+| 09/02 - 15/02 | Gestão de Serviços de TI - Unidade 1 | ✅ | Reunião Inicial | Participou da Reunião Inicial |
+| 16/02 - 22/02 | Gestão de Serviços de TI - Unidade 2 | ✅ | Seleção de tema e escolha de grupos | Participou nas conversas de seleção de tema |
+| 23/02 - 01/03 | Arquitetura de Software Distribuído - Unidade 1 e 2 | ✅ | Atualizar a seção "Problema" na documentação do projeto | Seção "Problema" na documentação do projeto Atualizada |
+| 02/03 - 08/03 | Arquitetura de Software Distribuído - Unidade 3 | ✅ | Atualizar a seção "Problema" na documentação do projeto | Seção "Problema" na documentação do projeto Atualizada |
 | 09/03 - 15/03 | APIs e Web Services - Unidade 1 | ⬜ |  |  |
 | 16/03 - 22/03 | APIs e Web Services - Unidade 2 | ⬜ |  |  |
 | 23/03 - 29/03 | APIs e Web Services - Unidade 2 | ⬜ |  |  |
