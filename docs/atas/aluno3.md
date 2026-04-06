@@ -11,7 +11,7 @@
 | 09/03 - 15/03 | APIs e Web Services - Unidade 1 | ✅ | Definição dos microserviços e separação dos mesmos | Definição dos microserviços e separação dos mesmos |
 | 16/03 - 22/03 | APIs e Web Services - Unidade 2 | ✅ | Estudos microfundamentos | Estudos microfundamentos  |
 | 23/03 - 29/03 | APIs e Web Services - Unidade 2 | ✅ | Implementação da API de catálogos | Implementação da API de catálogos |
-| 30/03 - 05/04 | Recuperação de Informação na Web e Redes Sociais - Unidade 1 | ✅ | Testes e ajustes APIs  | Testes e ajustes APIs |
+| 30/03 - 05/04 | Recuperação de Informação na Web e Redes Sociais - Unidade 1 | ✅ | Testes e ajustes API catálogo  | Testes e ajustes API catálogo |
 | 06/04 - 12/04 | Recuperação de Informação na Web e Redes Sociais - Unidade 2 | ⬜ |  |  |
 | 13/04 - 19/04 | Computação Ubíqua e Pervasiva e IoT - Unidade 1 | ⬜ |  |  |
 | 20/04 - 26/04 | Computação Ubíqua e Pervasiva e IoT - Unidade 2 | ⬜ |  |  |
