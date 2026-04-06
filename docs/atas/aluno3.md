@@ -4,14 +4,14 @@
 
 | Período | Microfundamento | Estudou? | Atividade Prevista | Atividade Realizada |
 |:-------:|:---------------:|:--------:|:------------------:|:-------------------:|
-| 09/02 - 15/02 | Gestão de Serviços de TI - Unidade 1 | ✅ |  |  |
-| 16/02 - 22/02 | Gestão de Serviços de TI - Unidade 2 | ✅ |  |  |
-| 23/02 - 01/03 | Arquitetura de Software Distribuído - Unidade 1 e 2 | ✅ |  |  |
-| 02/03 - 08/03 | Arquitetura de Software Distribuído - Unidade 3 | ✅ | Concluir a parte de objetivos do projeto | Conclusão da parte de objetivos do projeto|
-| 09/03 - 15/03 | APIs e Web Services - Unidade 1 | ⬜ |  |  |
-| 16/03 - 22/03 | APIs e Web Services - Unidade 2 | ⬜ |  |  |
-| 23/03 - 29/03 | APIs e Web Services - Unidade 2 | ⬜ |  |  |
-| 30/03 - 05/04 | Recuperação de Informação na Web e Redes Sociais - Unidade 1 | ⬜ |  |  |
+| 09/02 - 15/02 | Gestão de Serviços de TI - Unidade 1 | ✅ | Análise e escolha do tema | Análise e escolha do tema |
+| 16/02 - 22/02 | Gestão de Serviços de TI - Unidade 2 | ✅ | Estudos microfundamentos | Estudos microfundamentos |
+| 23/02 - 01/03 | Arquitetura de Software Distribuído - Unidade 1 e 2 | ✅ | Participação reunião e análise da entrega | Participação reunião e análise da entrega |
+| 02/03 - 08/03 | Arquitetura de Software Distribuído - Unidade 3 | ✅ | Estudos e fazer a parte de objetivos do projeto | Estudos e fazer a parte de objetivos do projeto|
+| 09/03 - 15/03 | APIs e Web Services - Unidade 1 | ✅ | Definição dos microserviços e separação dos mesmos | Definição dos microserviços e separação dos mesmos |
+| 16/03 - 22/03 | APIs e Web Services - Unidade 2 | ✅ | Estudos microfundamentos | Estudos microfundamentos  |
+| 23/03 - 29/03 | APIs e Web Services - Unidade 2 | ✅ | Implementação da API de catálogos | Implementação da API de catálogos |
+| 30/03 - 05/04 | Recuperação de Informação na Web e Redes Sociais - Unidade 1 | ✅ | Testes e ajustes APIs  | Testes e ajustes APIs |
 | 06/04 - 12/04 | Recuperação de Informação na Web e Redes Sociais - Unidade 2 | ⬜ |  |  |
 | 13/04 - 19/04 | Computação Ubíqua e Pervasiva e IoT - Unidade 1 | ⬜ |  |  |
 | 20/04 - 26/04 | Computação Ubíqua e Pervasiva e IoT - Unidade 2 | ⬜ |  |  |
