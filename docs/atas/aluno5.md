@@ -11,7 +11,7 @@
 | 09/03 - 15/03 | APIs e Web Services - Unidade 1 | ✅ | Estudar Microfundamento para elaborar API de integração do UserService | Estudo dos microfundamentos |
 | 16/03 - 22/03 | APIs e Web Services - Unidade 2 | ✅ | Estudar Microfundamento para elaborar API de integração do UserService | Estudo dos microfundamentos |
 | 23/03 - 29/03 | APIs e Web Services - Unidade 2 | ✅ | Criação da API de Integração: Users – Criação e Gerenciamento de Usuários | Desenvolvimento |
-| 30/03 - 05/04 | Recuperação de Informação na Web e Redes Sociais - Unidade 1 | ⬜ |  |  |
+| 30/03 - 05/04 | Recuperação de Informação na Web e Redes Sociais - Unidade 1 | ✅ | Criação da API Users | Desenvolvimento |
 | 06/04 - 12/04 | Recuperação de Informação na Web e Redes Sociais - Unidade 2 | ⬜ |  |  |
 | 13/04 - 19/04 | Computação Ubíqua e Pervasiva e IoT - Unidade 1 | ⬜ |  |  |
 | 20/04 - 26/04 | Computação Ubíqua e Pervasiva e IoT - Unidade 2 | ⬜ |  |  |
