@@ -10,8 +10,8 @@
 | 02/03 - 08/03 | Arquitetura de Software Distribuído - Unidade 3 | ✅ | Implementação da arquitetura, catalogo de serviços e requisitos do projeto | Implementação do docker, nginx e rabbitMq para inicio do projeto, catalogo de serviços e requisitos do sistema  |
 | 09/03 - 15/03 | APIs e Web Services - Unidade 1 | ✅ | Infraestrutura da STOCK API | Infraestrutura da STOCK API |
 | 16/03 - 22/03 | APIs e Web Services - Unidade 2 | ✅ | Implementação endpoits da API, healthcheck | Implementação endpoits da API, healthcheck |
-| 23/03 - 29/03 | APIs e Web Services - Unidade 2 | ⬜ |  |  |
-| 30/03 - 05/04 | Recuperação de Informação na Web e Redes Sociais - Unidade 1 | ⬜ |  |  |
+| 23/03 - 29/03 | APIs e Web Services - Unidade 2 | ✅ | Desenvolvimento STOCK API | Desenvolvimento STOCK API |
+| 30/03 - 05/04 | Recuperação de Informação na Web e Redes Sociais - Unidade 1 | ✅ | Desenvolvimento STOCK API | Desenvolvimento STOCK API |
 | 06/04 - 12/04 | Recuperação de Informação na Web e Redes Sociais - Unidade 2 | ⬜ |  |  |
 | 13/04 - 19/04 | Computação Ubíqua e Pervasiva e IoT - Unidade 1 | ⬜ |  |  |
 | 20/04 - 26/04 | Computação Ubíqua e Pervasiva e IoT - Unidade 2 | ⬜ |  |  |
