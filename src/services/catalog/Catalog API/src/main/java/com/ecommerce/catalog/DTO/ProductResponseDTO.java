@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.math.BigDecimal;
+import java.sql.Timestamp;
 import java.util.UUID;
 
 @Getter
@@ -16,4 +17,5 @@ public class ProductResponseDTO {
     private String urlImg;
     private Boolean active;
     private CategoryResponseDTO category;
+    private Timestamp createdAt;
 }
