@@ -1,6 +1,7 @@
 @StockAPI_HostAddress = http://localhost:5003
 @productId = REPLACE-WITH-CREATED-PRODUCT-ID
 @orderId = 22222222-2222-2222-2222-222222222222
+@otherOrderId = 33333333-3333-3333-3333-333333333333
 @unknownProductId = 99999999-9999-9999-9999-999999999999
 
 GET {{StockAPI_HostAddress}}/health
@@ -17,7 +18,13 @@ POST {{StockAPI_HostAddress}}/stock
 Content-Type: application/json
 
 {
-	"initialQuantity": 20
+	"name": "Camiseta Dry Fit",
+	"quantity": 20,
+	"color": "Preto",
+	"model": "Sport 2026",
+	"size": "M",
+	"costPrice": 39.90,
+	"salePrice": 89.90
 }
 
 ###
@@ -31,7 +38,16 @@ PUT {{StockAPI_HostAddress}}/stock/{{productId}}/reserve
 Content-Type: application/json
 
 {
-	"orderId": "{{orderId}}",
+	"orderId": "{{otherOrderId}}",
+	"quantity": 3
+}
+
+###
+
+PUT {{StockAPI_HostAddress}}/stock/{{productId}}/restock
+Content-Type: application/json
+
+{
 	"quantity": 5
 }
 

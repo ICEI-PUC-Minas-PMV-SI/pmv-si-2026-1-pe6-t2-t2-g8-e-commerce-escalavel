@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Npgsql;
 using StockAPI.Data;
 using StockAPI.Domain.Exceptions;
 using StockAPI.DTOs;
@@ -21,9 +22,15 @@ public class StockService : IStockService
     {
         return await _db.StockItems
             .AsNoTracking()
-            .OrderBy(x => x.ProductId)
+            .OrderBy(x => x.Name)
             .Select(x => new StockItemResponse(
                 x.ProductId,
+                x.Name,
+                x.Color,
+                x.Model,
+                x.Size,
+                x.CostPrice,
+                x.SalePrice,
                 x.QuantityAvailable,
                 x.QuantityReserved
             ))
@@ -41,81 +48,204 @@ public class StockService : IStockService
 
     public async Task<StockItemResponse> CreateAsync(CreateStockRequest request)
     {
-        var item = StockItem.Create(request.InitialQuantity);
+        var normalizedName = NormalizeProductName(request.Name);
+        var exists = await _db.StockItems.AnyAsync(x => x.Name.ToUpper() == normalizedName);
+        if (exists)
+        {
+            throw new StockAlreadyExistsException(request.Name);
+        }
+
+        var item = StockItem.Create(
+            request.Name,
+            request.Quantity,
+            request.Color,
+            request.Model,
+            request.Size,
+            request.CostPrice,
+            request.SalePrice);
 
         await using var transaction = await _db.Database.BeginTransactionAsync();
 
-        _db.StockItems.Add(item);
-        await _db.SaveChangesAsync();
+        try
+        {
+            _db.StockItems.Add(item);
+            _db.StockMovements.Add(CreateStockMovement(item.ProductId, null, MovementType.Restock, request.Quantity));
 
-        _db.StockMovements.Add(CreateStockMovement(item.ProductId, null, MovementType.Restock, request.InitialQuantity));
-
-        await _db.SaveChangesAsync();
-        await transaction.CommitAsync();
+            await _db.SaveChangesAsync();
+            await transaction.CommitAsync();
+        }
+        catch (DbUpdateException ex) when (IsUniqueViolation(ex))
+        {
+            await transaction.RollbackAsync();
+            throw new StockAlreadyExistsException(request.Name);
+        }
+        catch
+        {
+            await transaction.RollbackAsync();
+            throw;
+        }
 
         _logger.LogInformation(
-            "Stock created for ProductId={ProductId} with InitialQuantity={InitialQuantity}",
+            "Stock created for ProductId={ProductId}, Name={Name}, InitialQuantity={InitialQuantity}",
             item.ProductId,
-            request.InitialQuantity);
+            item.Name,
+            request.Quantity);
 
         return ToResponse(item);
     }
 
     public async Task<StockItemResponse> ReserveAsync(Guid productId, ReserveRequest request)
     {
-        var item = await GetItemOrThrowAsync(productId);
-        item.Reserve(request.Quantity);
+        await using var transaction = await _db.Database.BeginTransactionAsync();
+        try
+        {
+            var item = await GetItemOrThrowAsync(productId);
+            item.Reserve(request.Quantity);
 
-        _db.StockMovements.Add(CreateStockMovement(productId, request.OrderId, MovementType.Reserve, request.Quantity));
+            var reservation = await GetReservationAsync(productId, request.OrderId);
+            if (reservation is null)
+            {
+                reservation = StockReservation.Create(productId, request.OrderId, request.Quantity);
+                _db.StockReservations.Add(reservation);
+            }
+            else
+            {
+                reservation.Reserve(request.Quantity);
+            }
 
-        await SaveChangesWithConcurrencyHandlingAsync(productId);
-        _logger.LogInformation(
-            "Stock reserved for ProductId={ProductId}, OrderId={OrderId}, Quantity={Quantity}, Available={Available}, Reserved={Reserved}",
-            productId,
-            request.OrderId,
-            request.Quantity,
-            item.QuantityAvailable,
-            item.QuantityReserved);
+            _db.StockMovements.Add(CreateStockMovement(productId, request.OrderId, MovementType.Reserve, request.Quantity));
 
-        return ToResponse(item);
+            await SaveChangesWithConcurrencyHandlingAsync(productId);
+            await transaction.CommitAsync();
+
+            _logger.LogInformation(
+                "Stock reserved for ProductId={ProductId}, OrderId={OrderId}, Quantity={Quantity}, Available={Available}, Reserved={Reserved}",
+                productId,
+                request.OrderId,
+                request.Quantity,
+                item.QuantityAvailable,
+                item.QuantityReserved);
+
+            return ToResponse(item);
+        }
+        catch
+        {
+            await transaction.RollbackAsync();
+            throw;
+        }
     }
 
     public async Task<StockItemResponse> ReleaseAsync(Guid productId, ReleaseRequest request)
     {
-        var item = await GetItemOrThrowAsync(productId);
-        item.Release(request.Quantity);
+        await using var transaction = await _db.Database.BeginTransactionAsync();
+        try
+        {
+            var item = await GetItemOrThrowAsync(productId);
+            var reservation = await GetReservationAsync(productId, request.OrderId);
+            var reservedByOrder = reservation?.QuantityReserved ?? 0;
+            if (reservedByOrder < request.Quantity)
+            {
+                throw new InsufficientReservedStockException(productId, request.Quantity, reservedByOrder);
+            }
 
-        _db.StockMovements.Add(CreateStockMovement(productId, request.OrderId, MovementType.Release, request.Quantity));
+            item.Release(request.Quantity);
+            reservation!.Release(request.Quantity);
+            if (reservation.QuantityReserved == 0)
+            {
+                _db.StockReservations.Remove(reservation);
+            }
 
-        await SaveChangesWithConcurrencyHandlingAsync(productId);
-        _logger.LogInformation(
-            "Stock released for ProductId={ProductId}, OrderId={OrderId}, Quantity={Quantity}, Available={Available}, Reserved={Reserved}",
-            productId,
-            request.OrderId,
-            request.Quantity,
-            item.QuantityAvailable,
-            item.QuantityReserved);
+            _db.StockMovements.Add(CreateStockMovement(productId, request.OrderId, MovementType.Release, request.Quantity));
 
-        return ToResponse(item);
+            await SaveChangesWithConcurrencyHandlingAsync(productId);
+            await transaction.CommitAsync();
+
+            _logger.LogInformation(
+                "Stock released for ProductId={ProductId}, OrderId={OrderId}, Quantity={Quantity}, Available={Available}, Reserved={Reserved}",
+                productId,
+                request.OrderId,
+                request.Quantity,
+                item.QuantityAvailable,
+                item.QuantityReserved);
+
+            return ToResponse(item);
+        }
+        catch
+        {
+            await transaction.RollbackAsync();
+            throw;
+        }
     }
 
     public async Task<StockItemResponse> ConfirmAsync(Guid productId, ConfirmRequest request)
     {
-        var item = await GetItemOrThrowAsync(productId);
-        item.Confirm(request.Quantity);
+        await using var transaction = await _db.Database.BeginTransactionAsync();
+        try
+        {
+            var item = await GetItemOrThrowAsync(productId);
+            var reservation = await GetReservationAsync(productId, request.OrderId);
+            var reservedByOrder = reservation?.QuantityReserved ?? 0;
+            if (reservedByOrder < request.Quantity)
+            {
+                throw new InsufficientReservedStockException(productId, request.Quantity, reservedByOrder);
+            }
 
-        _db.StockMovements.Add(CreateStockMovement(productId, request.OrderId, MovementType.Confirm, request.Quantity));
+            item.Confirm(request.Quantity);
+            reservation!.Release(request.Quantity);
+            if (reservation.QuantityReserved == 0)
+            {
+                _db.StockReservations.Remove(reservation);
+            }
 
-        await SaveChangesWithConcurrencyHandlingAsync(productId);
-        _logger.LogInformation(
-            "Stock confirmed for ProductId={ProductId}, OrderId={OrderId}, Quantity={Quantity}, Available={Available}, Reserved={Reserved}",
-            productId,
-            request.OrderId,
-            request.Quantity,
-            item.QuantityAvailable,
-            item.QuantityReserved);
+            _db.StockMovements.Add(CreateStockMovement(productId, request.OrderId, MovementType.Confirm, request.Quantity));
 
-        return ToResponse(item);
+            await SaveChangesWithConcurrencyHandlingAsync(productId);
+            await transaction.CommitAsync();
+
+            _logger.LogInformation(
+                "Stock confirmed for ProductId={ProductId}, OrderId={OrderId}, Quantity={Quantity}, Available={Available}, Reserved={Reserved}",
+                productId,
+                request.OrderId,
+                request.Quantity,
+                item.QuantityAvailable,
+                item.QuantityReserved);
+
+            return ToResponse(item);
+        }
+        catch
+        {
+            await transaction.RollbackAsync();
+            throw;
+        }
+    }
+
+    public async Task<StockItemResponse> RestockAsync(Guid productId, RestockRequest request)
+    {
+        await using var transaction = await _db.Database.BeginTransactionAsync();
+        try
+        {
+            var item = await GetItemOrThrowAsync(productId);
+            item.Restock(request.Quantity);
+
+            _db.StockMovements.Add(CreateStockMovement(productId, null, MovementType.Restock, request.Quantity));
+
+            await SaveChangesWithConcurrencyHandlingAsync(productId);
+            await transaction.CommitAsync();
+
+            _logger.LogInformation(
+                "Stock restocked for ProductId={ProductId}, Quantity={Quantity}, Available={Available}, Reserved={Reserved}",
+                productId,
+                request.Quantity,
+                item.QuantityAvailable,
+                item.QuantityReserved);
+
+            return ToResponse(item);
+        }
+        catch
+        {
+            await transaction.RollbackAsync();
+            throw;
+        }
     }
 
     public async Task<IEnumerable<StockMovementResponse>> GetHistoryAsync(Guid productId)
@@ -145,6 +275,12 @@ public class StockService : IStockService
             ?? throw new StockNotFoundException(productId);
     }
 
+    private async Task<StockReservation?> GetReservationAsync(Guid productId, Guid orderId)
+    {
+        return await _db.StockReservations
+            .FirstOrDefaultAsync(x => x.ProductId == productId && x.OrderId == orderId);
+    }
+
     private async Task SaveChangesWithConcurrencyHandlingAsync(Guid productId)
     {
         try
@@ -163,7 +299,16 @@ public class StockService : IStockService
 
     private static StockItemResponse ToResponse(StockItem item)
     {
-        return new StockItemResponse(item.ProductId, item.QuantityAvailable, item.QuantityReserved);
+        return new StockItemResponse(
+            item.ProductId,
+            item.Name,
+            item.Color,
+            item.Model,
+            item.Size,
+            item.CostPrice,
+            item.SalePrice,
+            item.QuantityAvailable,
+            item.QuantityReserved);
     }
 
     private static StockMovement CreateStockMovement(Guid productId, Guid? orderId, MovementType type, int quantity)
@@ -177,5 +322,16 @@ public class StockService : IStockService
             Quantity = quantity,
             CreatedAt = DateTime.UtcNow
         };
+    }
+
+    private static bool IsUniqueViolation(DbUpdateException ex)
+    {
+        return ex.InnerException is PostgresException postgresException
+            && postgresException.SqlState == PostgresErrorCodes.UniqueViolation;
+    }
+
+    private static string NormalizeProductName(string name)
+    {
+        return (name ?? string.Empty).Trim().ToUpperInvariant();
     }
 }

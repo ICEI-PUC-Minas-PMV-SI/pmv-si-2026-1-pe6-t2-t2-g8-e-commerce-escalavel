@@ -33,8 +33,19 @@ public class StockController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> CreateStock([FromBody] CreateStockRequest request)
     {
-        var result = await _stockService.CreateAsync(request);
-        return CreatedAtAction(nameof(GetStock), new { productId = result.ProductId }, result);
+        try
+        {
+            var result = await _stockService.CreateAsync(request);
+            return CreatedAtAction(nameof(GetStock), new { productId = result.ProductId }, result);
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(new { error = ex.Message });
+        }
+        catch (StockAlreadyExistsException ex)
+        {
+            return Conflict(new { error = ex.Message });
+        }
     }
 
     [HttpPut("{productId:guid}/reserve")]
@@ -100,6 +111,24 @@ public class StockController : ControllerBase
         catch (InsufficientReservedStockException ex)
         {
             return UnprocessableEntity(new { error = ex.Message });
+        }
+    }
+
+    [HttpPut("{productId:guid}/restock")]
+    public async Task<IActionResult> Restock(Guid productId, [FromBody] RestockRequest request)
+    {
+        try
+        {
+            var result = await _stockService.RestockAsync(productId, request);
+            return Ok(result);
+        }
+        catch (StockConcurrencyException ex)
+        {
+            return Conflict(new { error = ex.Message });
+        }
+        catch (StockNotFoundException)
+        {
+            return NotFound();
         }
     }
 

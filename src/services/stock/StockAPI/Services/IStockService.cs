@@ -10,5 +10,6 @@ public interface IStockService
     Task<StockItemResponse> ReserveAsync(Guid productId, ReserveRequest request);
     Task<StockItemResponse> ReleaseAsync(Guid productId, ReleaseRequest request);
     Task<StockItemResponse> ConfirmAsync(Guid productId, ConfirmRequest request);
+    Task<StockItemResponse> RestockAsync(Guid productId, RestockRequest request);
     Task<IEnumerable<StockMovementResponse>> GetHistoryAsync(Guid productId);
 }
