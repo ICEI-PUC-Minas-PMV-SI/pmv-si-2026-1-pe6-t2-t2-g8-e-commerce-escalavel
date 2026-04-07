@@ -48,6 +48,9 @@ public class StockService : IStockService
 
     public async Task<StockItemResponse> CreateAsync(CreateStockRequest request)
     {
+        var quantity = request.Quantity
+            ?? throw new ArgumentException("Field 'quantity' is required.");
+
         var normalizedName = NormalizeProductName(request.Name);
         var exists = await _db.StockItems.AnyAsync(x => x.Name.ToUpper() == normalizedName);
         if (exists)
@@ -57,7 +60,7 @@ public class StockService : IStockService
 
         var item = StockItem.Create(
             request.Name,
-            request.Quantity,
+            quantity,
             request.Color,
             request.Model,
             request.Size,
@@ -69,7 +72,7 @@ public class StockService : IStockService
         try
         {
             _db.StockItems.Add(item);
-            _db.StockMovements.Add(CreateStockMovement(item.ProductId, null, MovementType.Restock, request.Quantity));
+            _db.StockMovements.Add(CreateStockMovement(item.ProductId, null, MovementType.Restock, quantity));
 
             await _db.SaveChangesAsync();
             await transaction.CommitAsync();
@@ -89,7 +92,7 @@ public class StockService : IStockService
             "Stock created for ProductId={ProductId}, Name={Name}, InitialQuantity={InitialQuantity}",
             item.ProductId,
             item.Name,
-            request.Quantity);
+            quantity);
 
         return ToResponse(item);
     }
