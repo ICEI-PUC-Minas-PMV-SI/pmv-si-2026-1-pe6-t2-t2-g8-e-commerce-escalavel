@@ -16,8 +16,6 @@ public class CatalogApplication {
 		dotenv.entries().forEach(entry ->
 				System.setProperty(entry.getKey(), entry.getValue())
 		);
-		System.out.println("Diretório atual: " + System.getProperty("user.dir"));
-
 		SpringApplication.run(CatalogApplication.class, args);
 	}
 
