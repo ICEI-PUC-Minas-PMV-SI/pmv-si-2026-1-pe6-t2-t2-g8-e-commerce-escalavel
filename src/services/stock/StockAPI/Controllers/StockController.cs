@@ -48,13 +48,17 @@ public class StockController : ControllerBase
         }
     }
 
-    [HttpPut("{productId:guid}/reserve")]
-    public async Task<IActionResult> Reserve(Guid productId, [FromBody] ReserveRequest request)
+    [HttpPut("{productId:guid}/reserve/{orderId:guid}")]
+    public async Task<IActionResult> Reserve(Guid productId, Guid orderId, [FromBody] ReserveRequest request)
     {
         try
         {
-            var result = await _stockService.ReserveAsync(productId, request);
+            var result = await _stockService.ReserveAsync(productId, orderId, request);
             return Ok(result);
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(new { error = ex.Message });
         }
         catch (StockConcurrencyException ex)
         {
@@ -70,13 +74,17 @@ public class StockController : ControllerBase
         }
     }
 
-    [HttpPut("{productId:guid}/release")]
-    public async Task<IActionResult> Release(Guid productId, [FromBody] ReleaseRequest request)
+    [HttpPut("{productId:guid}/release/{orderId:guid}")]
+    public async Task<IActionResult> Release(Guid productId, Guid orderId, [FromBody] ReleaseRequest request)
     {
         try
         {
-            var result = await _stockService.ReleaseAsync(productId, request);
+            var result = await _stockService.ReleaseAsync(productId, orderId, request);
             return Ok(result);
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(new { error = ex.Message });
         }
         catch (StockConcurrencyException ex)
         {
@@ -92,13 +100,17 @@ public class StockController : ControllerBase
         }
     }
 
-    [HttpPut("{productId:guid}/confirm")]
-    public async Task<IActionResult> Confirm(Guid productId, [FromBody] ConfirmRequest request)
+    [HttpPut("{productId:guid}/confirm/{orderId:guid}")]
+    public async Task<IActionResult> Confirm(Guid productId, Guid orderId, [FromBody] ConfirmRequest request)
     {
         try
         {
-            var result = await _stockService.ConfirmAsync(productId, request);
+            var result = await _stockService.ConfirmAsync(productId, orderId, request);
             return Ok(result);
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(new { error = ex.Message });
         }
         catch (StockConcurrencyException ex)
         {

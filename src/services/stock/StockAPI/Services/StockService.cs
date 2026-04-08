@@ -97,7 +97,7 @@ public class StockService : IStockService
         return ToResponse(item);
     }
 
-    public async Task<StockItemResponse> ReserveAsync(Guid productId, ReserveRequest request)
+    public async Task<StockItemResponse> ReserveAsync(Guid productId, Guid orderId, ReserveRequest request)
     {
         await using var transaction = await _db.Database.BeginTransactionAsync();
         try
@@ -105,10 +105,10 @@ public class StockService : IStockService
             var item = await GetItemOrThrowAsync(productId);
             item.Reserve(request.Quantity);
 
-            var reservation = await GetReservationAsync(productId, request.OrderId);
+            var reservation = await GetReservationAsync(productId, orderId);
             if (reservation is null)
             {
-                reservation = StockReservation.Create(productId, request.OrderId, request.Quantity);
+                reservation = StockReservation.Create(productId, orderId, request.Quantity);
                 _db.StockReservations.Add(reservation);
             }
             else
@@ -116,7 +116,7 @@ public class StockService : IStockService
                 reservation.Reserve(request.Quantity);
             }
 
-            _db.StockMovements.Add(CreateStockMovement(productId, request.OrderId, MovementType.Reserve, request.Quantity));
+            _db.StockMovements.Add(CreateStockMovement(productId, orderId, MovementType.Reserve, request.Quantity));
 
             await SaveChangesWithConcurrencyHandlingAsync(productId);
             await transaction.CommitAsync();
@@ -124,7 +124,7 @@ public class StockService : IStockService
             _logger.LogInformation(
                 "Stock reserved for ProductId={ProductId}, OrderId={OrderId}, Quantity={Quantity}, Available={Available}, Reserved={Reserved}",
                 productId,
-                request.OrderId,
+                orderId,
                 request.Quantity,
                 item.QuantityAvailable,
                 item.QuantityReserved);
@@ -138,13 +138,13 @@ public class StockService : IStockService
         }
     }
 
-    public async Task<StockItemResponse> ReleaseAsync(Guid productId, ReleaseRequest request)
+    public async Task<StockItemResponse> ReleaseAsync(Guid productId, Guid orderId, ReleaseRequest request)
     {
         await using var transaction = await _db.Database.BeginTransactionAsync();
         try
         {
             var item = await GetItemOrThrowAsync(productId);
-            var reservation = await GetReservationAsync(productId, request.OrderId);
+            var reservation = await GetReservationAsync(productId, orderId);
             var reservedByOrder = reservation?.QuantityReserved ?? 0;
             if (reservedByOrder < request.Quantity)
             {
@@ -158,7 +158,7 @@ public class StockService : IStockService
                 _db.StockReservations.Remove(reservation);
             }
 
-            _db.StockMovements.Add(CreateStockMovement(productId, request.OrderId, MovementType.Release, request.Quantity));
+            _db.StockMovements.Add(CreateStockMovement(productId, orderId, MovementType.Release, request.Quantity));
 
             await SaveChangesWithConcurrencyHandlingAsync(productId);
             await transaction.CommitAsync();
@@ -166,7 +166,7 @@ public class StockService : IStockService
             _logger.LogInformation(
                 "Stock released for ProductId={ProductId}, OrderId={OrderId}, Quantity={Quantity}, Available={Available}, Reserved={Reserved}",
                 productId,
-                request.OrderId,
+                orderId,
                 request.Quantity,
                 item.QuantityAvailable,
                 item.QuantityReserved);
@@ -180,13 +180,13 @@ public class StockService : IStockService
         }
     }
 
-    public async Task<StockItemResponse> ConfirmAsync(Guid productId, ConfirmRequest request)
+    public async Task<StockItemResponse> ConfirmAsync(Guid productId, Guid orderId, ConfirmRequest request)
     {
         await using var transaction = await _db.Database.BeginTransactionAsync();
         try
         {
             var item = await GetItemOrThrowAsync(productId);
-            var reservation = await GetReservationAsync(productId, request.OrderId);
+            var reservation = await GetReservationAsync(productId, orderId);
             var reservedByOrder = reservation?.QuantityReserved ?? 0;
             if (reservedByOrder < request.Quantity)
             {
@@ -200,7 +200,7 @@ public class StockService : IStockService
                 _db.StockReservations.Remove(reservation);
             }
 
-            _db.StockMovements.Add(CreateStockMovement(productId, request.OrderId, MovementType.Confirm, request.Quantity));
+            _db.StockMovements.Add(CreateStockMovement(productId, orderId, MovementType.Confirm, request.Quantity));
 
             await SaveChangesWithConcurrencyHandlingAsync(productId);
             await transaction.CommitAsync();
@@ -208,7 +208,7 @@ public class StockService : IStockService
             _logger.LogInformation(
                 "Stock confirmed for ProductId={ProductId}, OrderId={OrderId}, Quantity={Quantity}, Available={Available}, Reserved={Reserved}",
                 productId,
-                request.OrderId,
+                orderId,
                 request.Quantity,
                 item.QuantityAvailable,
                 item.QuantityReserved);

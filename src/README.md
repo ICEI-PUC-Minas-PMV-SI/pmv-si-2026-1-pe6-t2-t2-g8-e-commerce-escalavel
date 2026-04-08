@@ -245,11 +245,11 @@ Guardião da quantidade disponível de cada produto. Trabalha com o conceito de 
 | Método | Rota | Descrição | Auth |
 |------|------|------|------|
 | GET | /stock/{productId} | Quantidade disponível | Não |
-| POST | /stock | Define estoque inicial (productId gerado pelo banco) | Admin |
-| PUT | /stock/{productId}/reserve | Reserva unidades (pedido) | Sim |
-| PUT | /stock/{productId}/release | Libera reserva (cancelamento) | Sim |
-| PUT | /stock/{productId}/confirm | Baixa definitiva (pós pagto.) | Sim |
-| GET | /stock/{productId}/history | Histórico de movimentações | Admin |
+| POST | /stock | Define estoque inicial (productId gerado pelo banco) | Não |
+| PUT | /stock/{productId}/reserve/{orderId} | Reserva unidades (pedido) | Não |
+| PUT | /stock/{productId}/release/{orderId} | Libera reserva (cancelamento) | Não |
+| PUT | /stock/{productId}/confirm/{orderId} | Baixa definitiva (pós pagto.) | Não |
+| GET | /stock/{productId}/history | Histórico de movimentações | Não |
 
 ## Schema do banco (schema: stock):
 
