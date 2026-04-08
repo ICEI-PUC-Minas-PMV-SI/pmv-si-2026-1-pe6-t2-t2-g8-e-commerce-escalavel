@@ -3,6 +3,7 @@ package com.ecommerce.catalog.service;
 import com.ecommerce.catalog.DTO.CategoryResponseDTO;
 import com.ecommerce.catalog.DTO.ProductRequestDTO;
 import com.ecommerce.catalog.DTO.ProductResponseDTO;
+import com.ecommerce.catalog.exception.ResourceNotFoundException;
 import com.ecommerce.catalog.model.Category;
 import com.ecommerce.catalog.model.Product;
 import com.ecommerce.catalog.repository.CategoryRepository;
@@ -34,12 +35,12 @@ public class ProductService {
 
     public ProductResponseDTO findById(UUID id) {
         return toResponseDTO(productRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Produto não encontrado")));
+                .orElseThrow(() -> new ResourceNotFoundException("Produto não encontrado")));
     }
 
     public ProductResponseDTO save(ProductRequestDTO dto) {
         Category category = categoryRepository.findById(dto.getCategoryId())
-                .orElseThrow(() -> new RuntimeException("Categoria não encontrada"));
+                .orElseThrow(() -> new ResourceNotFoundException("Categoria não encontrada"));
         Product product = new Product();
         product.setName(dto.getName());
         product.setDescription(dto.getDescription());
@@ -52,14 +53,20 @@ public class ProductService {
 
     public ProductResponseDTO update(UUID id, ProductRequestDTO dto) {
         Product existing = productRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Produto não encontrado"));
-        Category category = categoryRepository.findById(dto.getCategoryId())
-                .orElseThrow(() -> new RuntimeException("Categoria não encontrada"));
+                .orElseThrow(() -> new ResourceNotFoundException("Produto não encontrado"));
+        Category category = null;
+
+        if (dto.getCategoryId() != null) {
+            category = categoryRepository.findById(dto.getCategoryId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Categoria não encontrada"));
+        }
+
         existing.setName(dto.getName());
         existing.setDescription(dto.getDescription());
         existing.setPrice(dto.getPrice());
         existing.setUrlImg(dto.getUrlImg());
         existing.setActive(dto.getActive());
+        existing.setCreatedAt(dto.getCreatedAt());
         existing.setCategory(category);
         return toResponseDTO(productRepository.save(existing));
     }

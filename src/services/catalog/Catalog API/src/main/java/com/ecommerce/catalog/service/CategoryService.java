@@ -2,6 +2,7 @@ package com.ecommerce.catalog.service;
 
 import com.ecommerce.catalog.DTO.CategoryRequestDTO;
 import com.ecommerce.catalog.DTO.CategoryResponseDTO;
+import com.ecommerce.catalog.exception.ResourceNotFoundException;
 import com.ecommerce.catalog.model.Category;
 import com.ecommerce.catalog.repository.CategoryRepository;
 import org.springframework.stereotype.Service;
@@ -26,12 +27,12 @@ public class CategoryService {
 
     public CategoryResponseDTO findById(UUID id) {
         return toResponseDTO(categoryRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Categoria não encontrada")));
+                .orElseThrow(() -> new ResourceNotFoundException("Categoria não encontrada")));
     }
 
     public CategoryResponseDTO update(UUID id, CategoryRequestDTO dto) {
         Category existing = categoryRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Categoria não encontrada"));
+                .orElseThrow(() -> new ResourceNotFoundException("Categoria não encontrada"));
         existing.setName(dto.getName());
         existing.setActive(dto.getActive());
         return toResponseDTO(categoryRepository.save(existing));
