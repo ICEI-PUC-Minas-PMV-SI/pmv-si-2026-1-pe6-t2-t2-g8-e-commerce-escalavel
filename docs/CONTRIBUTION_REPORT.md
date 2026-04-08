@@ -1,6 +1,6 @@
 # 📊 Relatório de Contribuições do Projeto
 
-**Última atualização:** 07/04/2026 00:45
+**Última atualização:** 08/04/2026 01:31
 
 ---
 
@@ -16,26 +16,26 @@
 | Vitor Linas           |         9 |       141 |        75 |          5 |              3 |               1 |
 | gabriel               |         3 |      1097 |        43 |         20 |              0 |               0 |
 | gabrielcambraia       |         8 |        24 |        21 |          2 |              6 |               2 |
-| github-actions[bot]   |        27 |       198 |       191 |          3 |             27 |               1 |
+| github-actions[bot]   |        28 |       204 |       197 |          3 |             28 |               1 |
 | github-classroom[bot] |         1 |      2152 |         0 |         45 |              1 |              13 |
-| nicolaspborges96      |        23 |     10425 |       836 |        104 |             11 |               2 |
+| nicolaspborges96      |        25 |     10695 |       869 |        105 |             11 |               2 |
 
 
 ## 📅 Contribuições Semanais (Todo o Semestre)
 
-**2026-03-31**: Carlos Morais: 1, Dev-Vinicio: 1, João Gabriel Perez: 1, Vitor Linas: 1, gabriel: 3, gabrielcambraia: 4, github-actions[bot]: 11, nicolaspborges96: 6
+**2026-04-01**: Carlos Morais: 1, Dev-Vinicio: 1, João Gabriel Perez: 1, Vitor Linas: 1, gabriel: 3, gabrielcambraia: 4, github-actions[bot]: 12, nicolaspborges96: 8
 
-**2026-03-24**: Dev-Vinicio: 2, Nicolas: 1, Vitor Linas: 8, github-actions[bot]: 11, nicolaspborges96: 5
+**2026-03-25**: Dev-Vinicio: 2, Nicolas: 1, Vitor Linas: 6, github-actions[bot]: 9, nicolaspborges96: 5
 
-**2026-03-17**: github-actions[bot]: 3, nicolaspborges96: 3
+**2026-03-18**: Vitor Linas: 2, github-actions[bot]: 4, nicolaspborges96: 1
 
-**2026-03-10**: Dev-Vinicio: 4, Hugo Freitas: 1, João Gabriel Perez: 2, github-actions[bot]: 2, nicolaspborges96: 4
+**2026-03-11**: Dev-Vinicio: 1, Hugo Freitas: 1, João Gabriel Perez: 2, github-actions[bot]: 3, nicolaspborges96: 3
 
-**2026-03-03**: Carlos Morais: 1, Dev-Vinicio: 4, Hugo Freitas: 3, Nicolas: 3, gabrielcambraia: 4, nicolaspborges96: 5
+**2026-03-04**: Carlos Morais: 1, Dev-Vinicio: 7, Hugo Freitas: 3, Nicolas: 3, gabrielcambraia: 4, nicolaspborges96: 8
 
-**2026-02-24**: Dev-Vinicio: 2, Hugo Freitas: 8
+**2026-02-25**: Dev-Vinicio: 2, Hugo Freitas: 8
 
-**2026-02-17**: github-classroom[bot]: 1
+**2026-02-18**: github-classroom[bot]: 1
 
 
 
