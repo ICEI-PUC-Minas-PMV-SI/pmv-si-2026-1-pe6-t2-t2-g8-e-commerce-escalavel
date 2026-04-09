@@ -1,10 +1,14 @@
-package main.java.com.projeto6.OrderAPI.dto;
+package main.java.com.projeto6.OrderAPI.model;
 
-// DTO que representa um item dentro do pedido.
-public class OrderItemRequest {
+import jakarta.persistence.Embeddable;
+
+@Embeddable
+public class Item {
 
     private Long productId;
     private Integer quantity;
+
+    // Getters e Setters
 
     public Long getProductId() {
         return productId;

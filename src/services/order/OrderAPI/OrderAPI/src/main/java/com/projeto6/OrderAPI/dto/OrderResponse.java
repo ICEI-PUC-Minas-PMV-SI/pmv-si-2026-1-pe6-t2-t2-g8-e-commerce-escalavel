@@ -1,18 +1,37 @@
 package main.java.com.projeto6.OrderAPI.dto;
 
-// DTO responsável por representar os dados de saída
+import java.util.List;
+
 public class OrderResponse {
 
-    private Long orderId;
+    private Long id;
+    private Long customerId;
+    private List<ItemResponse> items;
     private String status;
-    private Double total;
 
-    public Long getOrderId() {
-        return orderId;
+    // Getters e Setters
+    public Long getId() {
+        return id;
     }
 
-    public void setOrderId(Long orderId) {
-        this.orderId = orderId;
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Long getCustomerId() {
+        return customerId;
+    }
+
+    public void setCustomerId(Long customerId) {
+        this.customerId = customerId;
+    }
+
+    public List<ItemResponse> getItems() {
+        return items;
+    }
+
+    public void setItems(List<ItemResponse> items) {
+        this.items = items;
     }
 
     public String getStatus() {
@@ -21,13 +40,5 @@ public class OrderResponse {
 
     public void setStatus(String status) {
         this.status = status;
-    }
-
-    public Double getTotal() {
-        return total;
-    }
-
-    public void setTotal(Double total) {
-        this.total = total;
     }
 }

@@ -1,78 +1,115 @@
 package main.java.com.projeto6.OrderAPI.service;
 
-import com.projeto6.order.dto.OrderRequest;
-import com.projeto6.order.dto.OrderResponse;
-import com.projeto6.order.dto.OrderItemRequest;
-import com.projeto6.order.model.Order;
-import com.projeto6.order.model.OrderItem;
-import com.projeto6.order.repository.OrderRepository;
+import main.java.com.projeto6.OrderAPI.dto.ItemRequest;
+import main.java.com.projeto6.OrderAPI.dto.ItemResponse;
+import main.java.com.projeto6.OrderAPI.dto.OrderRequest;
+import main.java.com.projeto6.OrderAPI.dto.OrderResponse;
+import main.java.com.projeto6.OrderAPI.model.Order;
+import main.java.com.projeto6.OrderAPI.model.Item;
+import main.java.com.projeto6.OrderAPI.repository.OrderRepository;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
-
-// Contém operações de criação e consulta de pedidos.
 @Service
 public class OrderService {
 
     @Autowired
-    private OrderRepository orderRepository;
+    private OrderRepository repository;
 
- 
-// Cria um novo pedido.
+    // Criar pedido
     public OrderResponse createOrder(OrderRequest request) {
-
-        // 1. Criar entidade Order
         Order order = new Order();
-        order.setUserId(request.getUserId());
+
+        order.setCustomerId(request.getCustomerId());
+        order.setItems(toItemList(request.getItems())); // conversão
         order.setStatus("CREATED");
 
-        // 2. Converter itens
-        List<OrderItem> items = new ArrayList<>();
+        Order saved = repository.save(order);
+        return toResponse(saved);
+    }
 
-        for (OrderItemRequest itemRequest : request.getItems()) {
-            OrderItem item = new OrderItem();
-            item.setProductId(itemRequest.getProductId());
-            item.setQuantity(itemRequest.getQuantity());
+    // Listar todos
+    public List<OrderResponse> getAllOrders() {
+        return repository.findAll()
+                .stream()
+                .map(this::toResponse)
+                .collect(Collectors.toList());
+    }
 
-            // preço mockado (temporário)
-            item.setPrice(50.0);
+    // Buscar por ID
+    public OrderResponse getOrderById(Long id) {
+        Order order = repository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Pedido não encontrado"));
 
-            items.add(item);
-        }
+        return toResponse(order);
+    }
 
-        order.setItems(items);
+    // Buscar por usuário
+    public List<OrderResponse> getOrdersByUser(Long userId) {
+        return repository.findByCustomerId(userId)
+                .stream()
+                .map(this::toResponse)
+                .collect(Collectors.toList());
+    }
 
-        // 3. Calcular total
-        double total = items.stream()
-                .mapToDouble(i -> i.getPrice() * i.getQuantity())
-                .sum();
+    // Atualizar status
+    public OrderResponse updateStatus(Long id, String status) {
+        Order order = repository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Pedido não encontrado"));
 
-        order.setTotal(total);
+        order.setStatus(status);
+        Order updated = repository.save(order);
 
-        // 4. Salvar no banco
-        Order savedOrder = orderRepository.save(order);
+        return toResponse(updated);
+    }
 
-        // 5. Criar resposta
+    // Cancelar pedido
+    public OrderResponse cancelOrder(Long id) {
+        Order order = repository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Pedido não encontrado"));
+
+        order.setStatus("CANCELLED");
+        Order updated = repository.save(order);
+
+        return toResponse(updated);
+    }
+
+
+    // 🔁 Conversões DTO ↔ Model
+
+    // DTO -> Model
+    private List<Item> toItemList(List<ItemRequest> itemsRequest) {
+        return itemsRequest.stream().map(itemReq -> {
+            Item item = new Item();
+            item.setProductId(itemReq.getProductId());
+            item.setQuantity(itemReq.getQuantity());
+            return item;
+        }).collect(Collectors.toList());
+    }
+
+    // Model <- DTO
+    private List<ItemResponse> toItemResponseList(List<Item> items) {
+        return items.stream().map(item -> {
+            ItemResponse response = new ItemResponse();
+            response.setProductId(item.getProductId());
+            response.setQuantity(item.getQuantity());
+            return response;
+        }).collect(Collectors.toList());
+    }
+
+    // Model -> Response
+    private OrderResponse toResponse(Order order) {
         OrderResponse response = new OrderResponse();
-        response.setOrderId(savedOrder.getId());
-        response.setStatus(savedOrder.getStatus());
-        response.setTotal(savedOrder.getTotal());
+
+        response.setId(order.getId());
+        response.setCustomerId(order.getCustomerId());
+        response.setItems(toItemResponseList(order.getItems())); // conversão
+        response.setStatus(order.getStatus());
 
         return response;
-    }
-
-//  Retorna todos os pedidos cadastrados.
-    public List<Order> getAllOrders() {
-        return orderRepository.findAll();
-    }
-
-
-// Retorna um pedido específico pelo ID.
-    public Order getOrderById(Long id) {
-        return orderRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Pedido não encontrado"));
     }
 }

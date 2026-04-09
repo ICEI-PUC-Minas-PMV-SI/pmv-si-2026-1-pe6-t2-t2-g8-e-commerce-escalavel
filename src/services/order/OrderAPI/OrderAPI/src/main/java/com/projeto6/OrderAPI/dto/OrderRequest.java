@@ -2,25 +2,25 @@ package main.java.com.projeto6.OrderAPI.dto;
 
 import java.util.List;
 
-// DTO responsável por representar os dados de entrada para criar pedido
 public class OrderRequest {
 
-    private Long userId;
-    private List<OrderItemRequest> items;
+    private Long customerId;
+    private List<ItemRequest> items;
 
-    public Long getUserId() {
-        return userId;
+    // Getters e Setters
+    public Long getCustomerId() {
+        return customerId;
     }
 
-    public void setUserId(Long userId) {
-        this.userId = userId;
+    public void setCustomerId(Long customerId) {
+        this.customerId = customerId;
     }
 
-    public List<OrderItemRequest> getItems() {
+    public List<ItemRequest> getItems() {
         return items;
     }
 
-    public void setItems(List<OrderItemRequest> items) {
+    public void setItems(List<ItemRequest> items) {
         this.items = items;
     }
 }
