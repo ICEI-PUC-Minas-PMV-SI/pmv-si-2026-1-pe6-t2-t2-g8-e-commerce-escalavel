@@ -6,13 +6,13 @@
 |:-------:|:---------------:|:--------:|:------------------:|:-------------------:|
 | 09/02 - 15/02 | Gestão de Serviços de TI - Unidade 1 | ✅ | Reuniões iniciais para para preparação dos projetos | Definição do tema |
 | 16/02 - 22/02 | Gestão de Serviços de TI - Unidade 2 | ✅ | Organização do grupo e planejamento | Organização do grupo e planejamento |
-| 23/02 - 01/03 | Arquitetura de Software Distribuído - Unidade 1 e 2 | ✅ |  |  |
-| 02/03 - 08/03 | Arquitetura de Software Distribuído - Unidade 3 | ✅ |  |  |
-| 09/03 - 15/03 | APIs e Web Services - Unidade 1 | ⬜ |  |  |
-| 16/03 - 22/03 | APIs e Web Services - Unidade 2 | ⬜ |  |  |
-| 23/03 - 29/03 | APIs e Web Services - Unidade 2 | ⬜ |  |  |
-| 30/03 - 05/04 | Recuperação de Informação na Web e Redes Sociais - Unidade 1 | ⬜ |  |  |
-| 06/04 - 12/04 | Recuperação de Informação na Web e Redes Sociais - Unidade 2 | ⬜ |  |  |
+| 23/02 - 01/03 | Arquitetura de Software Distribuído - Unidade 1 e 2 | ✅ | Planejamento da arquitetura do sistema | Planejamento da arquitetura do sistema |
+| 02/03 - 08/03 | Arquitetura de Software Distribuído - Unidade 3 | ✅ | Estudo do microfundamento | Estudo do microfundamento |
+| 09/03 - 15/03 | APIs e Web Services - Unidade 1 | ✅ | Estruturação da OrderAPI | Estruturação da OrderAPI |
+| 16/03 - 22/03 | APIs e Web Services - Unidade 2 | ✅ | Estudo do microfundamento | Estudo do microfundamento |
+| 23/03 - 29/03 | APIs e Web Services - Unidade 2 | ✅ | Estudo do microfundamento | Estudo do microfundamento |
+| 30/03 - 05/04 | Recuperação de Informação na Web e Redes Sociais - Unidade 1 | ✅ | Implementação das funcionalidades da OrderAPI | Implementação das funcionalidades da OrderAPI |
+| 06/04 - 12/04 | Recuperação de Informação na Web e Redes Sociais - Unidade 2 | ⬜ | Implementação de novas funcionalidades da OrderAPI, testes e documentação |  |
 | 13/04 - 19/04 | Computação Ubíqua e Pervasiva e IoT - Unidade 1 | ⬜ |  |  |
 | 20/04 - 26/04 | Computação Ubíqua e Pervasiva e IoT - Unidade 2 | ⬜ |  |  |
 | 27/04 - 03/05 | Desenvolvimento de Aplicações Móveis - Unidade 1 | ⬜ |  |  |
