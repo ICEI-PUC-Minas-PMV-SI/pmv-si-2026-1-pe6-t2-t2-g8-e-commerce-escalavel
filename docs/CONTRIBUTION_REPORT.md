@@ -1,6 +1,6 @@
 # 📊 Relatório de Contribuições do Projeto
 
-**Última atualização:** 09/04/2026 14:55
+**Última atualização:** 09/04/2026 15:37
 
 ---
 
@@ -11,19 +11,19 @@
 | Carlos Morais         |         2 |         7 |        15 |          2 |              2 |               2 |
 | Dev-Vinicio           |        13 |      7201 |       891 |         32 |             12 |               3 |
 | Hugo Freitas          |        12 |        73 |        26 |          7 |             11 |               5 |
-| João Gabriel Perez    |         5 |      1356 |       196 |         42 |              1 |               1 |
+| João Gabriel Perez    |         6 |      1363 |       203 |         42 |              2 |               1 |
 | Nicolas               |         4 |      5243 |       212 |         25 |              1 |               1 |
 | Vitor Linas           |         9 |       141 |        75 |          5 |              3 |               1 |
 | gabriel               |         4 |      1200 |        70 |         25 |              0 |               0 |
 | gabrielcambraia       |        10 |       345 |        21 |          3 |              6 |               2 |
-| github-actions[bot]   |        32 |       235 |       228 |          3 |             32 |               1 |
+| github-actions[bot]   |        33 |       239 |       232 |          3 |             33 |               1 |
 | github-classroom[bot] |         1 |      2152 |         0 |         45 |              1 |              13 |
 | nicolaspborges96      |        25 |     10695 |       869 |        105 |             11 |               2 |
 
 
 ## 📅 Contribuições Semanais (Todo o Semestre)
 
-**2026-04-02**: Carlos Morais: 1, Dev-Vinicio: 1, João Gabriel Perez: 3, Vitor Linas: 1, gabriel: 3, gabrielcambraia: 6, github-actions[bot]: 16, nicolaspborges96: 8
+**2026-04-02**: Carlos Morais: 1, Dev-Vinicio: 1, João Gabriel Perez: 4, Vitor Linas: 1, gabriel: 3, gabrielcambraia: 6, github-actions[bot]: 17, nicolaspborges96: 8
 
 **2026-03-26**: Dev-Vinicio: 2, Nicolas: 1, Vitor Linas: 6, gabriel: 1, github-actions[bot]: 9, nicolaspborges96: 5
 
