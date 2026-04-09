@@ -1,12 +1,12 @@
-package main.java.com.projeto6.OrderAPI.service;
+package com.projeto6.OrderAPI.service;
 
-import main.java.com.projeto6.OrderAPI.dto.ItemRequest;
-import main.java.com.projeto6.OrderAPI.dto.ItemResponse;
-import main.java.com.projeto6.OrderAPI.dto.OrderRequest;
-import main.java.com.projeto6.OrderAPI.dto.OrderResponse;
-import main.java.com.projeto6.OrderAPI.model.Order;
-import main.java.com.projeto6.OrderAPI.model.Item;
-import main.java.com.projeto6.OrderAPI.repository.OrderRepository;
+import com.projeto6.OrderAPI.dto.ItemRequest;
+import com.projeto6.OrderAPI.dto.ItemResponse;
+import com.projeto6.OrderAPI.dto.OrderRequest;
+import com.projeto6.OrderAPI.dto.OrderResponse;
+import com.projeto6.OrderAPI.model.Order;
+import com.projeto6.OrderAPI.model.Item;
+import com.projeto6.OrderAPI.repository.OrderRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

@@ -1,9 +1,12 @@
-package main.java.com.projeto6.OrderAPI.controller;
+package com.projeto6.OrderAPI.controller;
 
-import main.java.com.projeto6.OrderAPI.dto.OrderRequest;
-import main.java.com.projeto6.OrderAPI.dto.OrderResponse;
-import main.java.com.projeto6.OrderAPI.service.OrderService;
-import main.java.com.projeto6.OrderAPI.model.Order;
+import com.projeto6.OrderAPI.dto.OrderRequest;
+import com.projeto6.OrderAPI.dto.OrderResponse;
+import com.projeto6.OrderAPI.service.OrderService;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Parameter;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -11,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Tag(name = "Pedidos", description = "Endpoints para gerenciamento de pedidos")
 @RestController
 @RequestMapping("/orders")
 public class OrderController {
@@ -19,6 +23,7 @@ public class OrderController {
     private OrderService orderService;
 
     // Criar pedido
+    @Operation(summary = "Criar um novo pedido")
     @PostMapping
     public ResponseEntity<OrderResponse> createOrder(
             @RequestBody OrderRequest request) {
@@ -27,37 +32,52 @@ public class OrderController {
     }
 
     // Listar todos os pedidos
+    @Operation(summary = "Listar todos os pedidos")
     @GetMapping
     public ResponseEntity<List<OrderResponse>> getAllOrders() {
         return ResponseEntity.ok(orderService.getAllOrders());
     }
 
     // Buscar pedido por ID
+    @Operation(summary = "Buscar pedido pelo ID")
     @GetMapping("/{id}")
-    public ResponseEntity<OrderResponse> getOrderById(@PathVariable Long id) {
+    public ResponseEntity<OrderResponse> getOrderById(
+            @Parameter(description = "ID do pedido", example = "1")
+            @PathVariable Long id) {
+
         return ResponseEntity.ok(orderService.getOrderById(id));
     }
 
     // Buscar pedidos por usuário
+    @Operation(summary = "Buscar pedidos por ID do usuário")
     @GetMapping("/user/{userId}")
     public ResponseEntity<List<OrderResponse>> getOrdersByUser(
+            @Parameter(description = "ID do usuário", example = "10")
             @PathVariable Long userId) {
 
         return ResponseEntity.ok(orderService.getOrdersByUser(userId));
     }
 
-    // Atualizar status (principal no fluxo)
+    // Atualizar status
+    @Operation(summary = "Atualizar status do pedido")
     @PatchMapping("/{id}/status")
     public ResponseEntity<OrderResponse> updateStatus(
+            @Parameter(description = "ID do pedido", example = "1")
             @PathVariable Long id,
+
+            @Parameter(description = "Novo status do pedido", example = "APROVADO")
             @RequestParam String status) {
 
         return ResponseEntity.ok(orderService.updateStatus(id, status));
     }
 
     // Cancelar pedido
+    @Operation(summary = "Cancelar um pedido")
     @PostMapping("/{id}/cancel")
-    public ResponseEntity<OrderResponse> cancelOrder(@PathVariable Long id) {
+    public ResponseEntity<OrderResponse> cancelOrder(
+            @Parameter(description = "ID do pedido", example = "1")
+            @PathVariable Long id) {
+
         return ResponseEntity.ok(orderService.cancelOrder(id));
     }
 }

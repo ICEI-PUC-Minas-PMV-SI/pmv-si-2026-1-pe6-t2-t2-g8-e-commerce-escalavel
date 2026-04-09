@@ -1,4 +1,4 @@
-package main.java.com.projeto6.OrderAPI.model;
+package com.projeto6.OrderAPI.model;
 
 import jakarta.persistence.Embeddable;
 
