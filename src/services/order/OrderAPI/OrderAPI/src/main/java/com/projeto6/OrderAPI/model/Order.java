@@ -1,9 +1,7 @@
-package main.java.com.projeto6.OrderAPI.model;
+package com.projeto6.OrderAPI.model;
 
 import jakarta.persistence.*;
 import java.util.List;
-
-// Entidade que representa um pedido no sistema.
 
 @Entity
 @Table(name = "orders")
@@ -13,40 +11,26 @@ public class Order {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // ID do usuário que fez o pedido
-    private Long userId;
+    private Long customerId;
 
-    // Valor total do pedido
-    private Double total;
-
-    // Status do pedido (CREATED, PAID, FAILED, etc.)
     private String status;
 
+    // Lista de itens do pedido
+    @ElementCollection
+    @CollectionTable(name = "order_items",joinColumns = @JoinColumn(name = "order_id"))
+    private List<Item> items;
 
-// Lista de itens do pedido.
-    @OneToMany(cascade = CascadeType.ALL)
-    private List<OrderItem> items;
-
-    // Getters e Setters
-
+    //Getters e Setters
     public Long getId() {
         return id;
     }
 
-    public Long getUserId() {
-        return userId;
+    public Long getCustomerId() {
+        return customerId;
     }
 
-    public void setUserId(Long userId) {
-        this.userId = userId;
-    }
-
-    public Double getTotal() {
-        return total;
-    }
-
-    public void setTotal(Double total) {
-        this.total = total;
+    public void setCustomerId(Long customerId) {
+        this.customerId = customerId;
     }
 
     public String getStatus() {
@@ -57,11 +41,11 @@ public class Order {
         this.status = status;
     }
 
-    public List<OrderItem> getItems() {
+    public List<Item> getItems() {
         return items;
     }
 
-    public void setItems(List<OrderItem> items) {
+    public void setItems(List<Item> items) {
         this.items = items;
     }
 }

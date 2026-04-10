@@ -1,26 +1,38 @@
-package main.java.com.projeto6.OrderAPI.dto;
+package com.projeto6.OrderAPI.dto;
 
 import java.util.List;
+import io.swagger.v3.oas.annotations.media.Schema;
 
-// DTO responsável por representar os dados de entrada para criar pedido
+@Schema(description = "DTO para criação de um pedido")
 public class OrderRequest {
 
-    private Long userId;
-    private List<OrderItemRequest> items;
+    @Schema(
+        description = "ID do cliente que está fazendo o pedido",
+        example = "1",
+        required = true
+    )
+    private Long customerId;
 
-    public Long getUserId() {
-        return userId;
+    @Schema(
+        description = "Lista de itens que compõem o pedido",
+        required = true
+    )
+    private List<ItemRequest> items;
+
+    // Getters e Setters
+    public Long getCustomerId() {
+        return customerId;
     }
 
-    public void setUserId(Long userId) {
-        this.userId = userId;
+    public void setCustomerId(Long customerId) {
+        this.customerId = customerId;
     }
 
-    public List<OrderItemRequest> getItems() {
+    public List<ItemRequest> getItems() {
         return items;
     }
 
-    public void setItems(List<OrderItemRequest> items) {
+    public void setItems(List<ItemRequest> items) {
         this.items = items;
     }
 }
