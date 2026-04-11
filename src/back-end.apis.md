@@ -550,3 +550,189 @@ Cenarios de erro importantes:
 - `services/catalog/Catalog API/src/main/java/com/ecommerce/catalog/dto`
 - `gateway/nginx.conf`
 - `http://localhost:5002/swagger-ui/index.html`
+
+
+---
+# Back-End APIs
+
+## NotificationService
+
+### Objetivos do Worker
+
+O NotificationService e responsavel por processar eventos de pedidos e realizar o envio de notificacoes de forma assincrona dentro da arquitetura distribuida.
+
+Objetivos principais:
+
+* Consumir eventos de pedidos via RabbitMQ.
+* Processar notificacoes de forma desacoplada.
+* Simular envio de e-mails para clientes.
+* Registrar notificacoes no banco de dados.
+
+---
+
+### Modelagem da Aplicacao
+
+Entidades principais (schema `public`):
+
+* `notifications`: registro das notificacoes processadas (id, message, sentAt).
+
+Regras de negocio centrais:
+
+* Cada mensagem recebida gera um registro de notificacao.
+* O processamento e assincrono e nao depende de resposta imediata.
+* Mensagens invalidas nao devem gerar persistencia no banco.
+
+---
+
+### Tecnologias Utilizadas
+
+* .NET 8 (Worker Service)
+* MassTransit
+* RabbitMQ
+* Entity Framework Core
+* PostgreSQL (Npgsql)
+
+---
+
+### Arquitetura
+
+O NotificationService nao expoe endpoints HTTP, funcionando como um Worker que consome mensagens da fila RabbitMQ.
+
+Fluxo:
+
+1. Um evento e publicado na fila `notifications`
+2. O NotificationService consome a mensagem
+3. Processa o evento
+4. Salva no banco de dados
+5. Exibe log no console
+
+---
+
+### Estrutura da Mensagem
+
+Formato esperado:
+
+```json
+{
+  "orderId": 1,
+  "customerEmail": "string"
+}
+```
+
+---
+
+### Consideracoes de Seguranca
+
+Estado atual:
+
+* Nao ha autenticacao ou autorizacao aplicada.
+* O servico consome mensagens diretamente da fila.
+
+Recomendacao:
+
+* Validar autenticacao no produtor (OrderAPI) e/ou gateway.
+* Implementar validacao de integridade das mensagens.
+
+---
+
+### Implantacao
+
+Servico em Docker Compose:
+
+* `notificationservice` consumindo fila RabbitMQ `notifications`.
+
+Dependencias:
+
+* RabbitMQ ativo
+* Banco PostgreSQL ativo
+
+Comandos principais:
+
+```bash
+dotnet build
+dotnet run
+```
+
+---
+
+### Testes
+
+Fluxo recomendado de validacao funcional:
+
+1. Publicar mensagem na fila RabbitMQ
+2. Consumir mensagem pelo NotificationService
+3. Verificar log no console
+4. Validar registro no banco
+
+---
+
+### Casos de Teste
+
+#### Caso 01 – Pedido Criado
+
+Entrada:
+
+```json
+{
+  "orderId": 1,
+  "customerEmail": "teste@email.com"
+}
+```
+
+Acao:
+Publicar mensagem manualmente na fila `notifications` via interface do RabbitMQ.
+
+Resultado esperado:
+
+* Mensagem consumida com sucesso
+* Registro salvo na tabela `notifications`
+* Log exibido no console:
+
+```
+Email enviado para teste@email.com
+```
+
+---
+
+#### Caso 02 – Multiplas mensagens
+
+Entrada:
+Envio de varias mensagens consecutivas na fila.
+
+Resultado esperado:
+
+* Todas as mensagens processadas
+* Registros criados no banco
+* Logs exibidos corretamente
+
+---
+
+#### Caso 03 – Payload invalido
+
+Entrada:
+
+```json
+{
+  "erro": true
+}
+```
+
+Resultado esperado:
+
+* Mensagem ignorada ou erro registrado no console
+* Nenhum registro salvo no banco
+
+---
+
+### Consideracoes
+
+Os testes foram realizados via publicacao manual de mensagens no RabbitMQ, simulando o fluxo de eventos do sistema distribuido.
+
+---
+
+### Referencias
+
+* `notification/Program.cs`
+* `notification/NotificationService.csproj`
+* `gateway/nginx.conf`
+
