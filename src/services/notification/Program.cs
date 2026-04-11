@@ -1,21 +1,22 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Hosting;
 using MassTransit;
 
-var builder = Host.CreateApplicationBuilder(args);
+var builder = Microsoft.Extensions.Hosting.Host.CreateApplicationBuilder(args);
 
-// 1. BANCO DE DADOS
-var connectionString = "Host=localhost;Database=ecommerce;Username=ecom;Password=ecom123";
+// 1. BANCO DE DADOS (via env var ConnectionStrings__Default)
+var connectionString = builder.Configuration.GetConnectionString("Default")
+    ?? throw new InvalidOperationException("ConnectionStrings__Default is required.");
 builder.Services.AddDbContext<AppDbContext>(opt => opt.UseNpgsql(connectionString));
 
-// 2. RABBITMQ
+// 2. RABBITMQ (via env var RABBITMQ_URL)
+var rabbitMqUrl = builder.Configuration["RABBITMQ_URL"]
+    ?? throw new InvalidOperationException("RABBITMQ_URL is required.");
 builder.Services.AddMassTransit(x => {
     x.AddConsumer<NotificationConsumer>();
 
     x.UsingRabbitMq((context, cfg) => {
-        cfg.Host("localhost", "/", h => {
-            h.Username("guest");
-            h.Password("guest");
-        });
+        cfg.Host(new Uri(rabbitMqUrl));
 
         cfg.ReceiveEndpoint("notifications", e => {
             e.ConfigureConsumer<NotificationConsumer>(context);
@@ -53,6 +54,11 @@ public class AppDbContext : DbContext {
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
     public DbSet<NotificationLog> Notifications => Set<NotificationLog>();
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.HasDefaultSchema("notifications");
+    }
 }
 
 // =======================
