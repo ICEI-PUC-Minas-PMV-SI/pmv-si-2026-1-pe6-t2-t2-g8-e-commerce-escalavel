@@ -1,0 +1,7 @@
+node_modules
+docker-compose.yml
+test-db.js
+.env
+*.md
+.git
+.gitignore

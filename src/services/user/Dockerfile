@@ -1,15 +1,14 @@
-FROM node:20
+FROM node:20-slim
+WORKDIR /app
 
-WORKDIR /usr/src/app
+COPY package*.json ./
+RUN npm ci --only=production
 
-# Copia package.json e package-lock.json (se existir)
-COPY package.json package-lock.json* ./
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends curl \
+    && rm -rf /var/lib/apt/lists/*
 
-# Instala dependências
-RUN npm install
+COPY src ./src
 
-# Copia todo o restante do código
-COPY . .
-
-EXPOSE 5001
+EXPOSE 8080
 CMD ["node", "src/server.js"]
