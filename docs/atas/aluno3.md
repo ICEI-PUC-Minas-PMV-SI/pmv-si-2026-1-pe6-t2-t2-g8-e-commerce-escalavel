@@ -1,4 +1,4 @@
-# ATA de Acompanhamento - Nome completo do aluno 3
+# ATA de Acompanhamento - Gabriel Freitas Cambraia
 
 ## Registro de Atividades Semanais
 
@@ -12,7 +12,7 @@
 | 16/03 - 22/03 | APIs e Web Services - Unidade 2 | ✅ | Estudos microfundamentos | Estudos microfundamentos  |
 | 23/03 - 29/03 | APIs e Web Services - Unidade 2 | ✅ | Implementação da API de catálogos | Implementação da API de catálogos |
 | 30/03 - 05/04 | Recuperação de Informação na Web e Redes Sociais - Unidade 1 | ✅ | Testes e ajustes API catálogo  | Testes e ajustes API catálogo |
-| 06/04 - 12/04 | Recuperação de Informação na Web e Redes Sociais - Unidade 2 | ⬜ |  |  |
+| 06/04 - 12/04 | Recuperação de Informação na Web e Redes Sociais - Unidade 2 | ✅ | Conclusão e documentação CatalogAPI | Conclusão e documentação CatalogAPI |
 | 13/04 - 19/04 | Computação Ubíqua e Pervasiva e IoT - Unidade 1 | ⬜ |  |  |
 | 20/04 - 26/04 | Computação Ubíqua e Pervasiva e IoT - Unidade 2 | ⬜ |  |  |
 | 27/04 - 03/05 | Desenvolvimento de Aplicações Móveis - Unidade 1 | ⬜ |  |  |
