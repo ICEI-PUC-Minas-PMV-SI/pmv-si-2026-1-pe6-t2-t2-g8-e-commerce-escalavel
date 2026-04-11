@@ -3,54 +3,82 @@ using MassTransit;
 
 var builder = Host.CreateApplicationBuilder(args);
 
-// 1. CONFIGURAÇÃO DO BANCO DE DADOS 
+// 1. BANCO DE DADOS
 var connectionString = "Host=localhost;Database=ecommerce;Username=ecom;Password=ecom123";
 builder.Services.AddDbContext<AppDbContext>(opt => opt.UseNpgsql(connectionString));
 
-// 2. CONFIGURAÇÃO DO RABBITMQ (Mensageria)
+// 2. RABBITMQ
 builder.Services.AddMassTransit(x => {
     x.AddConsumer<NotificationConsumer>();
+
     x.UsingRabbitMq((context, cfg) => {
         cfg.Host("localhost", "/", h => {
             h.Username("guest");
             h.Password("guest");
         });
-        cfg.ReceiveEndpoint("fila-notificacao", e => e.ConfigureConsumer<NotificationConsumer>(context));
+
+        cfg.ReceiveEndpoint("notifications", e => {
+            e.ConfigureConsumer<NotificationConsumer>(context);
+        });
     });
 });
 
 var host = builder.Build();
+
+// ✔ GARANTE QUE O BANCO EXISTE
+using (var scope = host.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    db.Database.EnsureCreated();
+}
+
 host.Run();
 
-// --- CÓDIGO GERAL ---
 
-// Modelo do que vai ser salvo no banco
+// =======================
+// MODELOS
+// =======================
+
 public class NotificationLog {
     public int Id { get; set; }
     public string Message { get; set; } = "";
     public DateTime SentAt { get; set; } = DateTime.UtcNow;
 }
 
-// Configuração do Banco de Dados
+// =======================
+// DB CONTEXT
+// =======================
+
 public class AppDbContext : DbContext {
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
+
     public DbSet<NotificationLog> Notifications => Set<NotificationLog>();
 }
 
-// Contrato da Mensagem (dados do OrderService)
-public record OrderCreatedEvent(Guid OrderId, string CustomerEmail);
+// =======================
+// EVENTO (COMPATÍVEL COM JAVA)
+// =======================
 
-// Responsável por ler a fila
+public record OrderCreatedEvent(long OrderId, string CustomerEmail);
+
+// =======================
+// CONSUMER
+// =======================
+
 public class NotificationConsumer : IConsumer<OrderCreatedEvent> {
     private readonly AppDbContext _db;
+
     public NotificationConsumer(AppDbContext db) => _db = db;
 
     public async Task Consume(ConsumeContext<OrderCreatedEvent> context) {
         var email = context.Message.CustomerEmail;
-        Console.WriteLine($"🔔 NOTIFICAÇÃO: Enviando e-mail para {email}");
-        
-        // Salva no banco 
-        _db.Notifications.Add(new NotificationLog { Message = $"E-mail enviado para {email}" });
+
+        Console.WriteLine($"[NotificationService] Email enviado para {email}");
+
+        _db.Notifications.Add(new NotificationLog {
+            Message = $"Email enviado para {email}"
+        });
+
         await _db.SaveChangesAsync();
     }
 }
