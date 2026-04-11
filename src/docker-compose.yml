@@ -46,6 +46,8 @@ services:
         condition: service_healthy
       stockapi:
         condition: service_healthy
+      orderapi:
+        condition: service_healthy
     healthcheck:
       test: ["CMD-SHELL", "wget -qO- http://localhost/gateway/health >/dev/null 2>&1 || exit 1"]
       interval: 15s
@@ -113,34 +115,30 @@ services:
       retries: 3
       start_period: 20s
 
-  # orderapi:
-  #   build: ./services/order
-  #   ports:
-  #     - "5004:8080"
-  #   environment:
-  #     - JWT_SECRET=${JWT_SECRET}
-  #     - DB_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres/${POSTGRES_DB}
-  #     - USERS_URL=http://usersapi:8080
-  #     - STOCK_URL=http://stockapi:8080
-  #     - PAYMENT_URL=http://paymentapi:8080
-  #     - RABBITMQ_URL=amqp://guest:guest@rabbitmq:5672
-  #   depends_on:
-  #     postgres:
-  #       condition: service_healthy
-  #     rabbitmq:
-  #       condition: service_healthy
-  #     usersapi:
-  #       condition: service_healthy
-  #     stockapi:
-  #       condition: service_healthy
-  #     paymentapi:
-  #       condition: service_healthy
-  #   healthcheck:
-  #     test: ["CMD-SHELL", "curl -f http://localhost:8080/health || exit 1"]
-  #     interval: 15s
-  #     timeout: 5s
-  #     retries: 3
-  #     start_period: 20s
+  orderapi:
+    build: ./services/order/OrderAPI/OrderAPI
+    ports:
+      - "5004:8080"
+    environment:
+      - JWT_SECRET=${JWT_SECRET}
+      - DB_URL=jdbc:postgresql://postgres:5432/${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - USERS_URL=http://usersapi:8080
+      - STOCK_URL=http://stockapi:8080
+      - PAYMENT_URL=http://paymentapi:8080
+      - RABBITMQ_URL=amqp://guest:guest@rabbitmq:5672
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8080/actuator/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 40s
 
   # paymentapi:
   #   build: ./services/payment

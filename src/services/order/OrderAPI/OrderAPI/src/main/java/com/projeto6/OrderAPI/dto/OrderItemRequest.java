@@ -1,4 +1,4 @@
-package main.java.com.projeto6.OrderAPI.dto;
+package com.projeto6.OrderAPI.dto;
 
 // DTO que representa um item dentro do pedido.
 public class OrderItemRequest {
