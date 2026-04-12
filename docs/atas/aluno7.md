@@ -10,9 +10,9 @@
 | 02/03 - 08/03 | Arquitetura de Software Distribuído - Unidade 3 | ✅ | Desenvolvimento da parte de introdução do projeto | Conclusão do desenvolvimento da parte de introdução do projeto |
 | 09/03 - 15/03 | APIs e Web Services - Unidade 1 | ✅ | Estudar Microfundamento para elaborar a Worker NotificationService  | Estudo dos microfundamentos |
 | 16/03 - 22/03 | APIs e Web Services - Unidade 2 | ✅ | Estudar Microfundamento para elaborar a Worker NotificationService | Estudo dos microfundamentos |
-| 23/03 - 29/03 | APIs e Web Services - Unidade 2 | ✅ | Criação da Worker de notificação  – NotificationService | Desenvolvimento |
-| 30/03 - 05/04 | Recuperação de Informação na Web e Redes Sociais - Unidade 1 | ⬜ |  |  |
-| 06/04 - 12/04 | Recuperação de Informação na Web e Redes Sociais - Unidade 2 | ⬜ |  |  |
+| 23/03 - 29/03 | APIs e Web Services - Unidade 2 | ✅ | Estruturação da Worker de notificação  – NotificationService | Estruturação do NotificationService |
+| 30/03 - 05/04 | Recuperação de Informação na Web e Redes Sociais - Unidade 1 | ✅ | Criação da Worker de notificação  – NotificationService | Desenvolvimento |
+| 06/04 - 12/04 | Recuperação de Informação na Web e Redes Sociais - Unidade 2 | ✅ | Testes e documentação do NotificationService | Teste e documentação |
 | 13/04 - 19/04 | Computação Ubíqua e Pervasiva e IoT - Unidade 1 | ⬜ |  |  |
 | 20/04 - 26/04 | Computação Ubíqua e Pervasiva e IoT - Unidade 2 | ⬜ |  |  |
 | 27/04 - 03/05 | Desenvolvimento de Aplicações Móveis - Unidade 1 | ⬜ |  |  |
