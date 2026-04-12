@@ -1212,8 +1212,6 @@ Cenarios de erro importantes:
 - Buscar pedido inexistente (`500`).
 - Cancelar pedido inexistente (`500`).
 
----
-
 ### Referencias
 - `services/order/OrderAPI/OrderAPI/src/main/java/com/projeto6/OrderAPI/controller/OrderController.java`
 - `services/order/OrderAPI/OrderAPI/src/main/java/com/projeto6/OrderAPI/service/OrderService.java`
@@ -1222,4 +1220,150 @@ Cenarios de erro importantes:
 - `services/order/OrderAPI/OrderAPI/src/main/resources/application.properties`
 - `gateway/nginx.conf`
 - `http://localhost:5004/swagger-ui.html`
+
+# Back-End APIs
+
+## PaymentAPI
+
+### Objetivos da API
+A PaymentAPI é um microsserviço responsável por processar e simular transações financeiras para os pedidos do e-commerce.
+
+Objetivos principais:
+- Receber requisições de pagamento vinculadas a um pedido (`orderId`).
+- Validar a integridade dos dados enviados.
+- Simular a aprovação ou recusa de um cartão de crédito através de regras de negócio predefinidas.
+- Retornar um identificador de transação (`transactionId`) para auditoria e controle da OrderAPI.
+
+### Modelagem da Aplicação
+Diferente dos outros microsserviços, a PaymentAPI opera de forma **stateless** (sem estado e sem banco de dados), pois atua como um simulador (Mock) de um gateway de pagamento externo (como Pagar.me, Stripe ou Mercado Pago).
+
+Regras de negócio centrais (Simulação):
+- A requisição falha imediatamente se o `orderId` ou o `value` não forem fornecidos.
+- **Regra de Recusa:** Se o valor (`value`) da transação terminar com os decimais `.99` (ex: `250.99`), o pagamento é automaticamente simulado como **RECUSADO** (`DECLINED`).
+- **Regra de Aprovação:** Qualquer outro valor é simulado como **APROVADO** (`APPROVED`), gerando um `transactionId` único com o prefixo `TRX-`.
+
+### Tecnologias Utilizadas
+- Node.js 20
+- Express.js 4.18
+- Docker / Docker Compose
+- Nginx Gateway
+
+### Base URLs
+- Direto no serviço: `http://localhost:8080` (Porta interna do container)
+- Via gateway: `http://localhost:7000/api/payments`
+
+---
+
+### API Endpoints
+
+#### GET /health
+Objetivo: healthcheck da PaymentAPI.
+
+- URL direta: `/health`
+- URL gateway: `/api/payments/health`
+- Body: não possui
+
+Respostas:
+- `200 OK`
+
+Exemplo de resposta:
+```json
+{
+  "status": "ok",
+  "service": "paymentapi"
+}
+```
+
+#### POST /payments/process
+Objetivo: processar uma tentativa de pagamento para um pedido.
+
+- URL direta: `/payments/process`
+- URL gateway: `/api/payments/process`
+- Body:
+  - `orderId` (number ou string, obrigatório)
+  - `value` (decimal, obrigatório)
+
+Respostas:
+- `201 Created` — Pagamento Aprovado.
+- `400 Bad Request` — Faltam dados no payload.
+- `402 Payment Required` — Cartão recusado (Simulação).
+
+Exemplo de body (Requisição):
+```json
+{
+  "orderId": 1050,
+  "value": 250.00
+}
+```
+
+Exemplo de resposta `201 Created` (Aprovado):
+```json
+{
+  "transactionId": "TRX-837462",
+  "status": "APPROVED",
+  "orderId": 1050,
+  "processedAt": "2026-04-12T21:02:57.396Z"
+}
+```
+
+Exemplo de resposta `402 Payment Required` (Recusado):
+```json
+{
+  "transactionId": null,
+  "status": "DECLINED",
+  "message": "Cartão recusado (simulação)."
+}
+```
+
+---
+
+### Tratamento de Erros
+A PaymentAPI trata os erros de validação diretamente na rota principal, retornando objetos JSON padronizados com mensagens claras:
+- Omissão de campos obrigatórios (`orderId` ou `value`) retorna HTTP `400` com a mensagem `"Faltam dados: orderId ou value."`.
+- Regras de negócio não atendidas (como a simulação de recusa do cartão com final `.99`) não lançam exceções globais, mas retornam HTTP `402 Payment Required` com o status de recusa.
+
+---
+
+### Considerações de Segurança
+Estado atual:
+- Não há autenticação/autorização aplicada nos endpoints.
+- A API atua como um simulador em ambiente de desenvolvimento local.
+
+Recomendação:
+- Para uso em produção real, este serviço mockado deve ser substituído pela SDK oficial de um gateway de pagamento de mercado (Stripe, Pagar.me, etc.) e aceitar requisições restritas apenas de backend para backend (vindas exclusivamente da OrderAPI), bloqueando o acesso externo via Nginx.
+
+---
+
+### Implantação
+Serviço em Docker Compose:
+- `paymentapi` rodando na imagem oficial do `node:20` (versão completa com curl habilitado) e expondo a porta `8080` internamente.
+- Gateway Nginx roteando `/api/payments/*` para `paymentapi:8080`.
+
+Comandos principais:
+```bash
+docker compose build paymentapi
+docker compose up -d paymentapi
+docker compose logs paymentapi
+```
+
+---
+
+### Testes
+Fluxo recomendado de validação funcional:
+1. `GET /health` — checar se o serviço está operando no Gateway.
+2. `POST /payments/process` — testar cenário de sucesso com valor redondo (ex: `250.00`).
+3. `POST /payments/process` — testar cenário de recusa com valor terminando em `.99` (ex: `250.99`).
+
+Cenários de erro importantes:
+- Envio de payload vazio ou sem `orderId` (`400`).
+- Recusa do cartão via simulação (`402`).
+
+---
+
+### Referências
+- `services/payment/server.js`
+- `services/payment/package.json`
+- `services/payment/Dockerfile`
+- `gateway/nginx.conf`
+
 
