@@ -48,6 +48,8 @@ services:
         condition: service_healthy
       orderapi:
         condition: service_healthy
+      paymentapi:
+        condition: service_healthy
     healthcheck:
       test: ["CMD-SHELL", "wget -qO- http://localhost/gateway/health >/dev/null 2>&1 || exit 1"]
       interval: 15s
@@ -140,23 +142,20 @@ services:
       retries: 3
       start_period: 40s
 
-  # paymentapi:
-  #   build: ./services/payment
-  #   ports:
-  #     - "5005:8080"
-  #   environment:
-  #     - JWT_SECRET=${JWT_SECRET}
-  #     - DB_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres/${POSTGRES_DB}
-  #     - PAYMENT_MODE=random
-  #   depends_on:
-  #     postgres:
-  #       condition: service_healthy
-  #   healthcheck:
-  #     test: ["CMD-SHELL", "curl -f http://localhost:8080/health || exit 1"]
-  #     interval: 15s
-  #     timeout: 5s
-  #     retries: 3
-  #     start_period: 20s
+  paymentapi:
+    build: ./services/payment
+    ports:
+      - "5005:8080"
+    # Se no futuro você quiser colocar autenticação JWT nela, basta descomentar abaixo:
+    # environment:
+    #   - JWT_SECRET=${JWT_SECRET}
+    healthcheck:
+      # Usando curl, mesmo padrão que você usou na usersapi e orderapi
+      test: ["CMD-SHELL", "curl -f http://localhost:8080/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
 
   notificationworker:
     build: ./services/notification
