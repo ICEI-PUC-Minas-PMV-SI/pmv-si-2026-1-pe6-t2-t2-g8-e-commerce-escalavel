@@ -1,12 +1,14 @@
 # Back-End APIs
 
 ## Sumário
-* [UserAPI](#userapi)
-* [CatalogAPI](#catalogapi)
+
 * [StockAPI](#stockapi)
+* [CatalogAPI](#catalogapi)
+* [NotificationService](#notificationservice)
+* [UserAPI](#userapi)
 * [OrderAPI](#orderapi)
 * [PaymentAPI](#paymentapi)
-* [NotificationService](#notificationservice)
+
 
 ## StockAPI
 
@@ -235,8 +237,6 @@ Cenarios de erro importantes:
 - `services/stock/StockAPI/POSTMAN_API_REFERENCE.md`
 - `gateway/nginx.conf`
 
-
-# Back-End APIs
 
 ## CatalogAPI
 
@@ -558,7 +558,6 @@ Cenarios de erro importantes:
 
 
 ---
-# Back-End APIs
 
 ## NotificationService
 
@@ -745,7 +744,6 @@ Os testes foram realizados via publicacao manual de mensagens no RabbitMQ, simul
 
 
 ---
-# Back-End APIs
 
 ## UserAPI
 
@@ -1003,7 +1001,6 @@ Cenarios de erro importantes:
 
 
 ---
-# Back-End APIs
 
 ## OrderAPI
 
@@ -1229,7 +1226,6 @@ Cenarios de erro importantes:
 - `gateway/nginx.conf`
 - `http://localhost:5004/swagger-ui.html`
 
-# Back-End APIs
 
 ## PaymentAPI
 
@@ -1373,5 +1369,4 @@ Cenários de erro importantes:
 - `services/payment/package.json`
 - `services/payment/Dockerfile`
 - `gateway/nginx.conf`
-
 
