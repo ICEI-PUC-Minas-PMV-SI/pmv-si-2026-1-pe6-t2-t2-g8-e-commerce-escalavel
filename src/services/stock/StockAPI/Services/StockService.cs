@@ -48,17 +48,25 @@ public class StockService : IStockService
 
     public async Task<StockItemResponse> CreateAsync(CreateStockRequest request)
     {
+        var productId = request.ProductId
+            ?? throw new ArgumentException("Field 'productId' is required.");
+
+        if (productId == Guid.Empty)
+        {
+            throw new ArgumentException("Field 'productId' cannot be empty.");
+        }
+
         var quantity = request.Quantity
             ?? throw new ArgumentException("Field 'quantity' is required.");
 
-        var normalizedName = NormalizeProductName(request.Name);
-        var exists = await _db.StockItems.AnyAsync(x => x.Name.ToUpper() == normalizedName);
+        var exists = await _db.StockItems.AnyAsync(x => x.ProductId == productId);
         if (exists)
         {
-            throw new StockAlreadyExistsException(request.Name);
+            throw new StockAlreadyExistsException(productId);
         }
 
         var item = StockItem.Create(
+            productId,
             request.Name,
             quantity,
             request.Color,
@@ -80,7 +88,7 @@ public class StockService : IStockService
         catch (DbUpdateException ex) when (IsUniqueViolation(ex))
         {
             await transaction.RollbackAsync();
-            throw new StockAlreadyExistsException(request.Name);
+            throw new StockAlreadyExistsException(productId);
         }
         catch
         {
@@ -331,10 +339,5 @@ public class StockService : IStockService
     {
         return ex.InnerException is PostgresException postgresException
             && postgresException.SqlState == PostgresErrorCodes.UniqueViolation;
-    }
-
-    private static string NormalizeProductName(string name)
-    {
-        return (name ?? string.Empty).Trim().ToUpperInvariant();
     }
 }

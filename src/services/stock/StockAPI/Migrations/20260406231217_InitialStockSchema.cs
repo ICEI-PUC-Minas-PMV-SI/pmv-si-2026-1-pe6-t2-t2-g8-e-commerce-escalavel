@@ -71,8 +71,7 @@ namespace StockAPI.Migrations
                 name: "IX_stock_items_Name",
                 schema: "stock",
                 table: "stock_items",
-                column: "Name",
-                unique: true);
+                column: "Name");
 
             migrationBuilder.CreateIndex(
                 name: "IX_stock_items_ProductId",

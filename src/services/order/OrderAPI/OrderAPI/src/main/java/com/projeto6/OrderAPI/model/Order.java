@@ -2,34 +2,35 @@ package com.projeto6.OrderAPI.model;
 
 import jakarta.persistence.*;
 import java.util.List;
+import java.util.UUID;
 
 @Entity
 @Table(name = "orders")
 public class Order {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
 
-    private Long customerId;
+    private UUID customerId;
 
     private String status;
 
     // Lista de itens do pedido
     @ElementCollection
-    @CollectionTable(name = "order_items",joinColumns = @JoinColumn(name = "order_id"))
+    @CollectionTable(name = "order_items_collection", joinColumns = @JoinColumn(name = "order_id"))
     private List<Item> items;
 
     //Getters e Setters
-    public Long getId() {
+    public UUID getId() {
         return id;
     }
 
-    public Long getCustomerId() {
+    public UUID getCustomerId() {
         return customerId;
     }
 
-    public void setCustomerId(Long customerId) {
+    public void setCustomerId(UUID customerId) {
         this.customerId = customerId;
     }
 

@@ -1,16 +1,17 @@
 package com.projeto6.OrderAPI.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.util.UUID;
 
 @Schema(description = "DTO para representar um item no pedido")
 public class ItemRequest {
 
     @Schema(
         description = "ID do produto que será incluído no pedido",
-        example = "200",
+        example = "550e8400-e29b-41d4-a716-446655440000",
         required = true
     )
-    private Long productId;
+    private UUID productId;
 
     @Schema(
         description = "Quantidade do produto no pedido",
@@ -20,11 +21,11 @@ public class ItemRequest {
     private Integer quantity;
 
     // Getters e Setters
-    public Long getProductId() {
+    public UUID getProductId() {
         return productId;
     }
 
-    public void setProductId(Long productId) {
+    public void setProductId(UUID productId) {
         this.productId = productId;
     }
 

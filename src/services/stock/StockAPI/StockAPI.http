@@ -18,6 +18,7 @@ POST {{StockAPI_HostAddress}}/stock
 Content-Type: application/json
 
 {
+	"productId": "11111111-1111-1111-1111-111111111111",
 	"name": "Camiseta Dry Fit",
 	"quantity": 20,
 	"color": "Preto",

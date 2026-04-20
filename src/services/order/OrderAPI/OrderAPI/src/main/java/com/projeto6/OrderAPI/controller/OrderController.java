@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @Tag(name = "Pedidos", description = "Endpoints para gerenciamento de pedidos")
 @RestController
@@ -42,8 +43,8 @@ public class OrderController {
     @Operation(summary = "Buscar pedido pelo ID")
     @GetMapping("/{id}")
     public ResponseEntity<OrderResponse> getOrderById(
-            @Parameter(description = "ID do pedido", example = "1")
-            @PathVariable Long id) {
+            @Parameter(description = "ID do pedido", example = "550e8400-e29b-41d4-a716-446655440000")
+            @PathVariable UUID id) {
 
         return ResponseEntity.ok(orderService.getOrderById(id));
     }
@@ -52,8 +53,8 @@ public class OrderController {
     @Operation(summary = "Buscar pedidos por ID do usuário")
     @GetMapping("/user/{userId}")
     public ResponseEntity<List<OrderResponse>> getOrdersByUser(
-            @Parameter(description = "ID do usuário", example = "10")
-            @PathVariable Long userId) {
+            @Parameter(description = "ID do usuário", example = "550e8400-e29b-41d4-a716-446655440000")
+            @PathVariable UUID userId) {
 
         return ResponseEntity.ok(orderService.getOrdersByUser(userId));
     }
@@ -62,8 +63,8 @@ public class OrderController {
     @Operation(summary = "Atualizar status do pedido")
     @PatchMapping("/{id}/status")
     public ResponseEntity<OrderResponse> updateStatus(
-            @Parameter(description = "ID do pedido", example = "1")
-            @PathVariable Long id,
+            @Parameter(description = "ID do pedido", example = "550e8400-e29b-41d4-a716-446655440000")
+            @PathVariable UUID id,
 
             @Parameter(description = "Novo status do pedido", example = "APROVADO")
             @RequestParam String status) {
@@ -75,8 +76,8 @@ public class OrderController {
     @Operation(summary = "Cancelar um pedido")
     @PostMapping("/{id}/cancel")
     public ResponseEntity<OrderResponse> cancelOrder(
-            @Parameter(description = "ID do pedido", example = "1")
-            @PathVariable Long id) {
+            @Parameter(description = "ID do pedido", example = "550e8400-e29b-41d4-a716-446655440000")
+            @PathVariable UUID id) {
 
         return ResponseEntity.ok(orderService.cancelOrder(id));
     }

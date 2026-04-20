@@ -1,16 +1,18 @@
 package com.projeto6.OrderAPI.dto;
 
+import java.util.UUID;
+
 // DTO que representa um item dentro do pedido.
 public class OrderItemRequest {
 
-    private Long productId;
+    private UUID productId;
     private Integer quantity;
 
-    public Long getProductId() {
+    public UUID getProductId() {
         return productId;
     }
 
-    public void setProductId(Long productId) {
+    public void setProductId(UUID productId) {
         this.productId = productId;
     }
 

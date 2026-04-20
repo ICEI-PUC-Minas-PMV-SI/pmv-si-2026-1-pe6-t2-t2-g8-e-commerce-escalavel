@@ -65,7 +65,7 @@ public class AppDbContext : DbContext {
 // EVENTO (COMPATÍVEL COM JAVA)
 // =======================
 
-public record OrderCreatedEvent(long OrderId, string CustomerEmail);
+public record OrderCreatedEvent(Guid OrderId, string CustomerEmail);
 
 // =======================
 // CONSUMER

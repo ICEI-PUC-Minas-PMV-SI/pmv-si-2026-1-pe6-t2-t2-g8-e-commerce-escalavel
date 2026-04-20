@@ -1,19 +1,20 @@
 package com.projeto6.OrderAPI.model;
 
 import jakarta.persistence.*;
+import java.util.UUID;
 
 // Entidade que representa um item dentro de um pedido.
 
 @Entity
-@Table(name = "order_items")
+@Table(name = "order_items_entity")
 public class OrderItem {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
 
     // ID do produto
-    private Long productId;
+    private UUID productId;
 
     // Quantidade do produto no pedido
     private Integer quantity;
@@ -22,15 +23,15 @@ public class OrderItem {
     private Double price;
 
     // Getters e Setters
-    public Long getId() {
+    public UUID getId() {
         return id;
     }
 
-    public Long getProductId() {
+    public UUID getProductId() {
         return productId;
     }
 
-    public void setProductId(Long productId) {
+    public void setProductId(UUID productId) {
         this.productId = productId;
     }
 

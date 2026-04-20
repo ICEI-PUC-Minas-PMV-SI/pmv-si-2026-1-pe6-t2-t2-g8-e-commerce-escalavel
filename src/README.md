@@ -122,6 +122,52 @@ docker compose down -v
 docker compose up --build
 ```
 
+### Smoke test E2E de contratos (gateway)
+
+Após subir os serviços, rode o script abaixo para validar:
+
+- Healthchecks principais
+- Criação de estoque com `productId` externo (UUID)
+- Rejeição de duplicidade de estoque por `productId`
+- Fluxos de estoque: reserve, release e confirm
+- Cenários negativos de estoque (422)
+- Criação e consulta de pedido com UUID
+- Fluxos de pagamento aprovado, recusado e payload inválido
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\smoke-e2e.ps1
+```
+
+Parâmetros opcionais:
+
+```powershell
+# Alterar URL base do gateway
+powershell -ExecutionPolicy Bypass -File .\scripts\smoke-e2e.ps1 -GatewayBaseUrl "http://localhost:7000"
+
+# Pular healthchecks
+powershell -ExecutionPolicy Bypass -File .\scripts\smoke-e2e.ps1 -SkipHealthChecks
+```
+
+### Bootstrap inicial do Catalog (itens 1-3)
+
+Script para primeira execução no Postman/ambiente local:
+
+- Valida healthchecks principais
+- Cria categoria base
+- Cria produto vinculado na categoria
+- Valida listagem e busca por id
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\bootstrap-catalog.ps1
+```
+
+Parâmetros opcionais:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\bootstrap-catalog.ps1 -CategoryName "Camisetas"
+powershell -ExecutionPolicy Bypass -File .\scripts\bootstrap-catalog.ps1 -ProductName "Camiseta Dry Fit"
+```
+
 ---
 
 ## 📁 Estrutura de pastas

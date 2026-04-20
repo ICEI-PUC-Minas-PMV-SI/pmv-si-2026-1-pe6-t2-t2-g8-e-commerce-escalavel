@@ -1,6 +1,7 @@
 package com.projeto6.OrderAPI.dto;
 
 import java.util.List;
+import java.util.UUID;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
@@ -9,15 +10,15 @@ public class OrderResponse {
 
     @Schema(
         description = "ID único do pedido",
-        example = "100"
+        example = "550e8400-e29b-41d4-a716-446655440000"
     )
-    private Long id;
+    private UUID id;
 
     @Schema(
         description = "ID do cliente que realizou o pedido",
-        example = "1"
+        example = "550e8400-e29b-41d4-a716-446655440000"
     )
-    private Long customerId;
+    private UUID customerId;
 
     @Schema(
         description = "Lista de itens presentes no pedido"
@@ -31,19 +32,19 @@ public class OrderResponse {
     private String status;
 
     // Getters e Setters
-    public Long getId() {
+    public UUID getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(UUID id) {
         this.id = id;
     }
 
-    public Long getCustomerId() {
+    public UUID getCustomerId() {
         return customerId;
     }
 
-    public void setCustomerId(Long customerId) {
+    public void setCustomerId(UUID customerId) {
         this.customerId = customerId;
     }
 

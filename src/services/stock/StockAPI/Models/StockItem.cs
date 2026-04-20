@@ -16,6 +16,7 @@ public class StockItem
     public int QuantityReserved { get; set; }
 
     public static StockItem Create(
+        Guid productId,
         string name,
         int quantity,
         string color,
@@ -24,6 +25,11 @@ public class StockItem
         decimal costPrice,
         decimal salePrice)
     {
+        if (productId == Guid.Empty)
+        {
+            throw new ArgumentException("ProductId is required.", nameof(productId));
+        }
+
         if (quantity < 0)
         {
             throw new ArgumentOutOfRangeException(nameof(quantity), "Quantity cannot be negative.");
@@ -47,7 +53,7 @@ public class StockItem
         var item = new StockItem
         {
             Id = Guid.NewGuid(),
-            ProductId = Guid.NewGuid(),
+            ProductId = productId,
             Name = NormalizeRequiredText(name, nameof(name)),
             Color = NormalizeRequiredText(color, nameof(color)),
             Model = NormalizeRequiredText(model, nameof(model)),
@@ -125,6 +131,11 @@ public class StockItem
 
     private void EnsureInvariants()
     {
+        if (ProductId == Guid.Empty)
+        {
+            throw new InvalidOperationException("ProductId cannot be empty.");
+        }
+
         if (QuantityAvailable < 0)
         {
             throw new InvalidOperationException("QuantityAvailable cannot be negative.");

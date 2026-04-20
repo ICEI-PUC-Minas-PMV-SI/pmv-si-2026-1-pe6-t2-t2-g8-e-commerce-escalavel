@@ -71,8 +71,7 @@ namespace StockAPI.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Name")
-                        .IsUnique();
+                    b.HasIndex("Name");
 
                     b.HasIndex("ProductId")
                         .IsUnique();

@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -41,7 +42,7 @@ public class OrderService {
     }
 
     // Buscar por ID
-    public OrderResponse getOrderById(Long id) {
+    public OrderResponse getOrderById(UUID id) {
         Order order = repository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Pedido não encontrado"));
 
@@ -49,7 +50,7 @@ public class OrderService {
     }
 
     // Buscar por usuário
-    public List<OrderResponse> getOrdersByUser(Long userId) {
+    public List<OrderResponse> getOrdersByUser(UUID userId) {
         return repository.findByCustomerId(userId)
                 .stream()
                 .map(this::toResponse)
@@ -57,7 +58,7 @@ public class OrderService {
     }
 
     // Atualizar status
-    public OrderResponse updateStatus(Long id, String status) {
+    public OrderResponse updateStatus(UUID id, String status) {
         Order order = repository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Pedido não encontrado"));
 
@@ -68,7 +69,7 @@ public class OrderService {
     }
 
     // Cancelar pedido
-    public OrderResponse cancelOrder(Long id) {
+    public OrderResponse cancelOrder(UUID id) {
         Order order = repository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Pedido não encontrado"));
 
