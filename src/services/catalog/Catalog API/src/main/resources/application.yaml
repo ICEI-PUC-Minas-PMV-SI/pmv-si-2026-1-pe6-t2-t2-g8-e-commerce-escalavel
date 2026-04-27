@@ -13,4 +13,4 @@ spring:
         default_schema: catalog
 
 server:
-  port: ${SERVER_PORT:8080}
+  port: ${SERVER_PORT:5002}
