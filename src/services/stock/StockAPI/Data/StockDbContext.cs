@@ -20,8 +20,10 @@ public class StockDbContext : DbContext
             e.ToTable("stock_items");
             e.HasKey(x => x.Id);
             e.HasIndex(x => x.ProductId).IsUnique();
+            e.HasIndex(x => x.CategoryId);
             e.HasIndex(x => x.Name);
             e.Property(x => x.ProductId).IsRequired();
+            e.Property(x => x.CategoryId).IsRequired();
             e.Property(x => x.Name).IsRequired().HasMaxLength(150);
             e.Property(x => x.Color).IsRequired().HasMaxLength(50);
             e.Property(x => x.Model).IsRequired().HasMaxLength(80);

@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 namespace StockAPI.DTOs;
 
 public record CreateStockRequest(
-    [Required] Guid? ProductId,
+    [Required] Guid? CategoryId,
     [Required][MinLength(2)][MaxLength(150)] string Name,
     [Required][Range(0, int.MaxValue)] int? Quantity,
     [Required][MinLength(1)][MaxLength(50)] string Color,

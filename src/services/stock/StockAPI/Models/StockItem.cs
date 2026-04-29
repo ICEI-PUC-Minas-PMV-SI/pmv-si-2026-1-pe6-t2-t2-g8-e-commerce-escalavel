@@ -6,6 +6,7 @@ public class StockItem
 {
     public Guid Id { get; set; }
     public Guid ProductId { get; set; }
+    public Guid CategoryId { get; set; }
     public string Name { get; set; } = string.Empty;
     public string Color { get; set; } = string.Empty;
     public string Model { get; set; } = string.Empty;
@@ -16,7 +17,7 @@ public class StockItem
     public int QuantityReserved { get; set; }
 
     public static StockItem Create(
-        Guid productId,
+        Guid categoryId,
         string name,
         int quantity,
         string color,
@@ -25,9 +26,9 @@ public class StockItem
         decimal costPrice,
         decimal salePrice)
     {
-        if (productId == Guid.Empty)
+        if (categoryId == Guid.Empty)
         {
-            throw new ArgumentException("ProductId is required.", nameof(productId));
+            throw new ArgumentException("CategoryId is required.", nameof(categoryId));
         }
 
         if (quantity < 0)
@@ -53,7 +54,8 @@ public class StockItem
         var item = new StockItem
         {
             Id = Guid.NewGuid(),
-            ProductId = productId,
+            ProductId = Guid.NewGuid(),
+            CategoryId = categoryId,
             Name = NormalizeRequiredText(name, nameof(name)),
             Color = NormalizeRequiredText(color, nameof(color)),
             Model = NormalizeRequiredText(model, nameof(model)),
@@ -134,6 +136,11 @@ public class StockItem
         if (ProductId == Guid.Empty)
         {
             throw new InvalidOperationException("ProductId cannot be empty.");
+        }
+
+        if (CategoryId == Guid.Empty)
+        {
+            throw new InvalidOperationException("CategoryId cannot be empty.");
         }
 
         if (QuantityAvailable < 0)

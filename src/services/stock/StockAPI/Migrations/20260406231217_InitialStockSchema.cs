@@ -21,6 +21,7 @@ namespace StockAPI.Migrations
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     ProductId = table.Column<Guid>(type: "uuid", nullable: false),
+                    CategoryId = table.Column<Guid>(type: "uuid", nullable: false),
                     Name = table.Column<string>(type: "character varying(150)", maxLength: 150, nullable: false),
                     Color = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
                     Model = table.Column<string>(type: "character varying(80)", maxLength: 80, nullable: false),
@@ -66,6 +67,12 @@ namespace StockAPI.Migrations
                 {
                     table.PrimaryKey("PK_stock_reservations", x => x.Id);
                 });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_stock_items_CategoryId",
+                schema: "stock",
+                table: "stock_items",
+                column: "CategoryId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_stock_items_Name",

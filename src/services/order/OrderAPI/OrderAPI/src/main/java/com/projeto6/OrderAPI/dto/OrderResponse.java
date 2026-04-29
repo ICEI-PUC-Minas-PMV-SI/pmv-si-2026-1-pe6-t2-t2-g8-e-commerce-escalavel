@@ -1,37 +1,29 @@
 package com.projeto6.OrderAPI.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
-
-import io.swagger.v3.oas.annotations.media.Schema;
 
 @Schema(description = "DTO de resposta de um pedido")
 public class OrderResponse {
 
-    @Schema(
-        description = "ID único do pedido",
-        example = "550e8400-e29b-41d4-a716-446655440000"
-    )
+    @Schema(description = "ID único do pedido", example = "550e8400-e29b-41d4-a716-446655440000")
     private UUID id;
 
-    @Schema(
-        description = "ID do cliente que realizou o pedido",
-        example = "550e8400-e29b-41d4-a716-446655440000"
-    )
+    @Schema(description = "ID do cliente que realizou o pedido", example = "550e8400-e29b-41d4-a716-446655440000")
     private UUID customerId;
 
-    @Schema(
-        description = "Lista de itens presentes no pedido"
-    )
+    @Schema(description = "Lista de itens presentes no pedido")
     private List<ItemResponse> items;
 
-    @Schema(
-        description = "Status atual do pedido",
-        example = "CRIADO"
-    )
+    @Schema(description = "Status atual do pedido", example = "CONFIRMED")
     private String status;
 
-    // Getters e Setters
+    @Schema(description = "Valor total do pedido", example = "59.80")
+    private BigDecimal totalAmount;
+
     public UUID getId() {
         return id;
     }
@@ -62,5 +54,13 @@ public class OrderResponse {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public BigDecimal getTotalAmount() {
+        return totalAmount;
+    }
+
+    public void setTotalAmount(BigDecimal totalAmount) {
+        this.totalAmount = totalAmount;
     }
 }

@@ -1,6 +1,8 @@
 package com.projeto6.OrderAPI.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+
+import java.math.BigDecimal;
 import java.util.UUID;
 
 @Schema(description = "DTO para representar um item no pedido")
@@ -20,7 +22,14 @@ public class ItemRequest {
     )
     private Integer quantity;
 
-    // Getters e Setters
+    // TODO: substituir por lookup no CatalogAPI para evitar fraude de preço
+    @Schema(
+        description = "Preço unitário (temporário — ideal: vir do CatalogAPI)",
+        example = "29.90",
+        required = true
+    )
+    private BigDecimal price;
+
     public UUID getProductId() {
         return productId;
     }
@@ -35,5 +44,13 @@ public class ItemRequest {
 
     public void setQuantity(Integer quantity) {
         this.quantity = quantity;
+    }
+
+    public BigDecimal getPrice() {
+        return price;
+    }
+
+    public void setPrice(BigDecimal price) {
+        this.price = price;
     }
 }

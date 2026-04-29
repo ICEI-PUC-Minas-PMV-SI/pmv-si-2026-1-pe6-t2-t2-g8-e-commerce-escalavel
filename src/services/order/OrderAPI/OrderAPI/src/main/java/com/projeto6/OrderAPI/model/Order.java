@@ -1,6 +1,8 @@
 package com.projeto6.OrderAPI.model;
 
 import jakarta.persistence.*;
+
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
@@ -14,14 +16,15 @@ public class Order {
 
     private UUID customerId;
 
-    private String status;
+    @Enumerated(EnumType.STRING)
+    private OrderStatus status;
 
-    // Lista de itens do pedido
+    private BigDecimal totalAmount;
+
     @ElementCollection
     @CollectionTable(name = "order_items_collection", joinColumns = @JoinColumn(name = "order_id"))
     private List<Item> items;
 
-    //Getters e Setters
     public UUID getId() {
         return id;
     }
@@ -34,12 +37,20 @@ public class Order {
         this.customerId = customerId;
     }
 
-    public String getStatus() {
+    public OrderStatus getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(OrderStatus status) {
         this.status = status;
+    }
+
+    public BigDecimal getTotalAmount() {
+        return totalAmount;
+    }
+
+    public void setTotalAmount(BigDecimal totalAmount) {
+        this.totalAmount = totalAmount;
     }
 
     public List<Item> getItems() {

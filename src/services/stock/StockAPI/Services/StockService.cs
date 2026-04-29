@@ -25,6 +25,7 @@ public class StockService : IStockService
             .OrderBy(x => x.Name)
             .Select(x => new StockItemResponse(
                 x.ProductId,
+                x.CategoryId,
                 x.Name,
                 x.Color,
                 x.Model,
@@ -48,25 +49,19 @@ public class StockService : IStockService
 
     public async Task<StockItemResponse> CreateAsync(CreateStockRequest request)
     {
-        var productId = request.ProductId
-            ?? throw new ArgumentException("Field 'productId' is required.");
+        var categoryId = request.CategoryId
+            ?? throw new ArgumentException("Field 'categoryId' is required.");
 
-        if (productId == Guid.Empty)
+        if (categoryId == Guid.Empty)
         {
-            throw new ArgumentException("Field 'productId' cannot be empty.");
+            throw new ArgumentException("Field 'categoryId' cannot be empty.");
         }
 
         var quantity = request.Quantity
             ?? throw new ArgumentException("Field 'quantity' is required.");
 
-        var exists = await _db.StockItems.AnyAsync(x => x.ProductId == productId);
-        if (exists)
-        {
-            throw new StockAlreadyExistsException(productId);
-        }
-
         var item = StockItem.Create(
-            productId,
+            categoryId,
             request.Name,
             quantity,
             request.Color,
@@ -88,7 +83,7 @@ public class StockService : IStockService
         catch (DbUpdateException ex) when (IsUniqueViolation(ex))
         {
             await transaction.RollbackAsync();
-            throw new StockAlreadyExistsException(productId);
+            throw new StockAlreadyExistsException(item.ProductId);
         }
         catch
         {
@@ -97,8 +92,9 @@ public class StockService : IStockService
         }
 
         _logger.LogInformation(
-            "Stock created for ProductId={ProductId}, Name={Name}, InitialQuantity={InitialQuantity}",
+            "Stock created for ProductId={ProductId}, CategoryId={CategoryId}, Name={Name}, InitialQuantity={InitialQuantity}",
             item.ProductId,
+            item.CategoryId,
             item.Name,
             quantity);
 
@@ -312,6 +308,7 @@ public class StockService : IStockService
     {
         return new StockItemResponse(
             item.ProductId,
+            item.CategoryId,
             item.Name,
             item.Color,
             item.Model,

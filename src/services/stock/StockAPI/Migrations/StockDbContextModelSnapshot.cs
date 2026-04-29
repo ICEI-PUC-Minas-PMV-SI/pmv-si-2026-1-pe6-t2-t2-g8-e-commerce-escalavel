@@ -29,6 +29,9 @@ namespace StockAPI.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<Guid>("CategoryId")
+                        .HasColumnType("uuid");
+
                     b.Property<string>("Color")
                         .IsRequired()
                         .HasMaxLength(50)
@@ -67,6 +70,8 @@ namespace StockAPI.Migrations
                         .HasColumnType("character varying(30)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CategoryId");
 
                     b.HasIndex("Name");
 
