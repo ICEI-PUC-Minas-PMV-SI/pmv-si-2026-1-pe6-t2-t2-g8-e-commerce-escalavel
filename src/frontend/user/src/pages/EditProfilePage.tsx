@@ -28,8 +28,6 @@ export default function EditProfilePage() {
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
     if (!user) return
-    setError('')
-    setSuccess('')
     setLoading(true)
 
     try {
