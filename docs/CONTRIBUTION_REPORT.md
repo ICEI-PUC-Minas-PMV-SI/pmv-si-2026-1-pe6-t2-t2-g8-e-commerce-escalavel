@@ -1,6 +1,6 @@
 # 📊 Relatório de Contribuições do Projeto
 
-**Última atualização:** 29/04/2026 02:42
+**Última atualização:** 29/04/2026 02:55
 
 ---
 
@@ -9,21 +9,21 @@
 | Aluno                 |   Commits |   Linhas+ |   Linhas- |   Arquivos |   Docs Commits |   Docs Arquivos |
 |-----------------------|-----------|-----------|-----------|------------|----------------|-----------------|
 | Carlos Morais         |         2 |         7 |        15 |          2 |              2 |               2 |
-| Dev-Vinicio           |        15 |     11886 |      1034 |         54 |             13 |               3 |
+| Dev-Vinicio           |        17 |     11924 |      1039 |         55 |             13 |               3 |
 | Hugo Freitas          |        28 |       481 |        90 |         14 |             16 |               6 |
 | João Gabriel Perez    |        10 |      1731 |       334 |         42 |              2 |               1 |
 | Nicolas               |         4 |      5243 |       212 |         25 |              1 |               1 |
 | Vitor Linas           |        14 |       374 |        93 |          6 |              5 |               1 |
 | gabriel               |         8 |      4581 |       327 |         62 |              0 |               0 |
 | gabrielcambraia       |        12 |       671 |        23 |          3 |              7 |               2 |
-| github-actions[bot]   |        63 |       418 |       405 |          3 |             58 |               1 |
+| github-actions[bot]   |        64 |       432 |       419 |          3 |             59 |               1 |
 | github-classroom[bot] |         1 |      2152 |         0 |         45 |              1 |              13 |
 | nicolaspborges96      |        36 |     12776 |      1899 |        132 |             14 |               3 |
 
 
 ## 📅 Contribuições Semanais (Todo o Semestre)
 
-**2026-04-22**: Dev-Vinicio: 1, gabriel: 4, github-actions[bot]: 1
+**2026-04-22**: Dev-Vinicio: 3, gabriel: 4, github-actions[bot]: 2
 
 **2026-04-15**: github-actions[bot]: 2, nicolaspborges96: 1
 
