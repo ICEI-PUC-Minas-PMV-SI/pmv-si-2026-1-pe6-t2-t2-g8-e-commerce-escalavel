@@ -4,12 +4,20 @@ const router = express.Router();
 const userController = require('../controllers/userController');
 const { authenticate, authorize } = require('../middlewares/authMiddleware');
 
-// Lista todos usuários → apenas admin
+// Lista usuários ativos → apenas admin
 router.get(
   '/',
   authenticate,
   authorize('admin'),
   userController.getAllUsers
+);
+
+// Lista TODOS os usuários (ativos + inativos) → apenas admin
+router.get(
+  '/all',
+  authenticate,
+  authorize('admin'),
+  userController.getAllUsersAdmin
 );
 
 // Rota por id → o próprio usuário ou admin
@@ -56,6 +64,22 @@ router.delete(
     return res.status(403).json({ status: 'fail', message: 'Acesso não autorizado' });
   },
   userController.deleteUser
+);
+
+// Reativa usuário → apenas admin
+router.put(
+  '/:id/reactivate',
+  authenticate,
+  authorize('admin'),
+  userController.reactivateUser
+);
+
+// Exclusão definitiva (hard delete) → apenas admin
+router.delete(
+  '/:id/permanent',
+  authenticate,
+  authorize('admin'),
+  userController.hardDeleteUser
 );
 
 module.exports = router;

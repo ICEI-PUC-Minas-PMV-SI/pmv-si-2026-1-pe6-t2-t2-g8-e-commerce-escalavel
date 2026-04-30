@@ -1,5 +1,6 @@
 // src/controllers/authController.js
 const authService = require('../services/authService');
+const { sanitizeUser, isValidEmail, isValidCPF, isValidPhone, validateAddress } = require('../utils/userUtils');
 
 // Função para padronizar erros
 const errorHandler = (err, res) => {
@@ -32,35 +33,10 @@ const errorHandler = (err, res) => {
   return res.status(status).json({ status: 'fail', message });
 };
 
-// Validação de e-mail
-const isValidEmail = (email) => {
-  const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  return re.test(email);
-};
-
-// Validação de endereço (opcional)
-const validateAddress = (address) => {
-  if (!address) return true;
-
-  const { street, city, state, zip } = address;
-
-  // Se qualquer campo vier, todos devem ser string (mínimo básico)
-  if (
-    (street && typeof street !== 'string') ||
-    (city && typeof city !== 'string') ||
-    (state && typeof state !== 'string') ||
-    (zip && typeof zip !== 'string')
-  ) {
-    return false;
-  }
-
-  return true;
-};
-
 // Registro de usuário
 const register = async (req, res) => {
   try {
-    const { name, email, password, address } = req.body;
+    const { name, email, password, cpf, phone, address } = req.body;
 
     // 🔹 validações
     if (!name || name.trim().length < 2) {
@@ -84,6 +60,20 @@ const register = async (req, res) => {
       });
     }
 
+    if (cpf && !isValidCPF(cpf)) {
+      return res.status(400).json({
+        status: 'fail',
+        message: 'CPF inválido',
+      });
+    }
+
+    if (phone && !isValidPhone(phone)) {
+      return res.status(400).json({
+        status: 'fail',
+        message: 'Telefone inválido',
+      });
+    }
+
     if (!validateAddress(address)) {
       return res.status(400).json({
         status: 'fail',
@@ -95,10 +85,19 @@ const register = async (req, res) => {
       name,
       email,
       password,
+      cpf: cpf || null,
+      phone: phone || null,
       address,
     });
 
-    res.status(201).json({ status: 'success', data: result });
+    res.status(201).json({
+      status: 'success',
+      data: {
+        user: sanitizeUser(result.user),
+        token: result.token,
+      },
+    });
+
   } catch (err) {
     errorHandler(err, res);
   }
@@ -126,7 +125,14 @@ const login = async (req, res) => {
 
     const result = await authService.login({ email, password });
 
-    res.json({ status: 'success', data: result });
+    res.json({
+      status: 'success',
+      data: {
+        user: sanitizeUser(result.user),
+        token: result.token,
+      },
+    });
+
   } catch (err) {
     errorHandler(err, res);
   }

@@ -1,0 +1,253 @@
+
+
+
+// cls
+
+// cd pmv-si-2026-1-pe6-t2-t2-g8-e-commerce-escalavel\src
+
+// docker compose up --build
+
+// docker compose down
+
+// docker compose exec postgres psql -U ecom -d ecommerce
+
+// \dn
+
+// SELECT id, name, email, role, created_at, active
+
+
+
+
+
+
+
+// POST http://localhost:5001/auth/register
+
+// POST http://localhost:5001/auth/login
+
+// GET http://localhost:5001/users
+
+// PUT http://localhost:5001/users/ID
+
+/** 
+
+    GET /health
+    POST /auth/register
+    POST /auth/login
+    GET /users
+    GET /users/:id
+    PUT /users/:id
+    PUT /users/:id/password
+    DELETE /users/:id
+
+ */
+
+
+/*** 
+
+    {
+        "name": "Marcos Teste",
+        "email": "marcos.teste@email.com",
+        "password": "12345678",
+        "address": {
+            "street": "Rua Teste",
+            "city": "Belo Horizonte",
+            "state": "MG",
+            "zip": "30000-000"
+        }
+    }
+
+*/
+
+
+/**
+  
+  
+    {
+        "status": "success",
+        "data": {
+            "user": {
+                "id": "cde99e08-c26e-44a0-bd4c-cc33a83f37dd",
+                "name": "Marcos Teste",
+                "email": "marcos.teste@email.com",
+                "password_hash": "$2b$10$9QSFQKxRAIFrhZJ1PncoX.gQCGbHwmR9kjRMYWUWt4TLZFkKYR6yu",
+                "role": "admin",
+                "created_at": "2026-04-26T02:11:21.641Z",
+                "active": true,
+                "address_street": "Rua Teste",
+                "address_city": "Belo Horizonte",
+                "address_state": "MG",
+                "address_zip": "30000-000"
+            },
+            "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjZGU5OWUwOC1jMjZlLTQ0YTAtYmQ0Yy1jYzMzYTgzZjM3ZGQiLCJlbWFpbCI6Im1hcmNvcy50ZXN0ZUBlbWFpbC5jb20iLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3NzcxNjk3OTAsImV4cCI6MTc3NzE3MzM5MH0.pDprNYO25_iUkyNvW_sS3-bDsDGtnwtTHg09ixekA7Q"
+        }
+    }
+
+
+
+    {
+        "status": "success",
+        "data": {
+            "user": {
+                "id": "b9b68fe2-3b99-4ac3-869c-5b28c498d047",
+                "name": "Wilton",
+                "email": "wilton.araujo.teste@email.com",
+                "role": "customer",
+                "created_at": "2026-04-27T01:59:39.133Z",
+                "street": "Rua vitor garcia",
+                "city": "Contagem",
+                "state": "MG",
+                "zip": "30523-879"
+            },
+            "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJiOWI2OGZlMi0zYjk5LTRhYzMtODY5Yy01YjI4YzQ5OGQwNDciLCJlbWFpbCI6IndpbHRvbi50ZXN0ZUBlbWFpbC5jb20iLCJyb2xlIjoiY3VzdG9tZXIiLCJpYXQiOjE3NzcyNTUxNzksImV4cCI6MTc3NzI1ODc3OX0.2ewPA01rV56m7hyDOezDN0jpU8lA24STdBDJpfRUoGw"
+        }
+    }   
+
+
+*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Fase 2 — Preparar o front-end da Etapa 3
+
+A etapa da faculdade pede primeiro front-end web. Então depois de fechar a UsersAPI, o próximo foco é a interface.
+
+Pelo enunciado, você precisa entregar:
+
+visão geral da interação do usuário;
+protótipo interativo/wireframes;
+fluxo de usabilidade/fluxograma;
+frontend web consumindo Web API;
+testes de unidade;
+controle de mudanças;
+quadro GitHub;
+contribuições dos membros.
+
+Para sua parte de User, o front mínimo deveria ter:
+
+Tela	Objetivo
+Login	Autenticar usuário
+Cadastro	Criar usuário customer
+Perfil	Ver dados do usuário logado
+Editar perfil	Alterar nome/e-mail/endereço
+Trocar senha	Atualizar senha
+Admin usuários	Listar usuários, apenas admin
+Desativar conta	Soft delete
+
+Ordem ideal do front:
+
+Criar estrutura base do front.
+Criar layout simples.
+Criar serviço HTTP para auth/users.
+Criar tela de login.
+Salvar token no navegador.
+Criar proteção de rotas.
+Criar tela de perfil.
+Criar tela admin de usuários.
+Criar testes unitários básicos.
+Documentar prints e evidências.
+
+
+
+
+
+
+
+
+Fase 3 — Documentação acadêmica
+
+Aqui é onde muita gente perde ponto mesmo com o sistema funcionando.
+
+Você precisa preparar:
+
+1. Documento de processos
+
+Fluxos sugeridos:
+
+Cadastro de usuário.
+Login.
+Usuário acessando perfil.
+Usuário editando perfil.
+Admin listando usuários.
+Usuário desativando conta.
+
+2. Fluxograma
+
+Um fluxo simples:
+
+Usuário entra no sistema
+→ Tem conta?
+   → Não: cadastro
+   → Sim: login
+→ API valida credenciais
+→ Gera token
+→ Front salva token
+→ Usuário acessa perfil
+→ Se role admin, libera painel de usuários
+
+3. Wireframes
+
+Telas mínimas:
+
+Login.
+Cadastro.
+Home autenticada.
+Perfil.
+Editar perfil.
+Admin usuários.
+
+4. Registro de testes
+
+Separar em:
+
+testes de API com Postman;
+testes automatizados com Jest/Supertest;
+testes manuais no front;
+testes de permissão admin/customer.
+
+5. Controle de mudanças
+
+Criar uma tabela tipo:
+
+Data	Alteração	Responsável	Motivo	Status
+26/04	Criação da UsersAPI	Marcos	Autenticação do sistema	Concluído
+26/04	Teste cadastro/login	Marcos	Validar JWT	Concluído
+26/04	Integração Docker	Equipe	Subir microsserviços	Concluído
+
+6. Evidências GitHub
+
+Prints necessários:
+
+quadro Kanban/issues/projects;
+commits;
+contributors;
+branches/PRs, se houver;
+histórico da sua parte da UsersAPI.
+
+
+
+7. Minha recomendação direta
+
+Agora eu faria nesta ordem:
+
+Conferir package.json, Dockerfile e server.js para garantir que qualquer pessoa consiga subir a UsersAPI.
+Testar todas as rotas pelo gateway http://localhost:7000, não só pela porta 5001.
+Criar uma coleção Postman da UsersAPI com register, login, get profile, update profile, update password, list users admin e delete user.
+Rodar os testes automatizados e salvar print.
+Padronizar/documentar os retornos JSON.
+Decidir se vai adicionar /auth/me antes do front.
+Começar o front web da Etapa 3 pelas telas de login/cadastro/perfil.
+Montar os artefatos acadêmicos: fluxograma, wireframes, testes, quadro GitHub e contribuições.
+
+Resumo final: sua UsersAPI já está funcional. O próximo passo não é sair criando coisa nova; é fechar contrato, testar pelo gateway, padronizar retorno, documentar e só depois integrar no front-end.
