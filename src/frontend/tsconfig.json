@@ -19,6 +19,6 @@
     "checkJs": false
   },
   "include": ["*.tsx", "*.ts", "components", "contexts", "services", "catalog", "user"],
-  "exclude": ["catalog/App.jsx", "catalog/main.jsx", "user/App.tsx", "user/main.tsx"],
+  "exclude": ["catalog/CatalogRoutes.jsx", "catalog/CatalogEntry.jsx", "user/UserRoutes.tsx", "user/UserEntry.tsx"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

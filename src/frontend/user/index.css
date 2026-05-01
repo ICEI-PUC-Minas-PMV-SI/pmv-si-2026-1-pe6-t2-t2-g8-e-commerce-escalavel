@@ -47,6 +47,8 @@ input { font-family: var(--font); }
   padding: 0; transition: color 0.2s;
 }
 .header-link:hover { color: var(--white); }
+.header-link-active { color: var(--white); border-bottom: 2px solid var(--white); padding-bottom: 2px; }
+.header-catalog-nav { display: flex; align-items: center; gap: 28px; }
 .header-logout { color: var(--gray-400); }
 .header-btn {
   font-size: 12px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase;

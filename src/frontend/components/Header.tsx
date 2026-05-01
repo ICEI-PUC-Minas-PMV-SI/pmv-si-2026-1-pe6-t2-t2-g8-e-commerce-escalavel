@@ -1,6 +1,6 @@
 // src/components/Header.tsx
 import { useState, useRef, useEffect } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, NavLink, useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 
 export default function Header() {
@@ -45,6 +45,12 @@ export default function Header() {
         <Link to={isAuthenticated ? '/perfil' : '/'} className="header-logo">
           INSIDER
         </Link>
+
+        <nav className="header-catalog-nav">
+          <NavLink to="/" end className={({ isActive }) => isActive ? 'header-link header-link-active' : 'header-link'}>Home</NavLink>
+          <NavLink to="/products" className={({ isActive }) => isActive ? 'header-link header-link-active' : 'header-link'}>Produtos</NavLink>
+          <NavLink to="/categories" className={({ isActive }) => isActive ? 'header-link header-link-active' : 'header-link'}>Categorias</NavLink>
+        </nav>
 
         <nav className="header-nav">
           {isAuthenticated ? (

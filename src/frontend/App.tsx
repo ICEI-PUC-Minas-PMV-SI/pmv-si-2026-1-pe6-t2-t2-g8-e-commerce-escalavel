@@ -11,13 +11,10 @@ import AdminUsersPage from './user/pages/AdminUsersPage'
 import Home from './catalog/pages/Home'
 import ProductsPage from './catalog/pages/ProductsPage'
 import CategoriesPage from './catalog/pages/CategoriesPage'
-import Navbar from './components/Navbar'
-
 export default function App() {
   return (
     <AuthProvider>
       <Header />
-      <Navbar />
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/products" element={<ProductsPage />} />
