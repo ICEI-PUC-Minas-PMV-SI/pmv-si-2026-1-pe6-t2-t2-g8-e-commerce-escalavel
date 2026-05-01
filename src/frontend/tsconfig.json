@@ -14,8 +14,11 @@
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "noFallthroughCasesInSwitch": true
+    "noFallthroughCasesInSwitch": true,
+    "allowJs": true,
+    "checkJs": false
   },
-  "include": ["src"],
+  "include": ["*.tsx", "*.ts", "components", "contexts", "services", "catalog", "user"],
+  "exclude": ["catalog/App.jsx", "catalog/main.jsx", "user/App.tsx", "user/main.tsx"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

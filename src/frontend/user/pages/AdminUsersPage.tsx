@@ -1,7 +1,7 @@
 // src/pages/AdminUsersPage.tsx
 import { useEffect, useState, useMemo } from 'react'
-import { User, apiGetAllUsersAdmin, apiDeleteUser, apiReactivateUser, apiHardDeleteUser } from '../api/userApi'
-import Toast, { ToastData } from '../components/Toast'
+import { User, apiGetAllUsersAdmin, apiDeleteUser, apiReactivateUser, apiHardDeleteUser } from '../../services/userApi'
+import Toast, { ToastData } from '../../components/Toast'
 
 type TabFilter = 'all' | 'active' | 'inactive'
 type ModalAction = 'deactivate' | 'reactivate' | 'hard-delete'

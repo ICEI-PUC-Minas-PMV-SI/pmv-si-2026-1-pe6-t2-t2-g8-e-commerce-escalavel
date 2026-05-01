@@ -1,9 +1,9 @@
 // src/pages/ProfilePage.tsx
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { useAuth } from '../contexts/AuthContext'
-import { apiDeleteUser } from '../api/userApi'
-import Toast, { ToastData } from '../components/Toast'
+import { useAuth } from '../../contexts/AuthContext'
+import { apiDeleteUser } from '../../services/userApi'
+import Toast, { ToastData } from '../../components/Toast'
 
 export default function ProfilePage() {
   const { user, logout } = useAuth()

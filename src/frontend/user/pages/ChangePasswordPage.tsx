@@ -1,9 +1,9 @@
 // src/pages/ChangePasswordPage.tsx
 import { useState, FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useAuth } from '../contexts/AuthContext'
-import { apiUpdatePassword } from '../api/userApi'
-import Toast, { ToastData } from '../components/Toast'
+import { useAuth } from '../../contexts/AuthContext'
+import { apiUpdatePassword } from '../../services/userApi'
+import Toast, { ToastData } from '../../components/Toast'
 
 export default function ChangePasswordPage() {
   const { user } = useAuth()

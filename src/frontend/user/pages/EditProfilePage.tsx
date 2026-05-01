@@ -1,9 +1,9 @@
 // src/pages/EditProfilePage.tsx
 import { useState, FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useAuth } from '../contexts/AuthContext'
-import { apiUpdateUser } from '../api/userApi'
-import Toast, { ToastData } from '../components/Toast'
+import { useAuth } from '../../contexts/AuthContext'
+import { apiUpdateUser } from '../../services/userApi'
+import Toast, { ToastData } from '../../components/Toast'
 
 export default function EditProfilePage() {
   const { user, setUser } = useAuth()

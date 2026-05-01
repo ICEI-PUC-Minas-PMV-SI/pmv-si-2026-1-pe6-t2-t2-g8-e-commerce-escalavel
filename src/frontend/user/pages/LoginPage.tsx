@@ -1,7 +1,7 @@
 // src/pages/LoginPage.tsx
 import { useState, FormEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { useAuth } from '../contexts/AuthContext'
+import { useAuth } from '../../contexts/AuthContext'
 
 export default function LoginPage() {
   const { login } = useAuth()

@@ -1,6 +1,6 @@
 // src/contexts/AuthContext.tsx
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react'
-import { User, apiLogin, apiRegister, Address } from '../api/userApi'
+import { User, apiLogin, apiRegister, Address } from '../services/userApi'
 
 interface AuthContextData {
   user: User | null
