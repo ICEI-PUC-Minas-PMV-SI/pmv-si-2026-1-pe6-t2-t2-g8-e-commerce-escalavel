@@ -25,6 +25,7 @@ public class StockService : IStockService
             .OrderBy(x => x.Name)
             .Select(x => new StockItemResponse(
                 x.ProductId,
+                x.CategoryId,
                 x.Name,
                 x.Color,
                 x.Model,
@@ -67,6 +68,7 @@ public class StockService : IStockService
 
         var item = StockItem.Create(
             productId,
+            request.CategoryId,
             request.Name,
             quantity,
             request.Color,
@@ -97,8 +99,9 @@ public class StockService : IStockService
         }
 
         _logger.LogInformation(
-            "Stock created for ProductId={ProductId}, Name={Name}, InitialQuantity={InitialQuantity}",
+            "Stock created for ProductId={ProductId}, CategoryId={CategoryId}, Name={Name}, InitialQuantity={InitialQuantity}",
             item.ProductId,
+            item.CategoryId,
             item.Name,
             quantity);
 
@@ -312,6 +315,7 @@ public class StockService : IStockService
     {
         return new StockItemResponse(
             item.ProductId,
+            item.CategoryId,
             item.Name,
             item.Color,
             item.Model,
