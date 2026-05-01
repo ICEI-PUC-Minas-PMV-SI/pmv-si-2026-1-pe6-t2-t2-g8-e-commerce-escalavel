@@ -1,36 +1,24 @@
 // src/controllers/userController.js
 const userRepository = require('../repositories/userRepository');
 const { hashPassword } = require('../utils/password');
-
-// Validação de e-mail
-const isValidEmail = (email) => {
-  const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  return re.test(email);
-};
-
-// Validação de endereço
-const validateAddress = (address) => {
-  if (!address) return true;
-
-  const { street, city, state, zip } = address;
-
-  if (
-    (street && typeof street !== 'string') ||
-    (city && typeof city !== 'string') ||
-    (state && typeof state !== 'string') ||
-    (zip && typeof zip !== 'string')
-  ) {
-    return false;
-  }
-
-  return true;
-};
+const { sanitizeUser, isValidEmail, isValidCPF, isValidPhone, validateAddress } = require('../utils/userUtils');
 
 // Retorna todos os usuários ativos
 const getAllUsers = async (req, res) => {
   try {
     const users = await userRepository.getAllUsers();
-    res.json({ status: 'success', data: users });
+    res.json({ status: 'success', data: users.map(sanitizeUser) });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ status: 'fail', message: 'Erro ao listar usuários' });
+  }
+};
+
+// Retorna TODOS os usuários (ativos + inativos) — admin
+const getAllUsersAdmin = async (req, res) => {
+  try {
+    const users = await userRepository.getAllUsersAdmin();
+    res.json({ status: 'success', data: users.map(sanitizeUser) });
   } catch (err) {
     console.error(err);
     res.status(500).json({ status: 'fail', message: 'Erro ao listar usuários' });
@@ -49,7 +37,12 @@ const getUserById = async (req, res) => {
       });
     }
 
-    res.json({ status: 'success', data: user });
+    res.json({
+      status: 'success',
+      data: sanitizeUser(user),
+    }); 
+
+
   } catch (err) {
     console.error(err);
     res.status(500).json({ status: 'fail', message: 'Erro ao buscar usuário' });
@@ -59,7 +52,7 @@ const getUserById = async (req, res) => {
 // Atualiza dados do usuário
 const updateUser = async (req, res) => {
   try {
-    const { name, email, address } = req.body;
+    let { name, email, cpf, phone, address } = req.body;
 
     // 🔹 validações
     if (name && name.trim().length < 2) {
@@ -69,10 +62,27 @@ const updateUser = async (req, res) => {
       });
     }
 
-    if (email && !isValidEmail(email)) {
+    if (email) {
+      if (!isValidEmail(email)) {
+        return res.status(400).json({
+          status: 'fail',
+          message: 'E-mail inválido',
+        });
+      }
+      email = email.toLowerCase(); // normaliza
+    }
+
+    if (cpf && !isValidCPF(cpf)) {
       return res.status(400).json({
         status: 'fail',
-        message: 'E-mail inválido',
+        message: 'CPF inválido',
+      });
+    }
+
+    if (phone && !isValidPhone(phone)) {
+      return res.status(400).json({
+        status: 'fail',
+        message: 'Telefone inválido',
       });
     }
 
@@ -83,16 +93,41 @@ const updateUser = async (req, res) => {
       });
     }
 
-    const updatedUser = await userRepository.update(req.params.id, {
-      name,
-      email,
-      address,
-    });
+    // 🔹 monta objeto apenas com campos definidos
+    const updateData = {};
 
-    res.json({ status: 'success', data: updatedUser });
+    if (name !== undefined) updateData.name = name;
+    if (email !== undefined) updateData.email = email;
+    if (cpf !== undefined) updateData.cpf = cpf;
+    if (phone !== undefined) updateData.phone = phone;
+
+    if (address !== undefined) {
+      if (address.street !== undefined) updateData.address_street = address.street;
+      if (address.city !== undefined) updateData.address_city = address.city;
+      if (address.state !== undefined) updateData.address_state = address.state;
+      if (address.zip !== undefined) updateData.address_zip = address.zip;
+    }
+
+    // 🔹 evita update vazio
+    if (Object.keys(updateData).length === 0) {
+      return res.status(400).json({
+        status: 'fail',
+        message: 'Nenhum dado válido para atualização',
+      });
+    }
+
+    const updatedUser = await userRepository.update(req.params.id, updateData);
+
+    res.json({
+      status: 'success',
+      data: sanitizeUser(updatedUser),
+    });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ status: 'fail', message: 'Erro ao atualizar usuário' });
+    res.status(500).json({
+      status: 'fail',
+      message: 'Erro ao atualizar usuário',
+    });
   }
 };
 
@@ -123,25 +158,46 @@ const updatePassword = async (req, res) => {
   }
 };
 
-// Desativa usuário
+// Desativa usuário (soft delete)
 const deleteUser = async (req, res) => {
   try {
     await userRepository.deactivate(req.params.id);
-
-    res.json({
-      status: 'success',
-      message: 'Usuário desativado com sucesso',
-    });
+    res.json({ status: 'success', message: 'Usuário desativado com sucesso' });
   } catch (err) {
     console.error(err);
     res.status(500).json({ status: 'fail', message: 'Erro ao desativar usuário' });
   }
 };
 
+// Reativa usuário — admin
+const reactivateUser = async (req, res) => {
+  try {
+    await userRepository.reactivate(req.params.id);
+    res.json({ status: 'success', message: 'Usuário reativado com sucesso' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ status: 'fail', message: 'Erro ao reativar usuário' });
+  }
+};
+
+// Exclusão definitiva — apenas admin
+const hardDeleteUser = async (req, res) => {
+  try {
+    await userRepository.hardDelete(req.params.id);
+    res.json({ status: 'success', message: 'Usuário excluído permanentemente' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ status: 'fail', message: 'Erro ao excluir usuário' });
+  }
+};
+
 module.exports = {
   getAllUsers,
+  getAllUsersAdmin,
   getUserById,
   updateUser,
   updatePassword,
   deleteUser,
+  reactivateUser,
+  hardDeleteUser,
 };

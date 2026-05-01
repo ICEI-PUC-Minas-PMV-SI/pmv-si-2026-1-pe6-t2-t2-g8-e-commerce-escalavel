@@ -9,7 +9,7 @@ const validateEmail = (email) => {
   return re.test(email);
 };
 
-const register = async ({ name, email, password, address }) => {
+const register = async ({ name, email, password, cpf, phone, address }) => {
   // valida e-mail
   if (!validateEmail(email)) {
     throw new Error('INVALID_EMAIL');
@@ -35,6 +35,8 @@ const register = async ({ name, email, password, address }) => {
     email,
     passwordHash,
     role: 'customer',
+    cpf: cpf || null,
+    phone: phone || null,
     address, // { street, city, state, zip }
   });
 

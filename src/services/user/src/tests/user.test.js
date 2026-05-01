@@ -23,7 +23,7 @@ beforeAll(async () => {
     ['Admin', 'admin@test.com', adminPasswordHash]
   );
   adminUserId = adminResult.rows[0].id;
-  adminToken = generateToken({ sub: adminUserId, email: 'admin@test.com', role: 'admin' });
+  adminToken = generateToken({ id: adminUserId, email: 'admin@test.com', role: 'admin' });
 
   // Cria usuário customer
   const customerPasswordHash = await hashPassword('Customer123');
@@ -34,7 +34,7 @@ beforeAll(async () => {
     ['Customer', 'customer@test.com', customerPasswordHash]
   );
   testUserId = customerResult.rows[0].id;
-  customerToken = generateToken({ sub: testUserId, email: 'customer@test.com', role: 'customer' });
+  customerToken = generateToken({ id: testUserId, email: 'customer@test.com', role: 'customer' });
 });
 
 afterAll(async () => {
@@ -49,8 +49,8 @@ describe('User Endpoints', () => {
       .get('/users')
       .set('Authorization', `Bearer ${adminToken}`);
     expect(res.statusCode).toBe(200);
-    expect(Array.isArray(res.body.users)).toBe(true);  // garante que users existe
-    expect(res.body.users.length).toBe(2);
+    expect(Array.isArray(res.body.data)).toBe(true);
+    expect(res.body.data.length).toBe(2);
   });
 
   it('Customer: should NOT list all users', async () => {
@@ -65,7 +65,7 @@ describe('User Endpoints', () => {
       .get(`/users/${testUserId}`)
       .set('Authorization', `Bearer ${customerToken}`);
     expect(res.statusCode).toBe(200);
-    expect(res.body.user.email).toBe('customer@test.com');
+    expect(res.body.data.email).toBe('customer@test.com');
   });
 
   it('Customer: should NOT get another user profile', async () => {
@@ -81,7 +81,7 @@ describe('User Endpoints', () => {
       .set('Authorization', `Bearer ${customerToken}`)
       .send({ name: 'Customer Updated', email: 'cust_updated@test.com' });
     expect(res.statusCode).toBe(200);
-    expect(res.body.user.name).toBe('Customer Updated');
+    expect(res.body.data.name).toBe('Customer Updated');
   });
 
   it('Customer: should update own password', async () => {
@@ -90,6 +90,7 @@ describe('User Endpoints', () => {
       .set('Authorization', `Bearer ${customerToken}`)
       .send({ password: 'NewPass123' });
     expect(res.statusCode).toBe(200);
+    expect(res.body.status).toBe('success');
     expect(res.body.message).toBe('Senha atualizada com sucesso');
   });
 
@@ -106,6 +107,7 @@ describe('User Endpoints', () => {
       .delete(`/users/${testUserId}`)
       .set('Authorization', `Bearer ${customerToken}`);
     expect(res.statusCode).toBe(200);
+    expect(res.body.status).toBe('success');
     expect(res.body.message).toBe('Usuário desativado com sucesso');
   });
 
@@ -114,6 +116,7 @@ describe('User Endpoints', () => {
       .delete(`/users/${adminUserId}`)
       .set('Authorization', `Bearer ${adminToken}`);
     expect(res.statusCode).toBe(200);
+    expect(res.body.status).toBe('success');
     expect(res.body.message).toBe('Usuário desativado com sucesso');
   });
 
