@@ -1,6 +1,6 @@
 # 📊 Relatório de Contribuições do Projeto
 
-**Última atualização:** 01/05/2026 21:19
+**Última atualização:** 01/05/2026 22:08
 
 ---
 
@@ -16,14 +16,14 @@
 | Vitor Linas           |        14 |       374 |        93 |          6 |              5 |               1 |
 | gabriel               |        10 |      4839 |       563 |         70 |              0 |               0 |
 | gabrielcambraia       |        13 |       671 |        23 |          3 |              7 |               2 |
-| github-actions[bot]   |        69 |       472 |       459 |          3 |             64 |               1 |
+| github-actions[bot]   |        70 |       481 |       468 |          3 |             65 |               1 |
 | github-classroom[bot] |         1 |      2152 |         0 |         45 |              1 |              13 |
-| nicolaspborges96      |        45 |     14318 |      3950 |        201 |             17 |               4 |
+| nicolaspborges96      |        47 |     14544 |      4057 |        211 |             17 |               4 |
 
 
 ## 📅 Contribuições Semanais (Todo o Semestre)
 
-**2026-04-24**: Dev-Vinicio: 4, João Gabriel Perez: 1, gabriel: 6, gabrielcambraia: 1, github-actions[bot]: 7, nicolaspborges96: 9
+**2026-04-24**: Dev-Vinicio: 4, João Gabriel Perez: 1, gabriel: 6, gabrielcambraia: 1, github-actions[bot]: 8, nicolaspborges96: 11
 
 **2026-04-17**: github-actions[bot]: 2, nicolaspborges96: 1
 
@@ -41,7 +41,7 @@
 
 **2026-02-27**: Dev-Vinicio: 2, Hugo Freitas: 8
 
-**2026-02-20**: github-classroom[bot]: 1
+**2026-02-13**: github-classroom[bot]: 1
 
 
 
