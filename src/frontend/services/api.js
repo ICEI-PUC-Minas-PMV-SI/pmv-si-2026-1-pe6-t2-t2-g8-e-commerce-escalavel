@@ -22,3 +22,40 @@ const getHeaders = () => ({
   'Authorization': `Bearer ${localStorage.getItem('token')}`
 })
 
+// OrderAPI service
+export const orderApi = {
+  createOrder: async (data) => {
+    const response = await fetch(`${BASE_URL}/orders`, {
+      method: 'POST',
+      headers: getHeaders(),
+      body: JSON.stringify(data)
+    })
+
+    return response.json()
+  },
+
+  getOrdersByUser: async (userId) => {
+    const response = await fetch(`${BASE_URL}/orders/user/${userId}`, {
+      headers: getHeaders()
+    })
+
+    return response.json()
+  },
+
+  getOrderById: async (id) => {
+    const response = await fetch(`${BASE_URL}/orders/${id}`, {
+      headers: getHeaders()
+    })
+
+    return response.json()
+  },
+
+  cancelOrder: async (id) => {
+    const response = await fetch(`${BASE_URL}/orders/${id}/cancel`, {
+      method: 'PUT',
+      headers: getHeaders()
+    })
+
+    return response.json()
+  }
+}

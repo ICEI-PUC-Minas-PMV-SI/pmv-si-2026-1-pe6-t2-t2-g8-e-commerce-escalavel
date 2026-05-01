@@ -11,6 +11,14 @@ import AdminUsersPage from './user/pages/AdminUsersPage'
 import Home from './catalog/pages/Home'
 import ProductsPage from './catalog/pages/ProductsPage'
 import CategoriesPage from './catalog/pages/CategoriesPage'
+
+// Order imports
+import CartPage from './Order/pages/CartPage'
+import CheckoutPage from './Order/pages/CheckoutPage'
+import OrdersPage from './Order/pages/OrdersPage'
+import { useState } from "react";
+import OrderDetailsModal from "./Order/components/modals/OrderDetailsModal";
+
 export default function App() {
   return (
     <AuthProvider>
@@ -26,6 +34,11 @@ export default function App() {
         <Route path="/perfil/senha" element={<PrivateRoute><ChangePasswordPage /></PrivateRoute>} />
         <Route path="/admin/usuarios" element={<PrivateRoute adminOnly><AdminUsersPage /></PrivateRoute>} />
         <Route path="*" element={<Navigate to="/" replace />} />
+
+        // Order routes
+        <Route path="/cart" element={<CartPage />} />
+        <Route path="/checkout" element={<CheckoutPage />} />
+        <Route path="/orders" element={<PrivateRoute><OrdersPage /></PrivateRoute>} />
       </Routes>
     </AuthProvider>
   )
