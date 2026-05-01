@@ -1,20 +1,14 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { Route } from 'react-router-dom'
 import Home from './pages/Home'
-import ProductsPage from './pages/catalog/ProductsPage'
-import CategoriesPage from './pages/catalog/CategoriesPage'
-import Navbar from './components/Navbar'
+import ProductsPage from './pages/ProductsPage'
+import CategoriesPage from './pages/CategoriesPage'
 
-function App() {
+export default function CatalogRoutes() {
   return (
-    <BrowserRouter>
-      <Navbar />
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/products" element={<ProductsPage />} />
-        <Route path="/categories" element={<CategoriesPage />} />
-      </Routes>
-    </BrowserRouter>
+    <>
+      <Route path="/" element={<Home />} />
+      <Route path="/products" element={<ProductsPage />} />
+      <Route path="/categories" element={<CategoriesPage />} />
+    </>
   )
 }
-
-export default App
