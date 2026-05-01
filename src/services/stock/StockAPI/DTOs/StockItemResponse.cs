@@ -2,6 +2,7 @@ namespace StockAPI.DTOs;
 
 public record StockItemResponse(
     Guid ProductId,
+    Guid CategoryId,
     string Name,
     string Color,
     string Model,
