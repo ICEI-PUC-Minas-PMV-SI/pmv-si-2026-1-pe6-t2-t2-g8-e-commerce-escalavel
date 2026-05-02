@@ -1,15 +1,13 @@
-function OrderSummary({ items }) {
-  const total = items.reduce(
-    (acc, item) => acc + item.price * item.quantity,
-    0
-  );
+import { Route } from 'react-router-dom'
+import PrivateRoute from '../components/PrivateRoute'
+import CartPage from './pages/CartPage'
+import CheckoutPage from './pages/CheckoutPage'
+import OrdersPage from './pages/OrdersPage'
 
-  return (
-    <div style={{ marginTop: 20 }}>
-      <h2>Resumo</h2>
-      <p>Total: R$ {total}</p>
-    </div>
-  );
-}
+const OrderRoutes = [
+  <Route key="cart" path="/cart" element={<CartPage />} />,
+  <Route key="checkout" path="/checkout" element={<CheckoutPage />} />,
+  <Route key="orders" path="/orders" element={<PrivateRoute><OrdersPage /></PrivateRoute>} />,
+]
 
-export default OrderSummary;
+export default OrderRoutes

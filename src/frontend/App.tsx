@@ -1,44 +1,19 @@
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { AuthProvider } from './contexts/AuthContext'
 import Header from './components/Header'
-import PrivateRoute from './components/PrivateRoute'
-import LoginPage from './user/pages/LoginPage'
-import RegisterPage from './user/pages/RegisterPage'
-import ProfilePage from './user/pages/ProfilePage'
-import EditProfilePage from './user/pages/EditProfilePage'
-import ChangePasswordPage from './user/pages/ChangePasswordPage'
-import AdminUsersPage from './user/pages/AdminUsersPage'
-import Home from './catalog/pages/Home'
-import ProductsPage from './catalog/pages/ProductsPage'
-import CategoriesPage from './catalog/pages/CategoriesPage'
-
-// Order imports
-import CartPage from './Order/pages/CartPage'
-import CheckoutPage from './Order/pages/CheckoutPage'
-import OrdersPage from './Order/pages/OrdersPage'
-import { useState } from "react";
-import OrderDetailsModal from "./Order/components/modals/OrderDetailsModal";
+import CatalogRoutes from './catalog/CatalogRoutes'
+import UserRoutes from './user/UserRoutes'
+import OrderRoutes from './Order/OrderRoutes'
 
 export default function App() {
   return (
     <AuthProvider>
       <Header />
       <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/products" element={<ProductsPage />} />
-        <Route path="/categories" element={<CategoriesPage />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/cadastro" element={<RegisterPage />} />
-        <Route path="/perfil" element={<PrivateRoute><ProfilePage /></PrivateRoute>} />
-        <Route path="/perfil/editar" element={<PrivateRoute><EditProfilePage /></PrivateRoute>} />
-        <Route path="/perfil/senha" element={<PrivateRoute><ChangePasswordPage /></PrivateRoute>} />
-        <Route path="/admin/usuarios" element={<PrivateRoute adminOnly><AdminUsersPage /></PrivateRoute>} />
+        {CatalogRoutes}
+        {UserRoutes}
+        {OrderRoutes}
         <Route path="*" element={<Navigate to="/" replace />} />
-
-        // Order routes
-        <Route path="/cart" element={<CartPage />} />
-        <Route path="/checkout" element={<CheckoutPage />} />
-        <Route path="/orders" element={<PrivateRoute><OrdersPage /></PrivateRoute>} />
       </Routes>
     </AuthProvider>
   )
