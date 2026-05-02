@@ -5,7 +5,17 @@
       "Bash(where docker *)",
       "Bash(docker --version)",
       "Bash(docker run *)",
-      "Bash(dotnet ef *)"
+      "Bash(dotnet ef *)",
+      "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\Nicolas\\\\Documents\\\\Repos\\\\Ecom\\\\pmv-si-2026-1-pe6-t2-t2-g8-e-commerce-escalavel\\\\src\\\\frontend\" -Recurse -Name)",
+      "Bash(docker volume *)",
+      "Bash(curl -v http://localhost:7000/api/stock/)",
+      "Bash(curl -s -o /dev/null -w \"no-slash: %{http_code}\\\\n\" http://localhost:7000/api/stock)",
+      "Bash(curl -s -o /dev/null -w \"with-slash: %{http_code}\\\\n\" http://localhost:7000/api/stock/)",
+      "Bash(curl -sI http://localhost:7000/api/stock)",
+      "Bash(git -C /c/Users/Nicolas/Documents/Repos/Ecom/pmv-si-2026-1-pe6-t2-t2-g8-e-commerce-escalavel ls-files src/gateway/)",
+      "Bash(git -C /c/Users/Nicolas/Documents/Repos/Ecom/pmv-si-2026-1-pe6-t2-t2-g8-e-commerce-escalavel log --oneline -- src/gateway/nginx.conf)",
+      "Bash(git -C /c/Users/Nicolas/Documents/Repos/Ecom/pmv-si-2026-1-pe6-t2-t2-g8-e-commerce-escalavel diff main..feat/implements-variations-skus -- src/gateway/nginx.conf)",
+      "Bash(npm run *)"
     ]
   }
 }
