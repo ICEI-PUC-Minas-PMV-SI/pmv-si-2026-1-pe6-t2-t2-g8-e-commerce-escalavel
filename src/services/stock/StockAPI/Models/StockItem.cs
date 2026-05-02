@@ -5,36 +5,16 @@ namespace StockAPI.Models;
 public class StockItem
 {
     public Guid Id { get; set; }
-    public Guid ProductId { get; set; }
-    public Guid CategoryId { get; set; }
-    public string Name { get; set; } = string.Empty;
-    public string Color { get; set; } = string.Empty;
-    public string Model { get; set; } = string.Empty;
-    public string Size { get; set; } = string.Empty;
+    public Guid SkuId { get; set; }
     public decimal CostPrice { get; set; }
-    public decimal SalePrice { get; set; }
     public int QuantityAvailable { get; set; }
     public int QuantityReserved { get; set; }
 
-    public static StockItem Create(
-        Guid productId,
-        Guid categoryId,
-        string name,
-        int quantity,
-        string color,
-        string model,
-        string size,
-        decimal costPrice,
-        decimal salePrice)
+    public static StockItem Create(Guid skuId, int quantity, decimal costPrice)
     {
-        if (productId == Guid.Empty)
+        if (skuId == Guid.Empty)
         {
-            throw new ArgumentException("ProductId is required.", nameof(productId));
-        }
-
-        if (categoryId == Guid.Empty)
-        {
-            throw new ArgumentException("CategoryId is required.", nameof(categoryId));
+            throw new ArgumentException("SkuId is required.", nameof(skuId));
         }
 
         if (quantity < 0)
@@ -47,27 +27,11 @@ public class StockItem
             throw new ArgumentOutOfRangeException(nameof(costPrice), "CostPrice cannot be negative.");
         }
 
-        if (salePrice < 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(salePrice), "SalePrice cannot be negative.");
-        }
-
-        if (salePrice < costPrice)
-        {
-            throw new ArgumentException("SalePrice cannot be lower than CostPrice.", nameof(salePrice));
-        }
-
         var item = new StockItem
         {
             Id = Guid.NewGuid(),
-            ProductId = productId,
-            CategoryId = categoryId,
-            Name = NormalizeRequiredText(name, nameof(name)),
-            Color = NormalizeRequiredText(color, nameof(color)),
-            Model = NormalizeRequiredText(model, nameof(model)),
-            Size = NormalizeRequiredText(size, nameof(size)),
+            SkuId = skuId,
             CostPrice = costPrice,
-            SalePrice = salePrice,
             QuantityAvailable = quantity,
             QuantityReserved = 0
         };
@@ -96,7 +60,7 @@ public class StockItem
 
         if (QuantityAvailable < quantity)
         {
-            throw new InsufficientAvailableStockException(ProductId, quantity, QuantityAvailable);
+            throw new InsufficientAvailableStockException(SkuId, quantity, QuantityAvailable);
         }
 
         QuantityAvailable -= quantity;
@@ -113,7 +77,7 @@ public class StockItem
 
         if (QuantityReserved < quantity)
         {
-            throw new InsufficientReservedStockException(ProductId, quantity, QuantityReserved);
+            throw new InsufficientReservedStockException(SkuId, quantity, QuantityReserved);
         }
 
         QuantityReserved -= quantity;
@@ -130,7 +94,7 @@ public class StockItem
 
         if (QuantityReserved < quantity)
         {
-            throw new InsufficientReservedStockException(ProductId, quantity, QuantityReserved);
+            throw new InsufficientReservedStockException(SkuId, quantity, QuantityReserved);
         }
 
         QuantityReserved -= quantity;
@@ -139,14 +103,9 @@ public class StockItem
 
     private void EnsureInvariants()
     {
-        if (ProductId == Guid.Empty)
+        if (SkuId == Guid.Empty)
         {
-            throw new InvalidOperationException("ProductId cannot be empty.");
-        }
-
-        if (CategoryId == Guid.Empty)
-        {
-            throw new InvalidOperationException("CategoryId cannot be empty.");
+            throw new InvalidOperationException("SkuId cannot be empty.");
         }
 
         if (QuantityAvailable < 0)
@@ -159,49 +118,9 @@ public class StockItem
             throw new InvalidOperationException("QuantityReserved cannot be negative.");
         }
 
-        if (string.IsNullOrWhiteSpace(Name))
-        {
-            throw new InvalidOperationException("Name cannot be empty.");
-        }
-
-        if (string.IsNullOrWhiteSpace(Color))
-        {
-            throw new InvalidOperationException("Color cannot be empty.");
-        }
-
-        if (string.IsNullOrWhiteSpace(Model))
-        {
-            throw new InvalidOperationException("Model cannot be empty.");
-        }
-
-        if (string.IsNullOrWhiteSpace(Size))
-        {
-            throw new InvalidOperationException("Size cannot be empty.");
-        }
-
         if (CostPrice < 0)
         {
             throw new InvalidOperationException("CostPrice cannot be negative.");
         }
-
-        if (SalePrice < 0)
-        {
-            throw new InvalidOperationException("SalePrice cannot be negative.");
-        }
-
-        if (SalePrice < CostPrice)
-        {
-            throw new InvalidOperationException("SalePrice cannot be lower than CostPrice.");
-        }
-    }
-
-    private static string NormalizeRequiredText(string value, string parameterName)
-    {
-        if (string.IsNullOrWhiteSpace(value))
-        {
-            throw new ArgumentException("Field is required.", parameterName);
-        }
-
-        return value.Trim();
     }
 }

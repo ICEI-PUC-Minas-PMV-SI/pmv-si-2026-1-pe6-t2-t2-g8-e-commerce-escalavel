@@ -42,6 +42,10 @@ ASPNETCORE_ENVIRONMENT=Development
 docker compose up
 ```
 
+para inicialização mais clean
+
+docker compose up -d --wait
+
 Na primeira execução o Docker vai baixar as imagens e compilar os serviços — isso pode levar alguns minutos. Das próximas vezes será muito mais rápido.
 
 ---

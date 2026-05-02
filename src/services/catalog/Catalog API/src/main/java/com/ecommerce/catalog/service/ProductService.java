@@ -3,14 +3,19 @@ package com.ecommerce.catalog.service;
 import com.ecommerce.catalog.DTO.CategoryResponseDTO;
 import com.ecommerce.catalog.DTO.ProductRequestDTO;
 import com.ecommerce.catalog.DTO.ProductResponseDTO;
+import com.ecommerce.catalog.DTO.ProductVariantResponseDTO;
+import com.ecommerce.catalog.DTO.SkuResponseDTO;
 import com.ecommerce.catalog.model.Category;
 import com.ecommerce.catalog.model.Product;
+import com.ecommerce.catalog.model.ProductVariant;
+import com.ecommerce.catalog.model.Sku;
 import com.ecommerce.catalog.repository.CategoryRepository;
 import com.ecommerce.catalog.repository.ProductRepository;
 import com.ecommerce.catalog.repository.ProductSpecification;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -43,7 +48,6 @@ public class ProductService {
         Product product = new Product();
         product.setName(dto.getName());
         product.setDescription(dto.getDescription());
-        product.setPrice(dto.getPrice());
         product.setUrlImg(dto.getUrlImg());
         product.setActive(dto.getActive());
         product.setCategory(category);
@@ -57,7 +61,6 @@ public class ProductService {
                 .orElseThrow(() -> new RuntimeException("Categoria não encontrada"));
         existing.setName(dto.getName());
         existing.setDescription(dto.getDescription());
-        existing.setPrice(dto.getPrice());
         existing.setUrlImg(dto.getUrlImg());
         existing.setActive(dto.getActive());
         existing.setCategory(category);
@@ -73,16 +76,42 @@ public class ProductService {
         dto.setId(product.getId());
         dto.setName(product.getName());
         dto.setDescription(product.getDescription());
-        dto.setPrice(product.getPrice());
         dto.setUrlImg(product.getUrlImg());
         dto.setActive(product.getActive());
+        dto.setCreatedAt(product.getCreatedAt());
 
-        CategoryResponseDTO categoryDTO = new CategoryResponseDTO();
-        categoryDTO.setId(product.getCategory().getId());
-        categoryDTO.setName(product.getCategory().getName());
-        categoryDTO.setActive(product.getCategory().getActive());
-        dto.setCategory(categoryDTO);
+        if (product.getCategory() != null) {
+            CategoryResponseDTO categoryDTO = new CategoryResponseDTO();
+            categoryDTO.setId(product.getCategory().getId());
+            categoryDTO.setName(product.getCategory().getName());
+            categoryDTO.setActive(product.getCategory().getActive());
+            dto.setCategory(categoryDTO);
+        }
 
+        List<ProductVariant> variants = product.getVariants() != null ? product.getVariants() : Collections.emptyList();
+        dto.setVariants(variants.stream().map(this::toVariantDTO).toList());
+
+        return dto;
+    }
+
+    private ProductVariantResponseDTO toVariantDTO(ProductVariant variant) {
+        ProductVariantResponseDTO dto = new ProductVariantResponseDTO();
+        dto.setId(variant.getId());
+        dto.setProductId(variant.getProduct().getId());
+        dto.setColor(variant.getColor());
+        List<Sku> skus = variant.getSkus() != null ? variant.getSkus() : Collections.emptyList();
+        dto.setSkus(skus.stream().map(this::toSkuDTO).toList());
+        return dto;
+    }
+
+    private SkuResponseDTO toSkuDTO(Sku sku) {
+        SkuResponseDTO dto = new SkuResponseDTO();
+        dto.setId(sku.getId());
+        dto.setVariantId(sku.getVariant().getId());
+        dto.setProductId(sku.getVariant().getProduct().getId());
+        dto.setSize(sku.getSize());
+        dto.setCode(sku.getCode());
+        dto.setPrice(sku.getPrice());
         return dto;
     }
 }

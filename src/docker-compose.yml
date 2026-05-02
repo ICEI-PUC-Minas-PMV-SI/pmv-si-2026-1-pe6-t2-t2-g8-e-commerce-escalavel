@@ -130,6 +130,7 @@ services:
       - USERS_URL=http://usersapi:8080
       - STOCK_URL=http://stockapi:8080
       - PAYMENT_URL=http://paymentapi:8080
+      - CATALOG_URL=http://catalogapi:8080
       - RABBITMQ_URL=amqp://guest:guest@rabbitmq:5672
     depends_on:
       postgres:

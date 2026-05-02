@@ -7,26 +7,25 @@ import java.util.UUID;
 public class ItemRequest {
 
     @Schema(
-        description = "ID do produto que será incluído no pedido",
+        description = "ID do SKU que será incluído no pedido",
         example = "550e8400-e29b-41d4-a716-446655440000",
         required = true
     )
-    private UUID productId;
+    private UUID skuId;
 
     @Schema(
-        description = "Quantidade do produto no pedido",
+        description = "Quantidade do SKU no pedido",
         example = "2",
         required = true
     )
     private Integer quantity;
 
-    // Getters e Setters
-    public UUID getProductId() {
-        return productId;
+    public UUID getSkuId() {
+        return skuId;
     }
 
-    public void setProductId(UUID productId) {
-        this.productId = productId;
+    public void setSkuId(UUID skuId) {
+        this.skuId = skuId;
     }
 
     public Integer getQuantity() {

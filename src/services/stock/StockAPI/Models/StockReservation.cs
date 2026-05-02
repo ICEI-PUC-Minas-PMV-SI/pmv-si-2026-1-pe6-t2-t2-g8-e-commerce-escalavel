@@ -3,15 +3,15 @@ namespace StockAPI.Models;
 public class StockReservation
 {
     public Guid Id { get; set; }
-    public Guid ProductId { get; set; }
+    public Guid SkuId { get; set; }
     public Guid OrderId { get; set; }
     public int QuantityReserved { get; set; }
 
-    public static StockReservation Create(Guid productId, Guid orderId, int quantity)
+    public static StockReservation Create(Guid skuId, Guid orderId, int quantity)
     {
-        if (productId == Guid.Empty)
+        if (skuId == Guid.Empty)
         {
-            throw new ArgumentException("ProductId must be a valid value.", nameof(productId));
+            throw new ArgumentException("SkuId must be a valid value.", nameof(skuId));
         }
 
         if (orderId == Guid.Empty)
@@ -27,7 +27,7 @@ public class StockReservation
         return new StockReservation
         {
             Id = Guid.NewGuid(),
-            ProductId = productId,
+            SkuId = skuId,
             OrderId = orderId,
             QuantityReserved = quantity
         };

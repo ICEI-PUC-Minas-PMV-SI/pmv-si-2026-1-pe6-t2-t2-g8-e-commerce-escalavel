@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git checkout *)",
+      "Bash(where docker *)",
+      "Bash(docker --version)",
+      "Bash(docker run *)",
+      "Bash(dotnet ef *)"
+    ]
+  }
+}

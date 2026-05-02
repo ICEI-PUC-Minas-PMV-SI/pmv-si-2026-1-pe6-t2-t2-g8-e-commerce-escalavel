@@ -23,10 +23,10 @@ public class StockController : ControllerBase
         return Ok(result);
     }
 
-    [HttpGet("{productId:guid}")]
-    public async Task<IActionResult> GetStock(Guid productId)
+    [HttpGet("{skuId:guid}")]
+    public async Task<IActionResult> GetStock(Guid skuId)
     {
-        var result = await _stockService.GetByProductIdAsync(productId);
+        var result = await _stockService.GetBySkuIdAsync(skuId);
         return result is null ? NotFound() : Ok(result);
     }
 
@@ -36,7 +36,7 @@ public class StockController : ControllerBase
         try
         {
             var result = await _stockService.CreateAsync(request);
-            return CreatedAtAction(nameof(GetStock), new { productId = result.ProductId }, result);
+            return CreatedAtAction(nameof(GetStock), new { skuId = result.SkuId }, result);
         }
         catch (ArgumentException ex)
         {
@@ -48,12 +48,12 @@ public class StockController : ControllerBase
         }
     }
 
-    [HttpPut("{productId:guid}/reserve/{orderId:guid}")]
-    public async Task<IActionResult> Reserve(Guid productId, Guid orderId, [FromBody] ReserveRequest request)
+    [HttpPut("{skuId:guid}/reserve/{orderId:guid}")]
+    public async Task<IActionResult> Reserve(Guid skuId, Guid orderId, [FromBody] ReserveRequest request)
     {
         try
         {
-            var result = await _stockService.ReserveAsync(productId, orderId, request);
+            var result = await _stockService.ReserveAsync(skuId, orderId, request);
             return Ok(result);
         }
         catch (ArgumentException ex)
@@ -74,12 +74,12 @@ public class StockController : ControllerBase
         }
     }
 
-    [HttpPut("{productId:guid}/release/{orderId:guid}")]
-    public async Task<IActionResult> Release(Guid productId, Guid orderId, [FromBody] ReleaseRequest request)
+    [HttpPut("{skuId:guid}/release/{orderId:guid}")]
+    public async Task<IActionResult> Release(Guid skuId, Guid orderId, [FromBody] ReleaseRequest request)
     {
         try
         {
-            var result = await _stockService.ReleaseAsync(productId, orderId, request);
+            var result = await _stockService.ReleaseAsync(skuId, orderId, request);
             return Ok(result);
         }
         catch (ArgumentException ex)
@@ -100,12 +100,12 @@ public class StockController : ControllerBase
         }
     }
 
-    [HttpPut("{productId:guid}/confirm/{orderId:guid}")]
-    public async Task<IActionResult> Confirm(Guid productId, Guid orderId, [FromBody] ConfirmRequest request)
+    [HttpPut("{skuId:guid}/confirm/{orderId:guid}")]
+    public async Task<IActionResult> Confirm(Guid skuId, Guid orderId, [FromBody] ConfirmRequest request)
     {
         try
         {
-            var result = await _stockService.ConfirmAsync(productId, orderId, request);
+            var result = await _stockService.ConfirmAsync(skuId, orderId, request);
             return Ok(result);
         }
         catch (ArgumentException ex)
@@ -126,12 +126,12 @@ public class StockController : ControllerBase
         }
     }
 
-    [HttpPut("{productId:guid}/restock")]
-    public async Task<IActionResult> Restock(Guid productId, [FromBody] RestockRequest request)
+    [HttpPut("{skuId:guid}/restock")]
+    public async Task<IActionResult> Restock(Guid skuId, [FromBody] RestockRequest request)
     {
         try
         {
-            var result = await _stockService.RestockAsync(productId, request);
+            var result = await _stockService.RestockAsync(skuId, request);
             return Ok(result);
         }
         catch (StockConcurrencyException ex)
@@ -144,12 +144,12 @@ public class StockController : ControllerBase
         }
     }
 
-    [HttpGet("{productId:guid}/history")]
-    public async Task<IActionResult> GetHistory(Guid productId)
+    [HttpGet("{skuId:guid}/history")]
+    public async Task<IActionResult> GetHistory(Guid skuId)
     {
         try
         {
-            var result = await _stockService.GetHistoryAsync(productId);
+            var result = await _stockService.GetHistoryAsync(skuId);
             return Ok(result);
         }
         catch (StockNotFoundException)
