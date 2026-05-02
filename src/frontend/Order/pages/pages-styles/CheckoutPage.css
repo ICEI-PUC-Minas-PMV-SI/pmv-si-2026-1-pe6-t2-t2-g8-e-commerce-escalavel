@@ -1,0 +1,152 @@
+.checkout-page {
+  max-width: 800px;
+  margin: 40px auto;
+  padding: 30px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+}
+
+/* título */
+.checkout-title {
+  font-size: 24px;
+  font-weight: 600;
+  margin-bottom: 20px;
+}
+
+/* seções */
+.checkout-section {
+  margin-bottom: 20px;
+}
+
+.checkout-section h2 {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+/* inputs e select padronizados */
+.checkout-input,
+.checkout-select {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 10px;
+
+  border: 1px solid #ddd;
+  border-radius: 8px;
+
+  background: #fff;
+  font-size: 14px;
+
+  outline: none;
+  box-sizing: border-box;
+}
+
+/* foco */
+.checkout-input:focus,
+.checkout-select:focus {
+  border-color: #000;
+}
+
+.payment-options {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.payment-card {
+  flex: 1;
+  padding: 12px;
+  border: 1px solid black;
+  border-radius: 10px;
+  background: #fff;
+  cursor: pointer;
+  text-align: center;
+  transition: 0.2s;
+}
+
+.payment-card:hover {
+  border-color: #000;
+  color: white
+}
+
+.payment-card.active {
+  background: black;
+  color: white;
+  border: 1px solid black;
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  transform: translateY(-1px);
+}
+
+.payment-card:hover {
+  background: #222;
+}
+
+/* resumo */
+.checkout-summary {
+  background: #f9f9f9;
+  padding: 15px;
+  border-radius: 10px;
+  margin-top: 20px;
+}
+
+.checkout-summary-item {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+  margin-bottom: 6px;
+  color: #555;
+}
+
+/* total */
+.checkout-total {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid #eee;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+/* botão principal */
+.checkout-button {
+  width: 100%;
+  padding: 14px;
+  margin-top: 20px;
+
+  border: none;
+  border-radius: 10px;
+
+  background: black;
+  color: white;
+
+  font-size: 14px;
+  font-weight: 600;
+
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.checkout-button:hover {
+  background: #222;
+}
+
+/* botão secundário (voltar) */
+.checkout-button.secondary {
+  background: white;
+  color: black;
+  border: 1px solid #ccc;
+  margin-top: 10px;
+}
+
+.checkout-button.secondary:hover {
+  background: #f5f5f5;
+}
+
+/* botão desabilitado (caso use depois) */
+.checkout-button:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}

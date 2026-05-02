@@ -1,0 +1,84 @@
+/* página principal */
+.cart-page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  padding: 30px;
+  background: #f5f5f5;
+}
+
+h1 {
+  margin-bottom: 15px;
+  font-size: 22px;
+  font-weight: 600;
+}
+
+/* lista de itens */
+.cart-items {
+  flex: 1; /* 🔥 isso empurra o resumo pra baixo */
+}
+
+/* checkbox */
+.cart-item-checkbox {
+  width: 18px;
+  height: 18px;
+  accent-color: black;
+  cursor: pointer;
+}
+
+/* resumo do pedido */
+.cart-summary {
+  background: #fff;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+
+  width: 100%;
+
+  /* 🔥 ESSENCIAL */
+  position: sticky;
+  bottom: 0;
+}
+
+/* items do summary */
+.summary-items {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.summary-item {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+  color: #555;
+}
+
+/* total */
+.summary-total {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+  padding-top: 10px;
+  border-top: 1px solid #eee;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+/* botão */
+.checkout-button {
+  margin-top: 20px;
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: 10px;
+  background: black;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.checkout-button:hover {
+  background: #222;
+}

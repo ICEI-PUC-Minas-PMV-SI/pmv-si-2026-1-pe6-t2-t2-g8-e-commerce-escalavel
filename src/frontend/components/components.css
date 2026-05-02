@@ -1,0 +1,9 @@
+.header-cart {
+  font-size: 20px;
+  color: white;
+  transition: 0.2s;
+}
+
+.header-cart:hover {
+  transform: scale(1.1);
+}

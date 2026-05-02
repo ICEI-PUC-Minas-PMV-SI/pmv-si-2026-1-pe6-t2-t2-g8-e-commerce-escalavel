@@ -1,13 +1,12 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import OrderSummary from "../components/OrderSummary";
 import { orderApi } from "../../services/Api";
 import OrderSuccessModal from "../components/modals/OrderSuccessModal";
+import "./pages-styles/CheckoutPage.css";
 
 function CheckoutPage() {
   const navigate = useNavigate();
 
-  // MOCK do carrinho
   const [cartItems] = useState([
     { id: 1, name: "Camiseta", price: 50, quantity: 2 },
     { id: 2, name: "Calça", price: 120, quantity: 1 }
@@ -19,7 +18,6 @@ function CheckoutPage() {
     paymentMethod: "credit_card"
   });
 
-  // 🆕 estado do pedido criado
   const [createdOrder, setCreatedOrder] = useState(null);
 
   const handleChange = (e) => {
@@ -37,10 +35,6 @@ function CheckoutPage() {
 
       const response = await orderApi.createOrder(orderData);
 
-      // ❌ REMOVE isso:
-      // navigate("/orders", { state: { newOrder: response } });
-
-      // ✅ AGORA:
       setCreatedOrder(response);
 
     } catch (error) {
@@ -50,40 +44,90 @@ function CheckoutPage() {
   };
 
   return (
-    <div>
-      <h1>Checkout</h1>
+    <div className="checkout-page">
 
-      <h2>Endereço</h2>
-      <input
-        name="address"
-        placeholder="Endereço"
-        onChange={handleChange}
-      />
-      <input
-        name="city"
-        placeholder="Cidade"
-        onChange={handleChange}
-      />
+      <h1 className="checkout-title">Checkout</h1>
 
-      <h2>Pagamento</h2>
-      <select name="paymentMethod" onChange={handleChange}>
-        <option value="credit_card">Cartão</option>
-        <option value="pix">PIX</option>
-      </select>
+      <div className="checkout-section">
+        <h2>Endereço</h2>
 
-      <OrderSummary items={cartItems} />
+        <input
+          className="checkout-input"
+          name="address"
+          placeholder="Endereço"
+          onChange={handleChange}
+        />
 
-      <button onClick={handleSubmit}>
+        <input
+          className="checkout-input"
+          name="city"
+          placeholder="Cidade"
+          onChange={handleChange}
+        />
+      </div>
+
+      <div className="checkout-section">
+        <h2>Pagamento</h2>
+
+        <div className="select-wrapper">
+          <div className="payment-options">
+
+            <div
+              className={`payment-card ${form.paymentMethod === "credit_card" ? "active" : ""}`}
+              onClick={() => setForm({ ...form, paymentMethod: "credit_card" })}
+            >
+              Cartão de crédito
+            </div>
+
+            <div
+              className={`payment-card ${form.paymentMethod === "debt_card" ? "active" : ""}`}
+              onClick={() => setForm({ ...form, paymentMethod: "debt_card" })}
+            >
+              Cartão de débito
+            </div>
+
+            <div
+              className={`payment-card ${form.paymentMethod === "pix" ? "active" : ""}`}
+              onClick={() => setForm({ ...form, paymentMethod: "pix" })}
+            >
+              PIX
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      {/* RESUMO */}
+
+      <div className="checkout-summary">
+        {cartItems.map(item => (
+          <div key={item.id} className="checkout-summary-item">
+            <span>{item.name} x{item.quantity}</span>
+            <span>R$ {item.price * item.quantity}</span>
+          </div>
+        ))}
+      </div>
+
+      <button
+        className="checkout-button"
+        onClick={handleSubmit}
+      >
         Confirmar pedido
       </button>
+      <button
+        className="checkout-button secondary"
+        onClick={() => navigate("/cart")}
+      >
+        Voltar
+      </button>
 
-      {/* 🪟 MODAL DE SUCESSO */}
       {createdOrder && (
         <OrderSuccessModal
           order={createdOrder}
           onClose={() => setCreatedOrder(null)}
         />
       )}
+
     </div>
   );
 }

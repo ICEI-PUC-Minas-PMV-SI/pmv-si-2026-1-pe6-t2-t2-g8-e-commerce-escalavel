@@ -2,12 +2,14 @@
 import { useState, useRef, useEffect } from 'react'
 import { Link, NavLink, useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
+import { FaShoppingBag } from "react-icons/fa";
+import "./components.css";
 
 export default function Header() {
   const { user, isAuthenticated, logout } = useAuth()
   const navigate = useNavigate()
 
-  const [open, setOpen]           = useState(false)
+  const [open, setOpen] = useState(false)
   const [loggingOut, setLoggingOut] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
 
@@ -53,6 +55,10 @@ export default function Header() {
         </nav>
 
         <nav className="header-nav">
+          <Link  to="/cart" className="header-link header-cart">
+            <FaShoppingBag />
+          </Link>
+
           {isAuthenticated ? (
             <>
               {user?.role === 'admin' && (
