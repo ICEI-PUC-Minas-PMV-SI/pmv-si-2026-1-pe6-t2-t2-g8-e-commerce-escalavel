@@ -55,7 +55,7 @@ export default function Header() {
         </nav>
 
         <nav className="header-nav">
-          <Link  to="/cart" className="header-link header-cart">
+          <Link to="/cart" className="header-link header-cart">
             <FaShoppingBag />
           </Link>
 
