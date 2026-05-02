@@ -12,7 +12,7 @@ using StockAPI.Data;
 namespace StockAPI.Migrations
 {
     [DbContext(typeof(StockDbContext))]
-    [Migration("20260406231217_InitialStockSchema")]
+    [Migration("20260502163707_InitialStockSchema")]
     partial class InitialStockSchema
     {
         /// <inheritdoc />
@@ -32,27 +32,9 @@ namespace StockAPI.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<string>("Color")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
-
                     b.Property<decimal>("CostPrice")
                         .HasPrecision(18, 2)
                         .HasColumnType("numeric(18,2)");
-
-                    b.Property<string>("Model")
-                        .IsRequired()
-                        .HasMaxLength(80)
-                        .HasColumnType("character varying(80)");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(150)
-                        .HasColumnType("character varying(150)");
-
-                    b.Property<Guid>("ProductId")
-                        .HasColumnType("uuid");
 
                     b.Property<int>("QuantityAvailable")
                         .HasColumnType("integer");
@@ -60,20 +42,12 @@ namespace StockAPI.Migrations
                     b.Property<int>("QuantityReserved")
                         .HasColumnType("integer");
 
-                    b.Property<decimal>("SalePrice")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("numeric(18,2)");
-
-                    b.Property<string>("Size")
-                        .IsRequired()
-                        .HasMaxLength(30)
-                        .HasColumnType("character varying(30)");
+                    b.Property<Guid>("SkuId")
+                        .HasColumnType("uuid");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Name");
-
-                    b.HasIndex("ProductId")
+                    b.HasIndex("SkuId")
                         .IsUnique();
 
                     b.ToTable("stock_items", "stock");
@@ -93,11 +67,11 @@ namespace StockAPI.Migrations
                     b.Property<Guid?>("OrderId")
                         .HasColumnType("uuid");
 
-                    b.Property<Guid>("ProductId")
-                        .HasColumnType("uuid");
-
                     b.Property<int>("Quantity")
                         .HasColumnType("integer");
+
+                    b.Property<Guid>("SkuId")
+                        .HasColumnType("uuid");
 
                     b.Property<string>("Type")
                         .IsRequired()
@@ -108,7 +82,7 @@ namespace StockAPI.Migrations
 
                     b.HasIndex("OrderId");
 
-                    b.HasIndex("ProductId");
+                    b.HasIndex("SkuId");
 
                     b.ToTable("stock_movements", "stock");
                 });
@@ -122,19 +96,19 @@ namespace StockAPI.Migrations
                     b.Property<Guid>("OrderId")
                         .HasColumnType("uuid");
 
-                    b.Property<Guid>("ProductId")
-                        .HasColumnType("uuid");
-
                     b.Property<int>("QuantityReserved")
                         .HasColumnType("integer");
+
+                    b.Property<Guid>("SkuId")
+                        .HasColumnType("uuid");
 
                     b.HasKey("Id");
 
                     b.HasIndex("OrderId");
 
-                    b.HasIndex("ProductId");
+                    b.HasIndex("SkuId");
 
-                    b.HasIndex("ProductId", "OrderId")
+                    b.HasIndex("SkuId", "OrderId")
                         .IsUnique();
 
                     b.ToTable("stock_reservations", "stock");

@@ -4,13 +4,9 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:7000/api'
 const httpClient = new HttpClient(API_URL)
 
 export interface StockItem {
-  productId: string
-  categoryId: string
-  name: string
-  color: string
-  model: string
-  size: string
-  salePrice: number
+  id: string
+  skuId: string
+  costPrice: number
   quantityAvailable: number
   quantityReserved: number
 }

@@ -2,7 +2,7 @@ namespace StockAPI.DTOs;
 
 public record StockMovementResponse(
     Guid Id,
-    Guid ProductId,
+    Guid SkuId,
     Guid? OrderId,
     string Type,
     int Quantity,

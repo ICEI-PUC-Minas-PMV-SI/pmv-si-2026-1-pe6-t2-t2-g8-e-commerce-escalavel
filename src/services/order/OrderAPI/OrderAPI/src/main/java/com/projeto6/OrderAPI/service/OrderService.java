@@ -1,11 +1,13 @@
 package com.projeto6.OrderAPI.service;
 
+import com.projeto6.OrderAPI.client.CatalogClient;
 import com.projeto6.OrderAPI.dto.ItemRequest;
 import com.projeto6.OrderAPI.dto.ItemResponse;
 import com.projeto6.OrderAPI.dto.OrderRequest;
 import com.projeto6.OrderAPI.dto.OrderResponse;
-import com.projeto6.OrderAPI.model.Order;
+import com.projeto6.OrderAPI.dto.SkuResponse;
 import com.projeto6.OrderAPI.model.Item;
+import com.projeto6.OrderAPI.model.Order;
 import com.projeto6.OrderAPI.repository.OrderRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,19 +23,20 @@ public class OrderService {
     @Autowired
     private OrderRepository repository;
 
-    // Criar pedido
+    @Autowired
+    private CatalogClient catalogClient;
+
     public OrderResponse createOrder(OrderRequest request) {
         Order order = new Order();
 
         order.setCustomerId(request.getCustomerId());
-        order.setItems(toItemList(request.getItems())); // conversão
+        order.setItems(toItemList(request.getItems()));
         order.setStatus("CREATED");
 
         Order saved = repository.save(order);
         return toResponse(saved);
     }
 
-    // Listar todos
     public List<OrderResponse> getAllOrders() {
         return repository.findAll()
                 .stream()
@@ -41,7 +44,6 @@ public class OrderService {
                 .collect(Collectors.toList());
     }
 
-    // Buscar por ID
     public OrderResponse getOrderById(UUID id) {
         Order order = repository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Pedido não encontrado"));
@@ -49,7 +51,6 @@ public class OrderService {
         return toResponse(order);
     }
 
-    // Buscar por usuário
     public List<OrderResponse> getOrdersByUser(UUID userId) {
         return repository.findByCustomerId(userId)
                 .stream()
@@ -57,7 +58,6 @@ public class OrderService {
                 .collect(Collectors.toList());
     }
 
-    // Atualizar status
     public OrderResponse updateStatus(UUID id, String status) {
         Order order = repository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Pedido não encontrado"));
@@ -68,7 +68,6 @@ public class OrderService {
         return toResponse(updated);
     }
 
-    // Cancelar pedido
     public OrderResponse cancelOrder(UUID id) {
         Order order = repository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Pedido não encontrado"));
@@ -79,36 +78,38 @@ public class OrderService {
         return toResponse(updated);
     }
 
-
-    // 🔁 Conversões DTO ↔ Model
-
-    // DTO -> Model
     private List<Item> toItemList(List<ItemRequest> itemsRequest) {
         return itemsRequest.stream().map(itemReq -> {
+            SkuResponse sku = catalogClient.findSkuById(itemReq.getSkuId());
+            if (sku == null) {
+                throw new RuntimeException("SKU não encontrado: " + itemReq.getSkuId());
+            }
             Item item = new Item();
-            item.setProductId(itemReq.getProductId());
+            item.setSkuId(sku.getId());
+            item.setProductId(sku.getProductId());
+            item.setUnitPrice(sku.getPrice());
             item.setQuantity(itemReq.getQuantity());
             return item;
         }).collect(Collectors.toList());
     }
 
-    // Model <- DTO
     private List<ItemResponse> toItemResponseList(List<Item> items) {
         return items.stream().map(item -> {
             ItemResponse response = new ItemResponse();
+            response.setSkuId(item.getSkuId());
             response.setProductId(item.getProductId());
+            response.setUnitPrice(item.getUnitPrice());
             response.setQuantity(item.getQuantity());
             return response;
         }).collect(Collectors.toList());
     }
 
-    // Model -> Response
     private OrderResponse toResponse(Order order) {
         OrderResponse response = new OrderResponse();
 
         response.setId(order.getId());
         response.setCustomerId(order.getCustomerId());
-        response.setItems(toItemResponseList(order.getItems())); // conversão
+        response.setItems(toItemResponseList(order.getItems()));
         response.setStatus(order.getStatus());
 
         return response;

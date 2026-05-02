@@ -20,13 +20,8 @@ namespace StockAPI.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    ProductId = table.Column<Guid>(type: "uuid", nullable: false),
-                    Name = table.Column<string>(type: "character varying(150)", maxLength: 150, nullable: false),
-                    Color = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
-                    Model = table.Column<string>(type: "character varying(80)", maxLength: 80, nullable: false),
-                    Size = table.Column<string>(type: "character varying(30)", maxLength: 30, nullable: false),
+                    SkuId = table.Column<Guid>(type: "uuid", nullable: false),
                     CostPrice = table.Column<decimal>(type: "numeric(18,2)", precision: 18, scale: 2, nullable: false),
-                    SalePrice = table.Column<decimal>(type: "numeric(18,2)", precision: 18, scale: 2, nullable: false),
                     QuantityAvailable = table.Column<int>(type: "integer", nullable: false),
                     QuantityReserved = table.Column<int>(type: "integer", nullable: false)
                 },
@@ -41,7 +36,7 @@ namespace StockAPI.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    ProductId = table.Column<Guid>(type: "uuid", nullable: false),
+                    SkuId = table.Column<Guid>(type: "uuid", nullable: false),
                     OrderId = table.Column<Guid>(type: "uuid", nullable: true),
                     Type = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false),
                     Quantity = table.Column<int>(type: "integer", nullable: false),
@@ -58,7 +53,7 @@ namespace StockAPI.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    ProductId = table.Column<Guid>(type: "uuid", nullable: false),
+                    SkuId = table.Column<Guid>(type: "uuid", nullable: false),
                     OrderId = table.Column<Guid>(type: "uuid", nullable: false),
                     QuantityReserved = table.Column<int>(type: "integer", nullable: false)
                 },
@@ -68,16 +63,10 @@ namespace StockAPI.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_stock_items_Name",
+                name: "IX_stock_items_SkuId",
                 schema: "stock",
                 table: "stock_items",
-                column: "Name");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_stock_items_ProductId",
-                schema: "stock",
-                table: "stock_items",
-                column: "ProductId",
+                column: "SkuId",
                 unique: true);
 
             migrationBuilder.CreateIndex(
@@ -87,10 +76,10 @@ namespace StockAPI.Migrations
                 column: "OrderId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_stock_movements_ProductId",
+                name: "IX_stock_movements_SkuId",
                 schema: "stock",
                 table: "stock_movements",
-                column: "ProductId");
+                column: "SkuId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_stock_reservations_OrderId",
@@ -99,16 +88,16 @@ namespace StockAPI.Migrations
                 column: "OrderId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_stock_reservations_ProductId",
+                name: "IX_stock_reservations_SkuId",
                 schema: "stock",
                 table: "stock_reservations",
-                column: "ProductId");
+                column: "SkuId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_stock_reservations_ProductId_OrderId",
+                name: "IX_stock_reservations_SkuId_OrderId",
                 schema: "stock",
                 table: "stock_reservations",
-                columns: new[] { "ProductId", "OrderId" },
+                columns: new[] { "SkuId", "OrderId" },
                 unique: true);
         }
 
