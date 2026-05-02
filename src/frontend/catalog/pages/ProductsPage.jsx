@@ -4,8 +4,17 @@ import { catalogApi } from '../../services/api'
 const PRICE_FORMATTER = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' })
 const EMPTY_FILTERS = { name: '', categoryId: '', minPrice: '', maxPrice: '' }
 
+function getDisplayPrice(product) {
+  const prices = (product.variants ?? [])
+    .flatMap(v => v.skus ?? [])
+    .map(s => s.price)
+    .filter(p => typeof p === 'number')
+  return prices.length ? Math.min(...prices) : null
+}
+
 function ProductCard({ product }) {
   const [imgFailed, setImgFailed] = useState(false)
+  const price = getDisplayPrice(product)
 
   return (
     <div className="bg-gray-800 text-white rounded-lg overflow-hidden flex flex-col">
@@ -25,9 +34,13 @@ function ProductCard({ product }) {
           <p className="text-gray-400 text-sm line-clamp-2 mb-3">{product.description}</p>
         )}
         <div className="mt-auto flex items-center justify-between">
-          <span className="text-green-400 font-bold text-lg">
-            {PRICE_FORMATTER.format(product.price)}
-          </span>
+          {price !== null ? (
+            <span className="text-green-400 font-bold text-lg">
+              A partir de {PRICE_FORMATTER.format(price)}
+            </span>
+          ) : (
+            <span className="text-gray-500 text-sm">Sem estoque</span>
+          )}
           {product.category?.name && (
             <span className="text-xs text-white-500 bg-gray-700 px-2 py-1 rounded-full">
               {product.category.name}

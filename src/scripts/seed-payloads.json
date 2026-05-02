@@ -1,0 +1,202 @@
+{
+  "_notes": [
+    "Sequencia de cadastro: 1) categoria  2) produtos  3) variants por produto  4) skus por variant  5) stock por sku",
+    "Substitua os placeholders {{...}} pelos UUIDs retornados a cada POST.",
+    "Gateway base URL local: http://localhost:7000/api",
+    "Direto no service (sem gateway): catalog em http://localhost:5002, stock em http://localhost:5003"
+  ],
+
+  "step_1_category": {
+    "method": "POST",
+    "url": "/api/catalog/categories",
+    "body": {
+      "name": "Roupas",
+      "active": true
+    },
+    "extract": "id -> {{categoryId}}"
+  },
+
+  "step_2_products": [
+    {
+      "method": "POST",
+      "url": "/api/catalog/products",
+      "body": {
+        "name": "Camiseta Basica Algodao",
+        "description": "Camiseta basica de algodao penteado, gola careca, modelagem regular",
+        "urlImg": "https://placehold.co/600x600/png?text=Camiseta",
+        "active": true,
+        "categoryId": "{{categoryId}}"
+      },
+      "extract": "id -> {{productId_1}}"
+    },
+    {
+      "method": "POST",
+      "url": "/api/catalog/products",
+      "body": {
+        "name": "Calca Jeans Slim",
+        "description": "Calca jeans masculina modelagem slim, lavagem media, 5 bolsos",
+        "urlImg": "https://placehold.co/600x600/png?text=Calca+Jeans",
+        "active": true,
+        "categoryId": "{{categoryId}}"
+      },
+      "extract": "id -> {{productId_2}}"
+    }
+  ],
+
+  "step_3_variants": [
+    {
+      "method": "POST",
+      "url": "/api/catalog/products/{{productId_1}}/variants",
+      "body": { "color": "Preta" },
+      "extract": "id -> {{variantId_1A}}"
+    },
+    {
+      "method": "POST",
+      "url": "/api/catalog/products/{{productId_1}}/variants",
+      "body": { "color": "Branca" },
+      "extract": "id -> {{variantId_1B}}"
+    },
+    {
+      "method": "POST",
+      "url": "/api/catalog/products/{{productId_2}}/variants",
+      "body": { "color": "Azul" },
+      "extract": "id -> {{variantId_2A}}"
+    },
+    {
+      "method": "POST",
+      "url": "/api/catalog/products/{{productId_2}}/variants",
+      "body": { "color": "Preta" },
+      "extract": "id -> {{variantId_2B}}"
+    }
+  ],
+
+  "step_4_skus": [
+    {
+      "method": "POST",
+      "url": "/api/catalog/variants/{{variantId_1A}}/skus",
+      "body": { "size": "M", "code": "TSHIRT-PRETA-M", "price": 59.90 },
+      "extract": "id -> {{skuId_1A_M}}"
+    },
+    {
+      "method": "POST",
+      "url": "/api/catalog/variants/{{variantId_1A}}/skus",
+      "body": { "size": "G", "code": "TSHIRT-PRETA-G", "price": 59.90 },
+      "extract": "id -> {{skuId_1A_G}}"
+    },
+    {
+      "method": "POST",
+      "url": "/api/catalog/variants/{{variantId_1B}}/skus",
+      "body": { "size": "M", "code": "TSHIRT-BRANCA-M", "price": 59.90 },
+      "extract": "id -> {{skuId_1B_M}}"
+    },
+    {
+      "method": "POST",
+      "url": "/api/catalog/variants/{{variantId_1B}}/skus",
+      "body": { "size": "G", "code": "TSHIRT-BRANCA-G", "price": 59.90 },
+      "extract": "id -> {{skuId_1B_G}}"
+    },
+    {
+      "method": "POST",
+      "url": "/api/catalog/variants/{{variantId_2A}}/skus",
+      "body": { "size": "40", "code": "JEANS-AZUL-40", "price": 199.90 },
+      "extract": "id -> {{skuId_2A_40}}"
+    },
+    {
+      "method": "POST",
+      "url": "/api/catalog/variants/{{variantId_2A}}/skus",
+      "body": { "size": "42", "code": "JEANS-AZUL-42", "price": 199.90 },
+      "extract": "id -> {{skuId_2A_42}}"
+    },
+    {
+      "method": "POST",
+      "url": "/api/catalog/variants/{{variantId_2B}}/skus",
+      "body": { "size": "40", "code": "JEANS-PRETA-40", "price": 219.90 },
+      "extract": "id -> {{skuId_2B_40}}"
+    },
+    {
+      "method": "POST",
+      "url": "/api/catalog/variants/{{variantId_2B}}/skus",
+      "body": { "size": "42", "code": "JEANS-PRETA-42", "price": 219.90 },
+      "extract": "id -> {{skuId_2B_42}}"
+    }
+  ],
+
+  "step_5_stock_optional": [
+    {
+      "method": "POST",
+      "url": "/api/stock/",
+      "body": { "skuId": "{{skuId_1A_M}}", "quantity": 50, "costPrice": 22.50 }
+    },
+    {
+      "method": "POST",
+      "url": "/api/stock/",
+      "body": { "skuId": "{{skuId_1A_G}}", "quantity": 30, "costPrice": 22.50 }
+    },
+    {
+      "method": "POST",
+      "url": "/api/stock/",
+      "body": { "skuId": "{{skuId_1B_M}}", "quantity": 40, "costPrice": 22.50 }
+    },
+    {
+      "method": "POST",
+      "url": "/api/stock/",
+      "body": { "skuId": "{{skuId_1B_G}}", "quantity": 25, "costPrice": 22.50 }
+    },
+    {
+      "method": "POST",
+      "url": "/api/stock/",
+      "body": { "skuId": "{{skuId_2A_40}}", "quantity": 15, "costPrice": 89.00 }
+    },
+    {
+      "method": "POST",
+      "url": "/api/stock/",
+      "body": { "skuId": "{{skuId_2A_42}}", "quantity": 12, "costPrice": 89.00 }
+    },
+    {
+      "method": "POST",
+      "url": "/api/stock/",
+      "body": { "skuId": "{{skuId_2B_40}}", "quantity": 10, "costPrice": 95.00 }
+    },
+    {
+      "method": "POST",
+      "url": "/api/stock/",
+      "body": { "skuId": "{{skuId_2B_42}}", "quantity": 8, "costPrice": 95.00 }
+    }
+  ],
+
+  "step_6_order_example": {
+    "_notes": [
+      "Cria pedido com 2 itens. Backend consulta Catalog (GET /skus/{id}) pra resolver productId + unitPrice snapshot.",
+      "customerId pode ser qualquer UUID valido (no MVP nao valida contra Users API).",
+      "Substitua skuId pelos UUIDs retornados no step 4."
+    ],
+    "method": "POST",
+    "url": "/api/orders/",
+    "body": {
+      "customerId": "11111111-2222-3333-4444-555555555555",
+      "items": [
+        { "skuId": "{{skuId_1A_M}}", "quantity": 2 },
+        { "skuId": "{{skuId_2A_40}}", "quantity": 1 }
+      ]
+    },
+    "expected_response_shape": {
+      "id": "<uuid gerado>",
+      "customerId": "11111111-2222-3333-4444-555555555555",
+      "status": "CREATED",
+      "items": [
+        {
+          "skuId": "<skuId_1A_M>",
+          "productId": "<productId_1 resolvido via lookup no catalog>",
+          "unitPrice": 59.90,
+          "quantity": 2
+        },
+        {
+          "skuId": "<skuId_2A_40>",
+          "productId": "<productId_2 resolvido via lookup no catalog>",
+          "unitPrice": 199.90,
+          "quantity": 1
+        }
+      ]
+    }
+  }
+}
