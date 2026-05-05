@@ -13,20 +13,6 @@ export default function Home() {
           <p className="text-gray-500 text-lg max-w-md">
             Peças selecionadas para quem não abre mão de personalidade.
           </p>
-          <div className="flex gap-3 mt-2">
-            <Link
-              to="/products"
-              className="bg-black text-white px-8 py-3 text-sm font-semibold tracking-wide hover:bg-gray-900 transition-colors"
-            >
-              Ver Produtos
-            </Link>
-            <Link
-              to="/categories"
-              className="border border-black text-black px-8 py-3 text-sm font-semibold tracking-wide hover:bg-gray-50 transition-colors"
-            >
-              Categorias
-            </Link>
-          </div>
         </div>
       </section>
 
