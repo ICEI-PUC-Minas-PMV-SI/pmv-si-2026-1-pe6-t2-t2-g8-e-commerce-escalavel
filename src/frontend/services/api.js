@@ -15,7 +15,35 @@ export const catalogApi = {
   getCategories: async () => {
     const response = await fetch(`${BASE_URL}/catalog/categories`)
     return response.json()
-  }
+  },
+
+  createProduct: async (data) => {
+    const response = await fetch(`${BASE_URL}/catalog/products`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('token')}` },
+      body: JSON.stringify(data),
+    })
+    if (!response.ok) throw new Error('Erro ao criar produto')
+    return response.json()
+  },
+
+  updateProduct: async (id, data) => {
+    const response = await fetch(`${BASE_URL}/catalog/products/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('token')}` },
+      body: JSON.stringify(data),
+    })
+    if (!response.ok) throw new Error('Erro ao atualizar produto')
+    return response.json()
+  },
+
+  deleteProduct: async (id) => {
+    const response = await fetch(`${BASE_URL}/catalog/products/${id}`, {
+      method: 'DELETE',
+      headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
+    })
+    if (!response.ok) throw new Error('Erro ao deletar produto')
+  },
 }
 const getHeaders = () => ({
   'Content-Type': 'application/json',
