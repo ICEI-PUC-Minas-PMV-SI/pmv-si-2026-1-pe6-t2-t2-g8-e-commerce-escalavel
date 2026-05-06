@@ -1,95 +1,129 @@
-import { useNavigate, Link } from "react-router-dom";
-import "./components-styles/CartItem.css";
+import { useState } from "react";
+import { Link } from "react-router-dom";
 import { FiTrash2 } from "react-icons/fi";
 
 function CartItem({ item, onRemove, onUpdateQuantity, onToggleSelect }) {
-  const navigate = useNavigate();
+  const [showModal, setShowModal] = useState(false);
+
   const subtotal = item.price * item.quantity;
 
-  const handleQuantityChange = (e) => {
-    const newQuantity = parseInt(e.target.value);
-    if (newQuantity > 0) {
-      onUpdateQuantity(item.id, newQuantity);
-    }
+  const handleConfirmRemove = () => {
+    onRemove(item.id);
+    setShowModal(false);
   };
 
   return (
-    <div className="cart-item">
+    <>
+      {/* CARD */}
+      <div className="flex items-center justify-between py-6 px-4 bg-white border border-gray-100 rounded-lg shadow-sm">
 
-      {/* imagem clicável */}
-      <div className="cart-item-media">
-        <Link to={`/products/${item.id}`}>
-          <div className="cart-item-image" />
-        </Link>
-      </div>
+        {/* esquerda */}
+        <div className="flex items-center gap-5">
 
-      {/* info */}
-      <div className="cart-item-info">
+          <Link to={`/products/${item.id}`}>
+            <div className="w-25 h-25 bg-gray-100 rounded-md" />
+          </Link>
 
-        {/* nome clicável */}
-        <Link
-          to={`/products/${item.id}`}
-          className="cart-item-title-link"
-        >
-          <h3 className="cart-item-title">
-            {item.name}
-          </h3>
-        </Link>
+          <div className="flex flex-col gap-4">
 
+            <Link
+              to={`/products/${item.id}`}
+              className="text-md font-medium text-gray-900 hover:underline"
+            >
+              {item.name}
+            </Link>
 
+            {/* quantidade */}
+            <div className="flex items-center gap-3">
 
-        <div className="cart-item-quantity">
+              <button
+                className="w-8 h-8 flex items-center justify-center rounded-full border border-black-300 text-gray-600 hover:bg-gray-100"
+                onClick={() =>
+                  onUpdateQuantity(item.id, Math.max(1, item.quantity - 1))
+                }
+              >
+                -
+              </button>
 
-          <button
-            className="qty-btn"
-            onClick={() =>
-              onUpdateQuantity(item.id, Math.max(1, item.quantity - 1))
-            }
-          >
-            -
-          </button>
+              <span className="text-sm text-gray-700 min-w-[20px] text-center">
+                {item.quantity}
+              </span>
 
-          <span className="qty-value">{item.quantity}</span>
+              <button
+                className="w-8 h-8 flex items-center justify-center rounded-full border border-black-300 text-gray-600 hover:bg-gray-100"
+                onClick={() =>
+                  onUpdateQuantity(item.id, item.quantity + 1)
+                }
+              >
+                +
+              </button>
 
-          <button
-            className="qty-btn"
-            onClick={() =>
-              onUpdateQuantity(item.id, item.quantity + 1)
-            }
-          >
-            +
-          </button>
+            </div>
 
+            <p className="text-xs text-gray-500">
+              Subtotal: R$ {subtotal}
+            </p>
+          </div>
         </div>
 
-        <p className="cart-item-subtotal">
-          Subtotal: R$ {subtotal}
-        </p>
-      </div>
+        {/* direita */}
+        <div className="flex flex-col items-center gap-10">
 
-      {/* ações */}
-      <div className="cart-item-actions">
-
-        <div className="cart-item-select">
+          {/* checkbox */}
           <input
             type="checkbox"
             checked={item.selected}
             onChange={() => onToggleSelect(item.id)}
-            className="cart-item-checkbox"
+            className="w-5 h-5 accent-black transition-transform duration-150 hover:scale-125 cursor-pointer"
           />
+
+          {/* lixeira */}
+          <button
+            onClick={() => setShowModal(true)}
+            className="text-black text-xl transition-transform duration-150 hover:scale-125"
+          >
+            <FiTrash2 />
+          </button>
+
         </div>
-
-        <button
-          className="trash-button"
-          onClick={() => onRemove(item.id)}
-          aria-label="Remover item"
-        >
-          <FiTrash2 />
-        </button>
-
       </div>
 
-    </div>
+      {/* MODAL */}
+      {showModal && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+
+          <div className="bg-white rounded-lg p-6 w-80 shadow-lg">
+
+            <h2 className="text-lg font-semibold mb-2">
+              Remover item?
+            </h2>
+
+            <p className="text-sm text-gray-600 mb-6">
+              Tem certeza que deseja remover <strong>{item.name}</strong> do carrinho?
+            </p>
+
+            <div className="flex justify-end gap-3">
+
+              <button
+                onClick={() => setShowModal(false)}
+                className="px-4 py-2 text-sm border border-gray-300 rounded-md hover:bg-gray-100"
+              >
+                Cancelar
+              </button>
+
+              <button
+                onClick={handleConfirmRemove}
+                className="px-4 py-2 text-sm bg-black text-white rounded-md hover:bg-gray-800"
+              >
+                Remover
+              </button>
+
+            </div>
+
+          </div>
+        </div>
+      )}
+    </>
   );
 }
 
