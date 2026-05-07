@@ -8,6 +8,16 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<StockDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("Default")));
 
+// ── Catalog client ───────────────────────────────────────
+var catalogUrl = builder.Configuration["CATALOG_URL"]
+    ?? Environment.GetEnvironmentVariable("CATALOG_URL")
+    ?? "http://catalogapi:8080";
+builder.Services.AddHttpClient<ICatalogClient, CatalogClient>(client =>
+{
+    client.BaseAddress = new Uri(catalogUrl);
+    client.Timeout = TimeSpan.FromSeconds(5);
+});
+
 // ── Services ─────────────────────────────────────────────
 builder.Services.AddScoped<IStockService, StockService>();
 builder.Services.AddControllers();

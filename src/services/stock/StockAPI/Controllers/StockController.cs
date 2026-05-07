@@ -23,6 +23,13 @@ public class StockController : ControllerBase
         return Ok(result);
     }
 
+    [HttpGet("detailed-items")]
+    public async Task<IActionResult> GetDetailedItems(CancellationToken cancellationToken)
+    {
+        var result = await _stockService.GetAllWithProductsAsync(cancellationToken);
+        return Ok(result);
+    }
+
     [HttpGet("{skuId:guid}")]
     public async Task<IActionResult> GetStock(Guid skuId)
     {

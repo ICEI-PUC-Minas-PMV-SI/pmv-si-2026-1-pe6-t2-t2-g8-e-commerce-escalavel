@@ -1,11 +1,14 @@
-import { useEffect, useMemo, useState } from 'react'
-import { getAllStockItems, type StockItem } from '../../services/stockClientService'
+import { useCallback, useEffect, useMemo, useState } from 'react'
+import {
+  getAllStockItemsDetailed,
+  type StockItem,
+  type StockItemDetailed,
+} from '../../services/stockClientService'
 import Toast, { type ToastData } from '../../components/Toast'
 import CreateStockModal from '../components/CreateStockModal'
 import RestockModal from '../components/RestockModal'
 import AdjustModal from '../components/AdjustModal'
 import HistoryDrawer from '../components/HistoryDrawer'
-import ProductCell from '../components/ProductCell'
 
 const PRICE_FORMATTER = new Intl.NumberFormat('pt-BR', {
   style: 'currency',
@@ -13,7 +16,7 @@ const PRICE_FORMATTER = new Intl.NumberFormat('pt-BR', {
 })
 
 export default function StockListPage() {
-  const [items, setItems] = useState<StockItem[]>([])
+  const [items, setItems] = useState<StockItemDetailed[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [search, setSearch] = useState('')
@@ -27,34 +30,42 @@ export default function StockListPage() {
   const showToast = (message: string, type: ToastData['type']) =>
     setToast({ message, type })
 
+  const refresh = useCallback(async (signal?: AbortSignal) => {
+    try {
+      const data = await getAllStockItemsDetailed(signal)
+      setItems(data)
+      setError(null)
+    } catch (err) {
+      if (err instanceof DOMException && err.name === 'AbortError') return
+      setError(err instanceof Error ? err.message : 'Falha ao carregar estoque.')
+    }
+  }, [])
+
   useEffect(() => {
     const controller = new AbortController()
-
-    getAllStockItems(controller.signal)
-      .then(setItems)
-      .catch((err) => {
-        if (err instanceof DOMException && err.name === 'AbortError') return
-        setError(err instanceof Error ? err.message : 'Falha ao carregar estoque.')
-      })
-      .finally(() => {
-        if (!controller.signal.aborted) setLoading(false)
-      })
-
+    refresh(controller.signal).finally(() => {
+      if (!controller.signal.aborted) setLoading(false)
+    })
     return () => controller.abort()
-  }, [])
+  }, [refresh])
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase()
     if (!q) return items
-    return items.filter((i) => i.skuId.toLowerCase().includes(q))
+    return items.filter((i) => {
+      if (i.skuId.toLowerCase().includes(q)) return true
+      const name = i.product?.name?.toLowerCase() ?? ''
+      const code = i.product?.code?.toLowerCase() ?? ''
+      return name.includes(q) || code.includes(q)
+    })
   }, [items, search])
 
-  const upsert = (item: StockItem) => {
+  const mergeUpdated = (updated: StockItem) => {
     setItems((prev) => {
-      const idx = prev.findIndex((p) => p.id === item.id)
-      if (idx === -1) return [...prev, item]
+      const idx = prev.findIndex((p) => p.id === updated.id)
+      if (idx === -1) return prev
       const copy = [...prev]
-      copy[idx] = item
+      copy[idx] = { ...updated, product: prev[idx].product }
       return copy
     })
   }
@@ -83,8 +94,8 @@ export default function StockListPage() {
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Buscar por SKU..."
-              className="w-64 rounded-md border border-gray-300 px-3 py-1.5 text-sm focus:border-gray-500 focus:outline-none"
+              placeholder="Buscar por SKU, nome ou código..."
+              className="w-72 rounded-md border border-gray-300 px-3 py-1.5 text-sm focus:border-gray-500 focus:outline-none"
             />
             <button
               onClick={() => setCreateOpen(true)}
@@ -106,7 +117,7 @@ export default function StockListPage() {
           )}
           {!loading && !error && filtered.length === 0 && (
             <p className="px-4 py-6 text-sm text-gray-600">
-              {items.length === 0 ? 'Nenhum item de estoque cadastrado.' : 'Nenhum SKU bate com a busca.'}
+              {items.length === 0 ? 'Nenhum item de estoque cadastrado.' : 'Nenhum item bate com a busca.'}
             </p>
           )}
           {!loading && !error && filtered.length > 0 && (
@@ -122,53 +133,83 @@ export default function StockListPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
-                {filtered.map((item) => (
-                  <tr key={item.id} className="hover:bg-gray-50">
-                    <td className="px-4 py-2">
-                      <ProductCell skuId={item.skuId} />
-                    </td>
-                    <td className="px-4 py-2">
-                      <button
-                        onClick={() => handleCopy(item.skuId)}
-                        className="max-w-[28ch] truncate font-mono text-xs text-gray-700 hover:text-gray-900"
-                        title={`${item.skuId} (clique para copiar)`}
-                      >
-                        {item.skuId}
-                      </button>
-                    </td>
-                    <td className="px-4 py-2 text-right text-sm tabular-nums text-gray-900">
-                      {item.quantityAvailable}
-                    </td>
-                    <td className="px-4 py-2 text-right text-sm tabular-nums text-gray-600">
-                      {item.quantityReserved}
-                    </td>
-                    <td className="px-4 py-2 text-right text-sm tabular-nums text-gray-900">
-                      {PRICE_FORMATTER.format(item.costPrice)}
-                    </td>
-                    <td className="px-4 py-2 text-right">
-                      <div className="flex justify-end gap-1.5">
+                {filtered.map((item) => {
+                  const p = item.product
+                  const subtitle = [p?.code, p?.size].filter(Boolean).join(' · ')
+                  return (
+                    <tr key={item.id} className="hover:bg-gray-50">
+                      <td className="px-4 py-2">
+                        <div className="flex items-center gap-3">
+                          <div className="h-20 w-20 flex-shrink-0 overflow-hidden rounded-md border border-gray-200 bg-gray-50">
+                            {p?.urlImg ? (
+                              <img
+                                src={p.urlImg}
+                                alt={p.name ?? 'produto'}
+                                className="h-full w-full object-cover"
+                                loading="lazy"
+                                onError={(e) => {
+                                  (e.currentTarget as HTMLImageElement).style.display = 'none'
+                                }}
+                              />
+                            ) : (
+                              <div className="flex h-full w-full items-center justify-center text-[10px] text-gray-400">
+                                sem imagem
+                              </div>
+                            )}
+                          </div>
+                          <div className="min-w-0">
+                            <div className="truncate text-sm font-medium text-gray-900" title={p?.name ?? ''}>
+                              {p?.name ?? 'Produto não encontrado'}
+                            </div>
+                            {subtitle && (
+                              <div className="truncate text-xs text-gray-500">{subtitle}</div>
+                            )}
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-4 py-2">
                         <button
-                          onClick={() => setRestockTarget(item)}
-                          className="rounded border border-gray-300 px-2 py-1 text-xs text-gray-700 hover:bg-gray-100"
+                          onClick={() => handleCopy(item.skuId)}
+                          className="max-w-[28ch] truncate font-mono text-xs text-gray-700 hover:text-gray-900"
+                          title={`${item.skuId} (clique para copiar)`}
                         >
-                          Reabastecer
+                          {item.skuId}
                         </button>
-                        <button
-                          onClick={() => setAdjustTarget(item)}
-                          className="rounded border border-gray-300 px-2 py-1 text-xs text-gray-700 hover:bg-gray-100"
-                        >
-                          Ajustar
-                        </button>
-                        <button
-                          onClick={() => setHistoryTarget(item)}
-                          className="rounded border border-gray-300 px-2 py-1 text-xs text-gray-700 hover:bg-gray-100"
-                        >
-                          Histórico
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
+                      </td>
+                      <td className="px-4 py-2 text-right text-sm tabular-nums text-gray-900">
+                        {item.quantityAvailable}
+                      </td>
+                      <td className="px-4 py-2 text-right text-sm tabular-nums text-gray-600">
+                        {item.quantityReserved}
+                      </td>
+                      <td className="px-4 py-2 text-right text-sm tabular-nums text-gray-900">
+                        {PRICE_FORMATTER.format(item.costPrice)}
+                      </td>
+                      <td className="px-4 py-2 text-right">
+                        <div className="flex justify-end gap-1.5">
+                          <button
+                            onClick={() => setRestockTarget(item)}
+                            className="rounded border border-gray-300 px-2 py-1 text-xs text-gray-700 hover:bg-gray-100"
+                          >
+                            Reabastecer
+                          </button>
+                          <button
+                            onClick={() => setAdjustTarget(item)}
+                            className="rounded border border-gray-300 px-2 py-1 text-xs text-gray-700 hover:bg-gray-100"
+                          >
+                            Ajustar
+                          </button>
+                          <button
+                            onClick={() => setHistoryTarget(item)}
+                            className="rounded border border-gray-300 px-2 py-1 text-xs text-gray-700 hover:bg-gray-100"
+                          >
+                            Histórico
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  )
+                })}
               </tbody>
             </table>
           )}
@@ -178,16 +219,16 @@ export default function StockListPage() {
       <CreateStockModal
         open={createOpen}
         onClose={() => setCreateOpen(false)}
-        onCreated={(item) => {
-          upsert(item)
+        onCreated={() => {
           showToast('Item criado.', 'success')
+          refresh()
         }}
       />
       <RestockModal
         item={restockTarget}
         onClose={() => setRestockTarget(null)}
         onUpdated={(item) => {
-          upsert(item)
+          mergeUpdated(item)
           showToast('Estoque reabastecido.', 'success')
         }}
       />
@@ -195,7 +236,7 @@ export default function StockListPage() {
         item={adjustTarget}
         onClose={() => setAdjustTarget(null)}
         onUpdated={(item) => {
-          upsert(item)
+          mergeUpdated(item)
           showToast('Estoque ajustado.', 'success')
         }}
       />

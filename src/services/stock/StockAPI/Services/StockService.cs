@@ -10,11 +10,13 @@ namespace StockAPI.Services;
 public class StockService : IStockService
 {
     private readonly StockDbContext _db;
+    private readonly ICatalogClient _catalog;
     private readonly ILogger<StockService> _logger;
 
-    public StockService(StockDbContext db, ILogger<StockService> logger)
+    public StockService(StockDbContext db, ICatalogClient catalog, ILogger<StockService> logger)
     {
         _db = db;
+        _catalog = catalog;
         _logger = logger;
     }
 
@@ -31,6 +33,29 @@ public class StockService : IStockService
                 x.QuantityReserved
             ))
             .ToListAsync();
+    }
+
+    public async Task<IEnumerable<StockItemDetailedResponse>> GetAllWithProductsAsync(CancellationToken cancellationToken = default)
+    {
+        var items = await _db.StockItems
+            .AsNoTracking()
+            .OrderBy(x => x.SkuId)
+            .ToListAsync(cancellationToken);
+
+        var enrichTasks = items.Select(async item =>
+        {
+            var product = await _catalog.GetProductBySkuIdAsync(item.SkuId, cancellationToken);
+            return new StockItemDetailedResponse(
+                item.Id,
+                item.SkuId,
+                item.CostPrice,
+                item.QuantityAvailable,
+                item.QuantityReserved,
+                product
+            );
+        });
+
+        return await Task.WhenAll(enrichTasks);
     }
 
     public async Task<StockItemResponse?> GetBySkuIdAsync(Guid skuId)

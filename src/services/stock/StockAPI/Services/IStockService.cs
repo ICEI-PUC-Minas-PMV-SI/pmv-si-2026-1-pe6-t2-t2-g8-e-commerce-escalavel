@@ -5,6 +5,7 @@ namespace StockAPI.Services;
 public interface IStockService
 {
     Task<IEnumerable<StockItemResponse>> GetAllAsync();
+    Task<IEnumerable<StockItemDetailedResponse>> GetAllWithProductsAsync(CancellationToken cancellationToken = default);
     Task<StockItemResponse?> GetBySkuIdAsync(Guid skuId);
     Task<StockItemResponse> CreateAsync(CreateStockRequest request);
     Task<StockItemResponse> ReserveAsync(Guid skuId, Guid orderId, ReserveRequest request);

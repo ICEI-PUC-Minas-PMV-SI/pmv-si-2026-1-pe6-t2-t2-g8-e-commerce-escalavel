@@ -11,6 +11,18 @@ export interface StockItem {
   quantityReserved: number
 }
 
+export interface CatalogProductInfo {
+  name: string | null
+  description: string | null
+  urlImg: string | null
+  code: string | null
+  size: string | null
+}
+
+export interface StockItemDetailed extends StockItem {
+  product: CatalogProductInfo | null
+}
+
 export type StockMovementType =
   | 'reserve'
   | 'release'
@@ -60,6 +72,16 @@ export async function getAllStockItems(signal?: AbortSignal): Promise<StockItem[
     signal,
     headers: authHeader(),
   })
+
+  if (Array.isArray(payload)) return payload
+  return Array.isArray(payload?.data) ? payload.data : []
+}
+
+export async function getAllStockItemsDetailed(signal?: AbortSignal): Promise<StockItemDetailed[]> {
+  const payload = await httpClient.get<StockItemDetailed[] | ApiResponse<StockItemDetailed[]>>(
+    '/stock/detailed-items',
+    { signal, headers: authHeader() }
+  )
 
   if (Array.isArray(payload)) return payload
   return Array.isArray(payload?.data) ? payload.data : []
