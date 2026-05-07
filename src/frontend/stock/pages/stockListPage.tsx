@@ -1,5 +1,11 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { getAllStockItems, type StockItem } from '../../services/stockClientService'
+import Toast, { type ToastData } from '../../components/Toast'
+import CreateStockModal from '../components/CreateStockModal'
+import RestockModal from '../components/RestockModal'
+import AdjustModal from '../components/AdjustModal'
+import HistoryDrawer from '../components/HistoryDrawer'
+import ProductCell from '../components/ProductCell'
 
 const PRICE_FORMATTER = new Intl.NumberFormat('pt-BR', {
   style: 'currency',
@@ -10,87 +16,196 @@ export default function StockListPage() {
   const [items, setItems] = useState<StockItem[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [search, setSearch] = useState('')
+  const [toast, setToast] = useState<ToastData | null>(null)
+
+  const [createOpen, setCreateOpen] = useState(false)
+  const [restockTarget, setRestockTarget] = useState<StockItem | null>(null)
+  const [adjustTarget, setAdjustTarget] = useState<StockItem | null>(null)
+  const [historyTarget, setHistoryTarget] = useState<StockItem | null>(null)
+
+  const showToast = (message: string, type: ToastData['type']) =>
+    setToast({ message, type })
 
   useEffect(() => {
     const controller = new AbortController()
 
-    async function fetchStock() {
-      setLoading(true)
-      setError(null)
+    getAllStockItems(controller.signal)
+      .then(setItems)
+      .catch((err) => {
+        if (err instanceof DOMException && err.name === 'AbortError') return
+        setError(err instanceof Error ? err.message : 'Falha ao carregar estoque.')
+      })
+      .finally(() => {
+        if (!controller.signal.aborted) setLoading(false)
+      })
 
-      try {
-        const data = await getAllStockItems(controller.signal)
-        setItems(data)
-      } catch (err) {
-        if (err instanceof DOMException && err.name === 'AbortError') {
-          return
-        }
-
-        setError('Failed to load stock. Check your gateway/API connection.')
-      } finally {
-        if (!controller.signal.aborted) {
-          setLoading(false)
-        }
-      }
-    }
-
-    fetchStock()
-
-    return () => {
-      controller.abort()
-    }
+    return () => controller.abort()
   }, [])
 
-  if (loading) {
-    return (
-      <div className="bg-white">
-        <div className="mx-auto max-w-2xl px-4 sm:px-6 sm:py-24 lg:max-w-7xl lg:px-8">
-          <p className="text-sm text-gray-600">Loading stock...</p>
-        </div>
-      </div>
-    )
+  const filtered = useMemo(() => {
+    const q = search.trim().toLowerCase()
+    if (!q) return items
+    return items.filter((i) => i.skuId.toLowerCase().includes(q))
+  }, [items, search])
+
+  const upsert = (item: StockItem) => {
+    setItems((prev) => {
+      const idx = prev.findIndex((p) => p.id === item.id)
+      if (idx === -1) return [...prev, item]
+      const copy = [...prev]
+      copy[idx] = item
+      return copy
+    })
   }
 
-  if (error) {
-    return (
-      <div className="bg-white">
-        <div className="mx-auto max-w-2xl px-4 sm:px-6 sm:py-24 lg:max-w-7xl lg:px-8">
-          <div className="rounded-md border border-red-200 bg-red-50 p-4 text-sm text-red-700">
-            {error}
-          </div>
-        </div>
-      </div>
-    )
-  }
-
-  if (items.length === 0) {
-    return (
-      <div className="bg-white">
-        <div className="mx-auto max-w-2xl px-4 sm:px-6 sm:py-24 lg:max-w-7xl lg:px-8">
-          <p className="text-sm text-gray-600">No stock items found.</p>
-        </div>
-      </div>
-    )
+  const handleCopy = async (skuId: string) => {
+    try {
+      await navigator.clipboard.writeText(skuId)
+      showToast('SKU copiado.', 'success')
+    } catch {
+      showToast('Não foi possível copiar.', 'error')
+    }
   }
 
   return (
     <div className="bg-white">
-      <div className="mx-auto max-w-2xl px-4 sm:px-6 sm:py-24 lg:max-w-7xl lg:px-8">
-        <div className="mt-6 grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-4 xl:gap-x-8">
-          {items.map((item) => (
-            <div key={item.id} className="group relative rounded-md border border-gray-200 p-4">
-              <h3 className="text-sm font-medium text-gray-900">SKU</h3>
-              <p className="mt-1 truncate text-xs text-gray-500" title={item.skuId}>{item.skuId}</p>
-              <p className="mt-2 text-xs text-gray-500">
-                Available: {item.quantityAvailable} | Reserved: {item.quantityReserved}
-              </p>
-              <p className="mt-2 text-sm font-medium text-gray-900">
-                Cost: {PRICE_FORMATTER.format(item.costPrice)}
-              </p>
+      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h1 className="text-xl font-semibold text-gray-900">Gestão de Estoque</h1>
+            <p className="mt-0.5 text-xs text-gray-500">
+              Adicionar itens, reabastecer ou ajustar quantidades.
+            </p>
+          </div>
+          <div className="flex items-center gap-2">
+            <input
+              type="text"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Buscar por SKU..."
+              className="w-64 rounded-md border border-gray-300 px-3 py-1.5 text-sm focus:border-gray-500 focus:outline-none"
+            />
+            <button
+              onClick={() => setCreateOpen(true)}
+              className="rounded-md bg-gray-900 px-3 py-1.5 text-sm font-medium text-white hover:bg-gray-800"
+            >
+              Novo item
+            </button>
+          </div>
+        </div>
+
+        <div className="mt-6 overflow-hidden rounded-md border border-gray-200">
+          {loading && (
+            <p className="px-4 py-6 text-sm text-gray-600">Carregando estoque...</p>
+          )}
+          {!loading && error && (
+            <div className="m-4 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+              {error}
             </div>
-          ))}
+          )}
+          {!loading && !error && filtered.length === 0 && (
+            <p className="px-4 py-6 text-sm text-gray-600">
+              {items.length === 0 ? 'Nenhum item de estoque cadastrado.' : 'Nenhum SKU bate com a busca.'}
+            </p>
+          )}
+          {!loading && !error && filtered.length > 0 && (
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-4 py-2 text-left text-xs font-medium uppercase tracking-wide text-gray-500">Produto</th>
+                  <th className="px-4 py-2 text-left text-xs font-medium uppercase tracking-wide text-gray-500">SKU</th>
+                  <th className="px-4 py-2 text-right text-xs font-medium uppercase tracking-wide text-gray-500">Disponível</th>
+                  <th className="px-4 py-2 text-right text-xs font-medium uppercase tracking-wide text-gray-500">Reservado</th>
+                  <th className="px-4 py-2 text-right text-xs font-medium uppercase tracking-wide text-gray-500">Custo</th>
+                  <th className="px-4 py-2 text-right text-xs font-medium uppercase tracking-wide text-gray-500">Ações</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {filtered.map((item) => (
+                  <tr key={item.id} className="hover:bg-gray-50">
+                    <td className="px-4 py-2">
+                      <ProductCell skuId={item.skuId} />
+                    </td>
+                    <td className="px-4 py-2">
+                      <button
+                        onClick={() => handleCopy(item.skuId)}
+                        className="max-w-[28ch] truncate font-mono text-xs text-gray-700 hover:text-gray-900"
+                        title={`${item.skuId} (clique para copiar)`}
+                      >
+                        {item.skuId}
+                      </button>
+                    </td>
+                    <td className="px-4 py-2 text-right text-sm tabular-nums text-gray-900">
+                      {item.quantityAvailable}
+                    </td>
+                    <td className="px-4 py-2 text-right text-sm tabular-nums text-gray-600">
+                      {item.quantityReserved}
+                    </td>
+                    <td className="px-4 py-2 text-right text-sm tabular-nums text-gray-900">
+                      {PRICE_FORMATTER.format(item.costPrice)}
+                    </td>
+                    <td className="px-4 py-2 text-right">
+                      <div className="flex justify-end gap-1.5">
+                        <button
+                          onClick={() => setRestockTarget(item)}
+                          className="rounded border border-gray-300 px-2 py-1 text-xs text-gray-700 hover:bg-gray-100"
+                        >
+                          Reabastecer
+                        </button>
+                        <button
+                          onClick={() => setAdjustTarget(item)}
+                          className="rounded border border-gray-300 px-2 py-1 text-xs text-gray-700 hover:bg-gray-100"
+                        >
+                          Ajustar
+                        </button>
+                        <button
+                          onClick={() => setHistoryTarget(item)}
+                          className="rounded border border-gray-300 px-2 py-1 text-xs text-gray-700 hover:bg-gray-100"
+                        >
+                          Histórico
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
         </div>
       </div>
+
+      <CreateStockModal
+        open={createOpen}
+        onClose={() => setCreateOpen(false)}
+        onCreated={(item) => {
+          upsert(item)
+          showToast('Item criado.', 'success')
+        }}
+      />
+      <RestockModal
+        item={restockTarget}
+        onClose={() => setRestockTarget(null)}
+        onUpdated={(item) => {
+          upsert(item)
+          showToast('Estoque reabastecido.', 'success')
+        }}
+      />
+      <AdjustModal
+        item={adjustTarget}
+        onClose={() => setAdjustTarget(null)}
+        onUpdated={(item) => {
+          upsert(item)
+          showToast('Estoque ajustado.', 'success')
+        }}
+      />
+      <HistoryDrawer
+        key={historyTarget?.skuId ?? 'closed'}
+        item={historyTarget}
+        onClose={() => setHistoryTarget(null)}
+      />
+
+      <Toast toast={toast} onClose={() => setToast(null)} />
     </div>
   )
 }

@@ -6,5 +6,6 @@ public record StockMovementResponse(
     Guid? OrderId,
     string Type,
     int Quantity,
+    string? Reason,
     DateTime CreatedAt
 );

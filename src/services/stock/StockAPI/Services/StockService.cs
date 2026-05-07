@@ -247,6 +247,36 @@ public class StockService : IStockService
         }
     }
 
+    public async Task<StockItemResponse> AdjustAsync(Guid skuId, AdjustStockRequest request)
+    {
+        await using var transaction = await _db.Database.BeginTransactionAsync();
+        try
+        {
+            var item = await GetItemOrThrowAsync(skuId);
+            item.Adjust(request.Delta);
+
+            _db.StockMovements.Add(CreateStockMovement(skuId, null, MovementType.Adjustment, request.Delta, request.Reason));
+
+            await SaveChangesWithConcurrencyHandlingAsync(skuId);
+            await transaction.CommitAsync();
+
+            _logger.LogInformation(
+                "Stock adjusted for SkuId={SkuId}, Delta={Delta}, Reason={Reason}, Available={Available}, Reserved={Reserved}",
+                skuId,
+                request.Delta,
+                request.Reason,
+                item.QuantityAvailable,
+                item.QuantityReserved);
+
+            return ToResponse(item);
+        }
+        catch
+        {
+            await transaction.RollbackAsync();
+            throw;
+        }
+    }
+
     public async Task<IEnumerable<StockMovementResponse>> GetHistoryAsync(Guid skuId)
     {
         var exists = await _db.StockItems.AnyAsync(x => x.SkuId == skuId);
@@ -263,6 +293,7 @@ public class StockService : IStockService
                 m.OrderId,
                 m.Type.ToString().ToLowerInvariant(),
                 m.Quantity,
+                m.Reason,
                 m.CreatedAt
             ))
             .ToListAsync();
@@ -306,7 +337,7 @@ public class StockService : IStockService
             item.QuantityReserved);
     }
 
-    private static StockMovement CreateStockMovement(Guid skuId, Guid? orderId, MovementType type, int quantity)
+    private static StockMovement CreateStockMovement(Guid skuId, Guid? orderId, MovementType type, int quantity, string? reason = null)
     {
         return new StockMovement
         {
@@ -315,6 +346,7 @@ public class StockService : IStockService
             OrderId = orderId,
             Type = type,
             Quantity = quantity,
+            Reason = reason,
             CreatedAt = DateTime.UtcNow
         };
     }

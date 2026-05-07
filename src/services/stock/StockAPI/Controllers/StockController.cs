@@ -144,6 +144,32 @@ public class StockController : ControllerBase
         }
     }
 
+    [HttpPut("{skuId:guid}/adjust")]
+    public async Task<IActionResult> Adjust(Guid skuId, [FromBody] AdjustStockRequest request)
+    {
+        try
+        {
+            var result = await _stockService.AdjustAsync(skuId, request);
+            return Ok(result);
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(new { error = ex.Message });
+        }
+        catch (StockConcurrencyException ex)
+        {
+            return Conflict(new { error = ex.Message });
+        }
+        catch (StockNotFoundException)
+        {
+            return NotFound();
+        }
+        catch (InsufficientAvailableStockException ex)
+        {
+            return UnprocessableEntity(new { error = ex.Message });
+        }
+    }
+
     [HttpGet("{skuId:guid}/history")]
     public async Task<IActionResult> GetHistory(Guid skuId)
     {

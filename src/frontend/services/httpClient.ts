@@ -3,6 +3,16 @@ type ErrorPayload = {
   error?: string
 }
 
+type RequestOptions = {
+  signal?: AbortSignal
+  headers?: HeadersInit
+}
+
+export function authHeader(): HeadersInit {
+  const token = localStorage.getItem('token')
+  return token ? { Authorization: `Bearer ${token}` } : {}
+}
+
 export class HttpClient {
   private readonly baseUrl: string
 
@@ -10,11 +20,39 @@ export class HttpClient {
     this.baseUrl = baseUrl
   }
 
-  async get<T>(path: string, options: { signal?: AbortSignal; headers?: HeadersInit } = {}): Promise<T> {
+  get<T>(path: string, options: RequestOptions = {}): Promise<T> {
+    return this.request<T>('GET', path, undefined, options)
+  }
+
+  post<T>(path: string, body?: unknown, options: RequestOptions = {}): Promise<T> {
+    return this.request<T>('POST', path, body, options)
+  }
+
+  put<T>(path: string, body?: unknown, options: RequestOptions = {}): Promise<T> {
+    return this.request<T>('PUT', path, body, options)
+  }
+
+  del<T>(path: string, options: RequestOptions = {}): Promise<T> {
+    return this.request<T>('DELETE', path, undefined, options)
+  }
+
+  private async request<T>(
+    method: string,
+    path: string,
+    body: unknown,
+    options: RequestOptions
+  ): Promise<T> {
+    const hasBody = body !== undefined && body !== null
+    const headers = new Headers(options.headers)
+    if (hasBody && !headers.has('Content-Type')) {
+      headers.set('Content-Type', 'application/json')
+    }
+
     const res = await fetch(`${this.baseUrl}${path}`, {
-      method: 'GET',
+      method,
       signal: options.signal,
-      headers: options.headers,
+      headers,
+      body: hasBody ? JSON.stringify(body) : undefined,
     })
 
     return this.parseResponse<T>(res)

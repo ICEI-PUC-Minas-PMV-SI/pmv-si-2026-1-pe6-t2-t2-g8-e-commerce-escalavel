@@ -62,9 +62,14 @@ export default function Header() {
           {isAuthenticated ? (
             <>
               {user?.role === 'admin' && (
-                <Link to="/admin/usuarios" className="header-link">
-                  Usuários
-                </Link>
+                <>
+                  <Link to="/admin/usuarios" className="header-link">
+                    Usuários
+                  </Link>
+                  <Link to="/stock" className="header-link">
+                    Estoque
+                  </Link>
+                </>
               )}
 
               <div className="hd-menu" ref={menuRef}>

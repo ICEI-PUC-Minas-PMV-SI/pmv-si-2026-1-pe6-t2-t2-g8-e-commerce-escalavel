@@ -85,6 +85,23 @@ public class StockItem
         EnsureInvariants();
     }
 
+    public void Adjust(int delta)
+    {
+        if (delta == 0)
+        {
+            throw new ArgumentException("Delta cannot be zero.", nameof(delta));
+        }
+
+        var next = QuantityAvailable + delta;
+        if (next < 0)
+        {
+            throw new InsufficientAvailableStockException(SkuId, -delta, QuantityAvailable);
+        }
+
+        QuantityAvailable = next;
+        EnsureInvariants();
+    }
+
     public void Confirm(int quantity)
     {
         if (quantity <= 0)

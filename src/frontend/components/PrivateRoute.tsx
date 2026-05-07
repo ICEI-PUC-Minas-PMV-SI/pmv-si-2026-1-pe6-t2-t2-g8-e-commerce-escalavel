@@ -13,7 +13,7 @@ export default function PrivateRoute({ children, adminOnly = false }: Props) {
 
   if (loading) return <div className="loading">Carregando...</div>
   if (!isAuthenticated) return <Navigate to="/login" replace />
-  if (adminOnly && user?.role !== 'admin') return <Navigate to="/perfil" replace />
+  if (adminOnly && user?.role !== 'admin') return <Navigate to="/" replace />
 
   return <>{children}</>
 }

@@ -5,5 +5,6 @@ public enum MovementType
     Reserve,
     Release,
     Confirm,
-    Restock
+    Restock,
+    Adjustment
 }

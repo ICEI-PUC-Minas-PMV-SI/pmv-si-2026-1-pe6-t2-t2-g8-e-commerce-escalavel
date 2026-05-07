@@ -7,5 +7,6 @@ public class StockMovement
     public Guid? OrderId { get; set; }
     public MovementType Type { get; set; }
     public int Quantity { get; set; }
+    public string? Reason { get; set; }
     public DateTime CreatedAt { get; set; }
 }
