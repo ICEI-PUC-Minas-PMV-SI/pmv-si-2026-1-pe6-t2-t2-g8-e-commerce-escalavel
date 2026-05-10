@@ -1,6 +1,6 @@
 # 📊 Relatório de Contribuições do Projeto
 
-**Última atualização:** 10/05/2026 14:33
+**Última atualização:** 10/05/2026 14:38
 
 ---
 
@@ -13,17 +13,17 @@
 | Hugo Freitas          |        28 |       481 |        90 |         14 |             16 |               6 |
 | João Gabriel Perez    |        18 |      3586 |      1208 |         76 |              3 |               1 |
 | Nicolas               |         5 |      6350 |       876 |         80 |              1 |               1 |
-| Vitor Linas           |        18 |       438 |       152 |          8 |              5 |               1 |
+| Vitor Linas           |        19 |       439 |       152 |          9 |              5 |               1 |
 | gabriel               |        12 |      5306 |       731 |         75 |              0 |               0 |
 | gabrielcambraia       |        14 |       671 |        23 |          3 |              7 |               2 |
-| github-actions[bot]   |        87 |       639 |       624 |          3 |             82 |               1 |
+| github-actions[bot]   |        88 |       643 |       628 |          3 |             83 |               1 |
 | github-classroom[bot] |         1 |      2152 |         0 |         45 |              1 |              13 |
 | nicolaspborges96      |        56 |     17844 |      5089 |        253 |             19 |               5 |
 
 
 ## 📅 Contribuições Semanais (Todo o Semestre)
 
-**2026-05-03**: Dev-Vinicio: 2, João Gabriel Perez: 4, Vitor Linas: 4, gabriel: 2, gabrielcambraia: 1, github-actions[bot]: 13, nicolaspborges96: 6
+**2026-05-03**: Dev-Vinicio: 2, João Gabriel Perez: 4, Vitor Linas: 5, gabriel: 2, gabrielcambraia: 1, github-actions[bot]: 14, nicolaspborges96: 6
 
 **2026-04-26**: Dev-Vinicio: 4, João Gabriel Perez: 4, Nicolas: 1, gabriel: 6, gabrielcambraia: 1, github-actions[bot]: 12, nicolaspborges96: 14
 
