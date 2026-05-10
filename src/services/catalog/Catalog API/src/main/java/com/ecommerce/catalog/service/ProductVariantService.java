@@ -40,6 +40,7 @@ public class ProductVariantService {
         ProductVariant variant = new ProductVariant();
         variant.setProduct(product);
         variant.setColor(dto.getColor());
+        variant.setUrlImg(dto.getUrlImg());
         return toResponseDTO(variantRepository.save(variant));
     }
 
@@ -47,6 +48,7 @@ public class ProductVariantService {
         ProductVariant existing = variantRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Variante não encontrada"));
         existing.setColor(dto.getColor());
+        existing.setUrlImg(dto.getUrlImg());
         return toResponseDTO(variantRepository.save(existing));
     }
 
@@ -59,6 +61,7 @@ public class ProductVariantService {
         dto.setId(variant.getId());
         dto.setProductId(variant.getProduct().getId());
         dto.setColor(variant.getColor());
+        dto.setUrlImg(variant.getUrlImg());
         List<Sku> skus = variant.getSkus() != null ? variant.getSkus() : Collections.emptyList();
         dto.setSkus(skus.stream().map(this::toSkuDTO).toList());
         return dto;

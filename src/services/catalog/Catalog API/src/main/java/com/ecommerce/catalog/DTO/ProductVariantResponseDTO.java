@@ -12,5 +12,6 @@ public class ProductVariantResponseDTO {
     private UUID id;
     private UUID productId;
     private String color;
+    private String urlImg;
     private List<SkuResponseDTO> skus;
 }

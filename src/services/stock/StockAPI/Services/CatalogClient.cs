@@ -29,12 +29,17 @@ public class CatalogClient : ICatalogClient
             if (sku is null || sku.ProductId == Guid.Empty) return null;
 
             var product = await GetAsync<ProductPayload>($"/products/{sku.ProductId}", cancellationToken);
-            if (product is null) return new CatalogProductInfo(null, null, null, sku.Code, sku.Size);
+            VariantPayload? variant = null;
+            if (sku.VariantId != Guid.Empty)
+            {
+                variant = await GetAsync<VariantPayload>($"/variants/{sku.VariantId}", cancellationToken);
+            }
 
+            var urlImg = variant?.UrlImg ?? product?.UrlImg;
             return new CatalogProductInfo(
-                product.Name,
-                product.Description,
-                product.UrlImg,
+                product?.Name,
+                product?.Description,
+                urlImg,
                 sku.Code,
                 sku.Size
             );
@@ -55,6 +60,7 @@ public class CatalogClient : ICatalogClient
         return await JsonSerializer.DeserializeAsync<T>(stream, JsonOptions, cancellationToken);
     }
 
-    private sealed record SkuPayload(Guid Id, Guid ProductId, string? Code, string? Size);
+    private sealed record SkuPayload(Guid Id, Guid VariantId, Guid ProductId, string? Code, string? Size);
     private sealed record ProductPayload(Guid Id, string? Name, string? Description, string? UrlImg);
+    private sealed record VariantPayload(Guid Id, string? Color, string? UrlImg);
 }

@@ -26,6 +26,9 @@ public class ProductVariant {
     @Column(nullable = false)
     private String color;
 
+    @Column(name = "url_img")
+    private String urlImg;
+
     @OneToMany(mappedBy = "variant", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Sku> skus;
 }

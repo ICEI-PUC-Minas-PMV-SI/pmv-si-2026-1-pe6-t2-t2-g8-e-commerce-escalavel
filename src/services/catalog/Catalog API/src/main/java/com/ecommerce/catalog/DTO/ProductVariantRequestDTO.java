@@ -7,4 +7,5 @@ import lombok.Setter;
 @Setter
 public class ProductVariantRequestDTO {
     private String color;
+    private String urlImg;
 }
