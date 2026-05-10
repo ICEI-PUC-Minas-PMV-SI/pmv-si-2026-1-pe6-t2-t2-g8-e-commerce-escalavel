@@ -1,90 +1,86 @@
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Hosting;
 using MassTransit;
 
-var builder = Microsoft.Extensions.Hosting.Host.CreateApplicationBuilder(args);
+var builder = WebApplication.CreateBuilder(args);
 
-// 1. BANCO DE DADOS (via env var ConnectionStrings__Default)
-var connectionString = builder.Configuration.GetConnectionString("Default")
-    ?? throw new InvalidOperationException("ConnectionStrings__Default is required.");
+// CONFIGURAÇÃO DO BANCO E CORS
+var connectionString = "Host=localhost;Database=ecommerce;Username=ecom;Password=ecom123";
 builder.Services.AddDbContext<AppDbContext>(opt => opt.UseNpgsql(connectionString));
+builder.Services.AddCors(); 
 
-// 2. RABBITMQ (via env var RABBITMQ_URL)
-var rabbitMqUrl = builder.Configuration["RABBITMQ_URL"]
-    ?? throw new InvalidOperationException("RABBITMQ_URL is required.");
+// CONFIGURAÇÃO DO RABBITMQ (Ouvindo Pedidos, Pagamentos e Estoque)
 builder.Services.AddMassTransit(x => {
     x.AddConsumer<NotificationConsumer>();
-
     x.UsingRabbitMq((context, cfg) => {
-        cfg.Host(new Uri(rabbitMqUrl));
-
-        cfg.ReceiveEndpoint("notifications", e => {
-            e.ConfigureConsumer<NotificationConsumer>(context);
+        cfg.Host("localhost", "/", h => {
+            h.Username("guest");
+            h.Password("guest");
         });
+        cfg.ReceiveEndpoint("fila-notificacoes-geral", e => e.ConfigureConsumer<NotificationConsumer>(context));
     });
 });
 
-var host = builder.Build();
+var app = builder.Build();
 
-// ✔ GARANTE QUE O BANCO EXISTE
-using (var scope = host.Services.CreateScope())
-{
-    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    db.Database.EnsureCreated();
-}
+// ROTA PARA O FRONT-END (React chama aqui)
+app.MapGet("/api/notifications", async (AppDbContext db) => 
+    await db.Notifications.OrderByDescending(x => x.CreatedAt).ToListAsync());
 
-host.Run();
+app.UseCors(p => p.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod());
+app.Run();
 
-
-// =======================
-// MODELOS
-// =======================
-
-public class NotificationLog {
+// --- MODELOS ---
+public class Notification {
     public int Id { get; set; }
+    public string Title { get; set; } = "";
     public string Message { get; set; } = "";
-    public DateTime SentAt { get; set; } = DateTime.UtcNow;
+    public string Type { get; set; } = "info"; // success, warning, error
+    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 }
-
-// =======================
-// DB CONTEXT
-// =======================
 
 public class AppDbContext : DbContext {
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
-
-    public DbSet<NotificationLog> Notifications => Set<NotificationLog>();
-
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
-    {
-        modelBuilder.HasDefaultSchema("notifications");
-    }
+    public DbSet<Notification> Notifications => Set<Notification>();
 }
 
-// =======================
-// EVENTO (COMPATÍVEL COM JAVA)
-// =======================
-
+// --- EVENTOS DE INTEGRAÇÃO ---
 public record OrderCreatedEvent(Guid OrderId, string CustomerEmail);
+public record PaymentConfirmedEvent(Guid OrderId);
+public record StockLowEvent(string ProductName);
 
-// =======================
-// CONSUMER
-// =======================
-
-public class NotificationConsumer : IConsumer<OrderCreatedEvent> {
+// --- O CONSUMER (Lógica de Recebimento) ---
+public class NotificationConsumer : 
+    IConsumer<OrderCreatedEvent>, 
+    IConsumer<PaymentConfirmedEvent>,
+    IConsumer<StockLowEvent> 
+{
     private readonly AppDbContext _db;
-
     public NotificationConsumer(AppDbContext db) => _db = db;
 
     public async Task Consume(ConsumeContext<OrderCreatedEvent> context) {
-        var email = context.Message.CustomerEmail;
-
-        Console.WriteLine($"[NotificationService] Email enviado para {email}");
-
-        _db.Notifications.Add(new NotificationLog {
-            Message = $"Email enviado para {email}"
+        _db.Notifications.Add(new Notification { 
+            Title = "Pedido Criado", 
+            Message = $"Pedido {context.Message.OrderId} recebido. Verifique seu e-mail: {context.Message.CustomerEmail}",
+            Type = "info" 
         });
+        await _db.SaveChangesAsync();
+    }
 
+    public async Task Consume(ConsumeContext<PaymentConfirmedEvent> context) {
+        _db.Notifications.Add(new Notification { 
+            Title = "Pagamento Aprovado", 
+            Message = $"Sucesso! O pagamento do pedido {context.Message.OrderId} foi confirmado.",
+            Type = "success" 
+        });
+        await _db.SaveChangesAsync();
+    }
+
+    public async Task Consume(ConsumeContext<StockLowEvent> context) {
+        _db.Notifications.Add(new Notification { 
+            Title = "Alerta de Estoque", 
+            Message = $"O item {context.Message.ProductName} está com poucas unidades!",
+            Type = "warning" 
+        });
         await _db.SaveChangesAsync();
     }
 }
