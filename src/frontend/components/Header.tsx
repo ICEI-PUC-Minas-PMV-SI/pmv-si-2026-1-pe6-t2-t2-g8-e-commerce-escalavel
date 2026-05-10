@@ -4,6 +4,7 @@ import { Link, NavLink, useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { useUI } from '../contexts/UIContext'
 import { FaShoppingBag } from "react-icons/fa";
+import NotificationBell from '../notification/components/NotificationBell'
 import "./components.css";
 
 export default function Header() {
@@ -65,6 +66,11 @@ export default function Header() {
         </nav>
 
         <nav className="header-nav">
+          {/* SINO DE NOTIFICAÇÃO*/}
+          <Link to="/notifications" className="header-link">
+            <NotificationBell count={3} />
+          </Link>
+          
           <Link to="/cart" className="header-link header-cart">
             <FaShoppingBag />
           </Link>
