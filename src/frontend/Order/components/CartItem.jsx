@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { FiTrash2 } from "react-icons/fi";
 
-function CartItem({ item, onRemove, onUpdateQuantity, onToggleSelect }) {
+function CartItem({ item, isSelected, onRemove, onUpdateQuantity, onToggleSelect }) {
   const [showModal, setShowModal] = useState(false);
 
   const subtotal = item.price * item.quantity;
@@ -20,14 +20,14 @@ function CartItem({ item, onRemove, onUpdateQuantity, onToggleSelect }) {
         {/* esquerda */}
         <div className="flex items-center gap-5">
 
-          <Link to={`/products/${item.id}`}>
+          <Link to={`/products/${item.productId}`}>
             <div className="w-25 h-25 bg-gray-100 rounded-md" />
           </Link>
 
           <div className="flex flex-col gap-4">
 
             <Link
-              to={`/products/${item.id}`}
+              to={`/products/${item.productId}`}
               className="text-md font-medium text-gray-900 hover:underline"
             >
               {item.name}
@@ -60,8 +60,15 @@ function CartItem({ item, onRemove, onUpdateQuantity, onToggleSelect }) {
 
             </div>
 
+            {item.variant || item.sku ? (
+              <p className="text-xs text-gray-500">
+                {item.variant ? `Cor: ${item.variant}` : ''}
+                {item.variant && item.sku ? ' · ' : ''}
+                {item.sku ? `Tamanho: ${item.sku}` : ''}
+              </p>
+            ) : null}
             <p className="text-xs text-gray-500">
-              Subtotal: R$ {subtotal}
+              Subtotal: R$ {subtotal.toFixed(2)}
             </p>
           </div>
         </div>
@@ -72,7 +79,7 @@ function CartItem({ item, onRemove, onUpdateQuantity, onToggleSelect }) {
           {/* checkbox */}
           <input
             type="checkbox"
-            checked={item.selected}
+            checked={isSelected}
             onChange={() => onToggleSelect(item.id)}
             className="w-5 h-5 accent-black transition-transform duration-150 hover:scale-125 cursor-pointer"
           />

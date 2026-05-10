@@ -12,6 +12,14 @@ export const catalogApi = {
     return response.json()
   },
 
+  getProductById: async (id) => {
+    const response = await fetch(`${BASE_URL}/catalog/products/${id}`)
+    if (!response.ok) {
+      throw new Error('Erro ao buscar produto')
+    }
+    return response.json()
+  },
+  
   getCategories: async () => {
     const response = await fetch(`${BASE_URL}/catalog/categories`)
     return response.json()

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { useSearchParams } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import { catalogApi } from '../../services/api'
 import { useAuth } from '../../contexts/AuthContext'
 
@@ -163,16 +163,17 @@ function ConfirmModal({ open, onConfirm, onClose, productName }) {
 function ProductCard({ product, isAdmin, onEdit, onDelete }) {
   const [imgFailed, setImgFailed] = useState(false)
   const price = getDisplayPrice(product)
+  const productLink = product?.id ? `/products/${product.id}` : '/products'
 
   return (
-    <div className="group flex flex-col border border-gray-100 hover:border-black transition-colors duration-200 relative">
+    <Link to={productLink} className="group flex flex-col border border-gray-100 hover:border-black transition-colors duration-200 relative">
       {isAdmin && (
         <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity z-10">
-          <button onClick={() => onEdit(product)}
+          <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); onEdit(product) }}
             className="bg-white border border-gray-200 text-xs font-semibold px-2 py-1 hover:bg-black hover:text-white hover:border-black transition-colors">
             Editar
           </button>
-          <button onClick={() => onDelete(product)}
+          <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); onDelete(product) }}
             className="bg-white border border-red-200 text-red-600 text-xs font-semibold px-2 py-1 hover:bg-red-600 hover:text-white hover:border-red-600 transition-colors">
             Deletar
           </button>
@@ -205,7 +206,7 @@ function ProductCard({ product, isAdmin, onEdit, onDelete }) {
           )}
         </div>
       </div>
-    </div>
+    </Link>
   )
 }
 

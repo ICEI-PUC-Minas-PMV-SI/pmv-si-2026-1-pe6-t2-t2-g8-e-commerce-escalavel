@@ -1,41 +1,49 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import CartItem from "../components/CartItem";
 import { useNavigate } from "react-router-dom";
+import { useCart } from "../../contexts/CartContext";
 
 function CartPage() {
   const navigate = useNavigate();
+  const { items, removeItem, updateQuantity } = useCart();
+  const [selectedItems, setSelectedItems] = useState(new Set());
 
-  const [cartItems, setCartItems] = useState([
-    { id: 1, name: "Camiseta", price: 50, quantity: 2, selected: true },
-    { id: 2, name: "Calça", price: 120, quantity: 1, selected: true }
-  ]);
+  useEffect(() => {
+    setSelectedItems(new Set(items.map(item => item.id)));
+  }, [items]);
 
-  const handleRemove = (id) => {
-    setCartItems(prev => prev.filter(item => item.id !== id));
-  };
-
-  const handleUpdateQuantity = (id, quantity) => {
-    setCartItems(prev =>
-      prev.map(item =>
-        item.id === id ? { ...item, quantity } : item
-      )
-    );
-  };
+  const handleRemove = (id) => removeItem(id);
+  const handleUpdateQuantity = (id, quantity) => updateQuantity(id, quantity);
 
   const toggleSelectItem = (id) => {
-    setCartItems(prev =>
-      prev.map(item =>
-        item.id === id
-          ? { ...item, selected: !item.selected }
-          : item
-      )
-    );
+    setSelectedItems(prev => {
+      const next = new Set(prev);
+      next.has(id) ? next.delete(id) : next.add(id);
+      return next;
+    });
   };
 
-  const total = cartItems
-    .filter(item => item.selected)
+  const total = items
+    .filter(item => selectedItems.has(item.id))
     .reduce((acc, item) => acc + item.price * item.quantity, 0);
 
+  const isEmpty = items.length === 0;
+
+  // 🔥 CASO VAZIO: tela inteira centralizada
+  if (isEmpty) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <button
+          onClick={() => navigate("/products")}
+          className="bg-black text-white px-8 py-4 rounded-md hover:bg-gray-800 transition text-lg"
+        >
+          Voltar às compras
+        </button>
+      </div>
+    );
+  }
+
+  // 🔥 CASO NORMAL: carrinho com itens
   return (
     <div className="flex flex-col lg:flex-row gap-8 p-6 max-w-6xl mx-auto">
 
@@ -43,57 +51,61 @@ function CartPage() {
       <div className="flex-1">
         <h1 className="text-2xl font-semibold mb-6">Carrinho</h1>
 
-        {cartItems.length === 0 ? (
-          <p className="text-gray-500">Seu carrinho está vazio</p>
-        ) : (
-          <div className="space-y-6">
-            {cartItems.map(item => (
-              <CartItem
-                key={item.id}
-                item={item}
-                onRemove={handleRemove}
-                onUpdateQuantity={handleUpdateQuantity}
-                onToggleSelect={toggleSelectItem}
-              />
-            ))}
-          </div>
-        )}
+        <div className="space-y-6">
+          {items.map(item => (
+            <CartItem
+              key={item.id}
+              item={item}
+              isSelected={selectedItems.has(item.id)}
+              onRemove={handleRemove}
+              onUpdateQuantity={handleUpdateQuantity}
+              onToggleSelect={toggleSelectItem}
+            />
+          ))}
+        </div>
       </div>
 
-      {/* RESUMO DO PEDIDO*/}
-      <div className="w-full lg:w-80 min-h-[420px] flex flex-col border border-gray-100 rounded-lg p-5 bg-white shadow-sm">
+      {/* RESUMO */}
+      <div className="w-full lg:w-80 flex flex-col border border-gray-100 rounded-lg p-5 bg-white shadow-sm">
 
-  <h2 className="text-xl font-bold mb-6 text-center">
-    Resumo do pedido
-  </h2>
+        <h2 className="text-xl font-bold mb-6 text-center">
+          Resumo do pedido
+        </h2>
 
-  <div className="flex flex-col gap-3 flex-1">
-    {cartItems
-      .filter(item => item.selected)
-      .map(item => (
-        <div key={item.id} className="flex justify-between text-md text-gray-600">
-          <span>{item.name} x{item.quantity}</span>
-          <span className="text-black font-medium">
-            R$ {item.price * item.quantity}
-          </span>
+        <div className="flex flex-col gap-3 flex-1">
+          {items
+            .filter(item => selectedItems.has(item.id))
+            .map(item => (
+              <div key={item.id} className="flex justify-between text-md text-gray-600">
+                <span>{item.name} x{item.quantity}</span>
+                <span className="text-black font-medium">
+                  R$ {(item.price * item.quantity).toFixed(2)}
+                </span>
+              </div>
+            ))}
         </div>
-      ))}
-  </div>
 
-  <div className="flex justify-between border-t pt-4 mb-5">
-    <span className="text-lg font-bold">Total</span>
-    <strong className="text-lg">R$ {total}</strong>
-  </div>
+        <div className="flex justify-between border-t pt-4 mb-5">
+          <span className="text-lg font-bold">Total</span>
+          <strong className="text-lg">R$ {total.toFixed(2)}</strong>
+        </div>
 
-  <button
-    onClick={() => navigate("/checkout")}
-    disabled={total === 0}
-    className="w-full bg-black text-white py-3 rounded-md hover:bg-gray-800 transition disabled:opacity-50 disabled:cursor-not-allowed"
-  >
-    Finalizar compra
-  </button>
+        <button
+          onClick={() => navigate("/checkout")}
+          disabled={total === 0}
+          className="w-full bg-black text-white py-3 rounded-md hover:bg-gray-800 transition disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          Finalizar compra
+        </button>
 
-</div>
+        <button
+          onClick={() => navigate("/products")}
+          className="w-full mt-3 border border-gray-300 text-black py-3 rounded-md hover:bg-gray-100 transition"
+        >
+          Voltar às compras
+        </button>
+
+      </div>
     </div>
   );
 }
