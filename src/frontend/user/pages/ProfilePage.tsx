@@ -6,14 +6,14 @@ import { apiDeleteUser } from '../../services/userApi'
 import Toast, { ToastData } from '../../components/Toast'
 
 /* ── Formatadores de exibição ── */
-function fmtPhone(v: string) {
+function fmtPhone(v: string | null) {
   if (!v) return null
   const d = v.replace(/\D/g, '')
   if (d.length === 11) return `(${d.slice(0,2)}) ${d.slice(2,7)}-${d.slice(7)}`
   if (d.length === 10) return `(${d.slice(0,2)}) ${d.slice(2,6)}-${d.slice(6)}`
   return v
 }
-function fmtCPF(v: string) {
+function fmtCPF(v: string | null) {
   if (!v) return null
   const d = v.replace(/\D/g, '')
   if (d.length === 11) return `${d.slice(0,3)}.${d.slice(3,6)}.${d.slice(6,9)}-${d.slice(9)}`

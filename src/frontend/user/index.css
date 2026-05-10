@@ -1303,3 +1303,25 @@ input { font-family: var(--font); }
   .hero-dots  { left: 28px; }
   .hero-counter { right: 28px; }
 }
+
+/* ── Fix overflow horizontal global ── */
+html, body { overflow-x: hidden; max-width: 100vw; }
+
+/* ── Hero: cabe em viewports curtos ── */
+.hero-root {
+  height: auto;
+  min-height: calc(100vh - 64px);
+}
+.hero-ambient {
+  max-width: 70%;
+  overflow: hidden;
+}
+.hero-ambient-line {
+  font-size: clamp(72px, 9vw, 132px);
+  letter-spacing: -6px;
+  word-break: keep-all;
+}
+@media (max-height: 760px) {
+  .hero-ambient-line { font-size: clamp(56px, 7vw, 96px); letter-spacing: -4px; }
+  .hero-info { padding-top: 24px; }
+}

@@ -102,4 +102,141 @@ export default function LoginPage() {
   /* erros de validação */
   const emailErr = (submitted || emailBlurred) ? validateEmail(email) : ''
   const passErr  = (submitted || passBlurred)  ? validatePassword(password) : ''
-  const emailOk  = 
+  const emailOk  = (submitted || emailBlurred) && !validateEmail(email)
+  const passOk   = (submitted || passBlurred)  && !validatePassword(password)
+
+  useEffect(() => { emailRef.current?.focus() }, [])
+  useEffect(() => { if (isAuthenticated) navigate('/perfil') }, [isAuthenticated, navigate])
+  useEffect(() => {
+    const iv = setInterval(() => {
+      setVisible(false)
+      setTimeout(() => { setSlide(s => (s + 1) % SLIDES.length); setVisible(true) }, 420)
+    }, 5000)
+    return () => clearInterval(iv)
+  }, [])
+
+  const goSlide = (i: number) => {
+    if (i === slide) return
+    setVisible(false)
+    setTimeout(() => { setSlide(i); setVisible(true) }, 350)
+  }
+
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault()
+    setSubmitted(true)
+    if (validateEmail(email) || validatePassword(password)) {
+      setShake(true)
+      setTimeout(() => setShake(false), 400)
+      return
+    }
+    setApiError('')
+    setLoading(true)
+    try {
+      await login(email, password)
+      setSuccess(true)
+      setTimeout(() => navigate('/perfil'), 800)
+    } catch (err: unknown) {
+      setApiError(err instanceof Error ? err.message : 'Erro ao entrar.')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const cur = SLIDES[slide]
+
+  return (
+    <div className="lv2-root">
+      <div className="lv2-left" style={{ background: cur.bg }}>
+        <div className="lv2-blob lv2-blob-a" style={{ background: cur.blob1 }} />
+        <div className="lv2-blob lv2-blob-b" style={{ background: cur.blob2 }} />
+        <div className="lv2-grid" />
+        <div className="lv2-brand">
+          <span className="lv2-brand-text">INSIDER</span>
+          <span className="lv2-brand-dot" style={{ background: cur.accent }} />
+        </div>
+        <div className={`lv2-slide${visible ? ' lv2-slide-in' : ' lv2-slide-out'}`}>
+          <span className="lv2-tag" style={{ color: cur.accent, borderColor: cur.accent }}>{cur.tag}</span>
+          <h2 className="lv2-headline">
+            {cur.headline.map((l, i) => <span key={i}>{l}</span>)}
+          </h2>
+          <p className="lv2-sub">{cur.sub}</p>
+          <div className="lv2-line" style={{ background: cur.accent }} />
+        </div>
+        <div className="lv2-nav">
+          <div className="lv2-dots">
+            {SLIDES.map((_, i) => (
+              <button key={i} type="button" className={`lv2-dot${i === slide ? ' lv2-dot-on' : ''}`}
+                style={i === slide ? { background: cur.accent, width: 28 } : {}}
+                onClick={() => goSlide(i)} aria-label={`Slide ${i + 1}`} />
+            ))}
+          </div>
+          <span className="lv2-counter">
+            <b>{String(slide + 1).padStart(2, '0')}</b>
+            <span className="lv2-counter-sep"> / </span>
+            {String(SLIDES.length).padStart(2, '0')}
+          </span>
+        </div>
+      </div>
+
+      <div className="lv2-right">
+        <div className={`lv2-card${shake ? ' lv2-shake' : ''}`}>
+          {success ? (
+            <div className="lv2-success">
+              <IconCheck />
+              <p>Bem-vindo de volta!</p>
+            </div>
+          ) : (
+            <form onSubmit={handleSubmit} noValidate>
+              <h1 className="lv2-title">Entrar</h1>
+              <p className="lv2-subtitle">Acesse sua conta</p>
+
+              {apiError && <div className="lv2-error"><IconX /> {apiError}</div>}
+
+              <div className="lv2-field">
+                <label className="lv2-label">E-mail</label>
+                <input
+                  ref={emailRef}
+                  type="email"
+                  className={`lv2-input${emailErr ? ' lv2-input-err' : ''}${emailOk ? ' lv2-input-ok' : ''}`}
+                  value={email}
+                  onChange={(e) => { setEmail(e.target.value); setApiError('') }}
+                  onBlur={() => setEmailBlurred(true)}
+                  autoComplete="email"
+                />
+                {emailErr && <span className="lv2-msg-err">{emailErr}</span>}
+              </div>
+
+              <div className="lv2-field">
+                <label className="lv2-label">Senha</label>
+                <div className="lv2-input-wrap">
+                  <input
+                    type={showPass ? 'text' : 'password'}
+                    className={`lv2-input${passErr ? ' lv2-input-err' : ''}${passOk ? ' lv2-input-ok' : ''}`}
+                    value={password}
+                    onChange={(e) => { setPassword(e.target.value); setApiError('') }}
+                    onBlur={() => setPassBlurred(true)}
+                    autoComplete="current-password"
+                  />
+                  <button type="button" className="lv2-eye" onClick={() => setShowPass(s => !s)} aria-label="Mostrar senha">
+                    {showPass ? <IconEyeOff /> : <IconEyeOpen />}
+                  </button>
+                </div>
+                {passErr && <span className="lv2-msg-err">{passErr}</span>}
+              </div>
+
+              <button type="submit" className="lv2-submit" disabled={loading}>
+                {loading ? 'Entrando...' : <>Entrar <IconArrow /></>}
+              </button>
+
+              <p className="lv2-footer">
+                Novo por aqui?{' '}
+                <Link to="/cadastro" className="lv2-link">Criar conta</Link>
+              </p>
+            </form>
+          )}
+        </div>
+      </div>
+    </div>
+  )
+}
+ 

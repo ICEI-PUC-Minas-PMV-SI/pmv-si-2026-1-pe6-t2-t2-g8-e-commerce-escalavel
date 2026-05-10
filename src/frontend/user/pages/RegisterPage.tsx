@@ -240,4 +240,135 @@ export default function RegisterPage() {
 
           {success ? (
             <div className="lv2-success">
+              <IconCheck />
+              <p>Conta criada! Redirecionando...</p>
+            </div>
+          ) : (
+            <div className={`rg2-step-wrap${slideClass}`}>
+              {step === 1 ? (
+                <form onSubmit={handleNext} noValidate>
+                  <h1 className="lv2-title">Criar conta</h1>
+                  <p className="lv2-subtitle">Etapa 1 de 2 — Dados de acesso</p>
+
+                  {apiError && <div className="lv2-error">{apiError}</div>}
+
+                  <div className="lv2-field">
+                    <label className="lv2-label">Nome completo</label>
+                    <input
+                      ref={nameRef}
+                      type="text"
+                      className={`lv2-input${fieldErr('name') ? ' lv2-input-err' : ''}${fieldOk('name') ? ' lv2-input-ok' : ''}`}
+                      value={form.name}
+                      onChange={set('name')}
+                      onBlur={blur('name')}
+                      autoComplete="name"
+                    />
+                    {fieldErr('name') && <span className="lv2-msg-err">{fieldErr('name')}</span>}
+                  </div>
+
+                  <div className="lv2-field">
+                    <label className="lv2-label">E-mail</label>
+                    <input
+                      type="email"
+                      className={`lv2-input${fieldErr('email') ? ' lv2-input-err' : ''}${fieldOk('email') ? ' lv2-input-ok' : ''}`}
+                      value={form.email}
+                      onChange={set('email')}
+                      onBlur={blur('email')}
+                      autoComplete="email"
+                    />
+                    {fieldErr('email') && <span className="lv2-msg-err">{fieldErr('email')}</span>}
+                  </div>
+
+                  <div className="lv2-field">
+                    <label className="lv2-label">Senha</label>
+                    <div className="lv2-input-wrap">
+                      <input
+                        type={showPass ? 'text' : 'password'}
+                        className={`lv2-input${fieldErr('password') ? ' lv2-input-err' : ''}${fieldOk('password') ? ' lv2-input-ok' : ''}`}
+                        value={form.password}
+                        onChange={set('password')}
+                        onBlur={blur('password')}
+                        autoComplete="new-password"
+                      />
+                      <button type="button" className="lv2-eye" onClick={() => setShowPass(s => !s)} aria-label="Mostrar senha">
+                        {showPass ? <IconEyeOff /> : <IconEyeOpen />}
+                      </button>
+                    </div>
+                    {strength && (
+                      <div className="rg2-strength" style={{ color: strength.color }}>
+                        <span className="rg2-strength-bar" style={{ background: strength.color, width: `${(strength.level + 1) * 25}%` }} />
+                        <span>{strength.label}</span>
+                      </div>
+                    )}
+                    {fieldErr('password') && <span className="lv2-msg-err">{fieldErr('password')}</span>}
+                  </div>
+
+                  <button type="submit" className="lv2-submit">
+                    Continuar <IconArrow />
+                  </button>
+
+                  <p className="lv2-footer">
+                    Já tem conta?{' '}
+                    <Link to="/login" className="lv2-link">Entrar</Link>
+                  </p>
+                </form>
+              ) : (
+                <form onSubmit={handleSubmit} noValidate>
+                  <button type="button" className="rg2-back" onClick={() => transitionStep(1, 'back')}>
+                    <IconBack /> Voltar
+                  </button>
+
+                  <h1 className="lv2-title">Quase lá</h1>
+                  <p className="lv2-subtitle">Etapa 2 de 2 — Dados opcionais</p>
+
+                  {apiError && <div className="lv2-error">{apiError}</div>}
+
+                  <div className="lv2-field">
+                    <label className="lv2-label">CPF</label>
+                    <input
+                      type="text"
+                      className="lv2-input"
+                      value={form.cpf}
+                      onChange={(e) => setForm(p => ({ ...p, cpf: maskCPF(e.target.value) }))}
+                      inputMode="numeric"
+                    />
+                  </div>
+
+                  <div className="lv2-field">
+                    <label className="lv2-label">Telefone</label>
+                    <input
+                      type="text"
+                      className="lv2-input"
+                      value={form.phone}
+                      onChange={(e) => setForm(p => ({ ...p, phone: maskPhone(e.target.value) }))}
+                      inputMode="tel"
+                    />
+                  </div>
+
+                  <div className="lv2-field">
+                    <label className="lv2-label">Endereço</label>
+                    <input type="text" className="lv2-input" placeholder="Rua" value={form.street} onChange={set('street')} />
+                  </div>
+                  <div className="lv2-field">
+                    <input type="text" className="lv2-input" placeholder="Cidade" value={form.city} onChange={set('city')} />
+                  </div>
+                  <div className="lv2-field">
+                    <input type="text" className="lv2-input" placeholder="Estado" value={form.state} onChange={set('state')} />
+                  </div>
+                  <div className="lv2-field">
+                    <input type="text" className="lv2-input" placeholder="CEP" value={form.zip} onChange={set('zip')} />
+                  </div>
+
+                  <button type="submit" className="lv2-submit" disabled={loading}>
+                    {loading ? 'Criando...' : <>Criar conta <IconArrow /></>}
+                  </button>
+                </form>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  )
+}
   

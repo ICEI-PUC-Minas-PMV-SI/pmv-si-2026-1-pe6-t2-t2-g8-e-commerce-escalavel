@@ -73,4 +73,4 @@
 }
 .hd-item:hover { background: var(--gray-50); color: var(--black); }
 .hd-item-danger { color: var(--red); }
-.hd-item-danger:hover { background: var(--red-light); col
+.hd-item-danger:hover { background: var(--red-light); color: var(--red); }

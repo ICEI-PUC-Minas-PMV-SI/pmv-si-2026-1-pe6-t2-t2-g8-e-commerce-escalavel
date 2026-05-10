@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\Nicolas\\\\Documents\\\\Repos\\\\Ecom\\\\pmv-si-2026-1-pe6-t2-t2-g8-e-commerce-escalavel\\\\src\" -Directory)",
+      "Bash(Select-Object Name)",
+      "Bash(npm run *)",
+      "Bash(curl -s http://localhost:3001/ -o /tmp/home.html)",
+      "Read(//tmp/**)",
+      "Bash(taskkill //IM node.exe //F)"
+    ]
+  }
+}

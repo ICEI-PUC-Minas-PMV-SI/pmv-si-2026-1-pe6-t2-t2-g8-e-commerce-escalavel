@@ -88,4 +88,11 @@ export default function Home() {
           <p className="hero-sub">{cur.sub}</p>
           <div className="hero-line" style={{ background: cur.accent }} />
           <div className="hero-cta-row">
-            <Link to="/products" cl
+            <Link to="/products" className="hero-cta-primary">Ver coleção</Link>
+            {!user && <Link to="/cadastro" className="hero-cta-ghost">Criar conta</Link>}
+          </div>
+        </div>
+      </section>
+    </main>
+  )
+}

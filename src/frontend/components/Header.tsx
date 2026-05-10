@@ -2,26 +2,16 @@
 import { useState, useRef, useEffect } from 'react'
 import { Link, NavLink, useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
-import { useUI } from '../contexts/UIContext'
 import { FaShoppingBag } from "react-icons/fa";
 import "./components.css";
 
 export default function Header() {
   const { user, isAuthenticated, logout } = useAuth()
-  const { openLogin } = useUI()
   const navigate = useNavigate()
 
-  const [open, setOpen]           = useState(false)
+  const [open, setOpen] = useState(false)
   const [loggingOut, setLoggingOut] = useState(false)
-  const [scrolled, setScrolled]   = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
-
-  // Scroll behavior — glassmorphism intensifica no scroll
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 20)
-    window.addEventListener('scroll', onScroll, { passive: true })
-    return () => window.removeEventListener('scroll', onScroll)
-  }, [])
 
   // Fecha dropdown ao clicar fora
   useEffect(() => {
@@ -37,10 +27,10 @@ export default function Header() {
   const handleLogout = () => {
     setOpen(false)
     setLoggingOut(true)
-    navigate('/')
     setTimeout(() => {
       logout()
       setLoggingOut(false)
+      navigate('/login')
     }, 450)
   }
 
@@ -52,7 +42,7 @@ export default function Header() {
     .toUpperCase() ?? '?'
 
   return (
-    <header className={`header${scrolled ? ' header-scrolled' : ''}${loggingOut ? ' header-logout-fade' : ''}`}>
+    <header className={`header${loggingOut ? ' header-logout-fade' : ''}`}>
       <div className="header-inner">
         <Link to={isAuthenticated ? '/perfil' : '/'} className="header-logo">
           INSIDER
@@ -110,4 +100,21 @@ export default function Header() {
                       Alterar Senha
                     </Link>
                     <div className="hd-sep" />
-                    <button classNam
+                    <button className="hd-item hd-item-danger" onClick={handleLogout}>
+                      Sair
+                    </button>
+                  </div>
+                )}
+              </div>
+            </>
+          ) : (
+            <>
+              <Link to="/login" className="header-link">Entrar</Link>
+              <Link to="/cadastro" className="header-btn">Criar conta</Link>
+            </>
+          )}
+        </nav>
+      </div>
+    </header>
+  )
+}
