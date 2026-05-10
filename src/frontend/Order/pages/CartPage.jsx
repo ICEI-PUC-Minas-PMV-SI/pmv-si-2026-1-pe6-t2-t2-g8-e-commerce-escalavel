@@ -29,7 +29,7 @@ function CartPage() {
 
   const isEmpty = items.length === 0;
 
-  // 🔥 CASO VAZIO: tela inteira centralizada
+  // CASO VAZIO: tela inteira centralizada
   if (isEmpty) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -43,7 +43,7 @@ function CartPage() {
     );
   }
 
-  // 🔥 CASO NORMAL: carrinho com itens
+  // CASO NORMAL: carrinho com itens
   return (
     <div className="flex flex-col lg:flex-row gap-8 p-6 max-w-6xl mx-auto">
 

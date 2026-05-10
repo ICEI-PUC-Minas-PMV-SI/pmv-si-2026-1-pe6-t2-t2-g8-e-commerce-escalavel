@@ -59,6 +59,7 @@ export default function ProductDetails() {
             name: product.name,
             variant: selectedVariant?.color,
             sku: selectedSku?.size,
+            skuId: selectedSku?.id,
             price: selectedSku?.price,
             quantity,
         }

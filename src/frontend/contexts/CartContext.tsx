@@ -6,6 +6,7 @@ export interface CartItem {
   name: string
   variant?: string
   sku?: string
+  skuId?: string
   price: number
   quantity: number
 }
@@ -46,7 +47,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         ...prev,
         {
           ...item,
-          id: `${item.productId}-${item.variant}-${item.sku}-${Date.now()}`
+          id: `${item.productId}-${item.variant}-${item.sku}-${item.skuId}-${Date.now()}`
         }
       ]
     })

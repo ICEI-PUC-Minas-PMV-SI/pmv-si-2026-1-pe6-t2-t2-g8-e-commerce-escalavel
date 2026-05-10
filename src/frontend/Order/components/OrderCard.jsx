@@ -72,10 +72,10 @@ function OrderCard({ order, onViewDetails, onCancel, onDiscard }) {
           </button>
 
           {/* só mostra cancelar se NÃO estiver cancelado */}
-          {order.status !== "Cancelado" && (
+          {order.status.toLowerCase() !== "cancelado" && order.status.toLowerCase() !== "cancelled" && (
             <button
               onClick={handleCancelClick}
-              className={`w-full text-sm transition ${order.status === "Entregue"
+              className={`w-full text-sm transition ${order.status.toLowerCase() === "entregue" || order.status.toLowerCase() === "delivered"
                 ? "text-gray-400 cursor-not-allowed "
                 : "text-red-500 hover:text-red-700 underline underline-offset-4 decoration-1"
                 }`}

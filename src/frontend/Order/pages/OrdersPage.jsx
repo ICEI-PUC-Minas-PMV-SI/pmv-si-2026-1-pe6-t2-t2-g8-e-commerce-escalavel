@@ -1,35 +1,55 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import OrderCard from "../components/OrderCard";
+import { useAuth } from "../../contexts/AuthContext";
+import { orderApi } from "../../services/api";
 
 function OrdersPage() {
   const navigate = useNavigate();
+  const { user } = useAuth();
 
-  const [orders, setOrders] = useState([
-    {
-      id: 10234,
-      productName: "Camiseta Essential",
-      status: "Entregue",
-      total: 220,
-      date: "05/05/2026"
-    },
-    {
-      id: 10235,
-      productName: "Calça Jeans",
-      status: "Em transporte",
-      total: 150,
-      date: "06/05/2026"
-    },
-    {
-      id: 10236,
-      productName: "Tênis Runner",
-      status: "Em transporte",
-      total: 89,
-      date: "06/05/2026"
+  const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    if (!user) {
+      setOrders([]);
+      return;
     }
-  ]);
 
-  // cancela mudando status
+    const fetchOrders = async () => {
+      setLoading(true);
+      setError(null);
+
+      try {
+        const data = await orderApi.getOrdersByUser(user.id);
+        const normalized = data.map(order => ({
+          id: order.id,
+          status: order.status,
+          productName: order.items?.length === 1
+            ? `Pedido - item ${order.items[0].productId}`
+            : `Pedido - ${order.items?.length || 0} itens`,
+          total: order.items?.reduce(
+            (sum, item) => sum + Number(item.unitPrice || 0) * item.quantity,
+            0
+          ),
+          productId: order.items?.[0]?.productId,
+        }));
+
+        setOrders(normalized);
+      } catch (err) {
+        console.error("Erro ao carregar pedidos:", err);
+        setError("Não foi possível carregar seus pedidos. Tente novamente mais tarde.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchOrders();
+  }, [user]);
+
+  // cancela mudando status localmente
   const handleCancelOrder = (orderId) => {
     setOrders(prev =>
       prev.map(order =>
@@ -40,13 +60,12 @@ function OrdersPage() {
     );
   };
 
-  // separação lógica
   const activeOrders = orders.filter(
-    order => order.status !== "Cancelado"
+    order => order.status.toLowerCase() !== "cancelado" && order.status.toLowerCase() !== "cancelled"
   );
 
   const canceledOrders = orders.filter(
-    order => order.status === "Cancelado"
+    order => order.status.toLowerCase() === "cancelado" || order.status.toLowerCase() === "cancelled"
   );
 
   const handleDiscardOrder = (orderId) => {
@@ -54,7 +73,6 @@ function OrdersPage() {
       prev.filter(order => order.id !== orderId)
     );
   };
-  
 
   return (
     <div className="max-w-5xl mx-auto p-6 flex flex-col gap-10">
@@ -64,6 +82,16 @@ function OrdersPage() {
         Meus pedidos
       </h1>
 
+      {loading && (
+        <p className="text-gray-500">Carregando pedidos...</p>
+      )}
+
+      {error && (
+        <div className="text-red-600 text-sm border border-red-200 bg-red-50 rounded-md p-3">
+          {error}
+        </div>
+      )}
+
       {/* PEDIDOS ATIVOS */}
       {activeOrders.length > 0 && (
         <div className="flex flex-col gap-5">
@@ -72,6 +100,7 @@ function OrdersPage() {
             <OrderCard
               key={order.id}
               order={order}
+              onViewDetails={() => order.productId && navigate(`/products/${order.productId}`)}
               onCancel={handleCancelOrder}
               onDiscard={handleDiscardOrder}
             />
@@ -94,6 +123,7 @@ function OrdersPage() {
               <OrderCard
                 key={order.id}
                 order={order}
+                onViewDetails={() => order.productId && navigate(`/products/${order.productId}`)}
                 onCancel={handleCancelOrder}
                 onDiscard={handleDiscardOrder}
               />
@@ -105,9 +135,9 @@ function OrdersPage() {
       )}
 
       {/* SEM PEDIDOS */}
-      {orders.length === 0 && (
+      {!loading && !error && orders.length === 0 && (
         <p className="text-gray-500">
-          Você ainda não possui pedidos.
+          {user ? "Você ainda não possui pedidos." : "Faça login para ver seus pedidos."}
         </p>
       )}
 
