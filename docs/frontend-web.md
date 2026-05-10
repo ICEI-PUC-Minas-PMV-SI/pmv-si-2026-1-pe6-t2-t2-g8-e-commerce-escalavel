@@ -269,6 +269,75 @@ Origem: `src/frontend/stock/`, `src/frontend/services/stockClientService.ts`. P�
 - **Resultado esperado:**
   - Drawer abre e refaz a chamada de carga, exibindo a lista atualizada de movimentos.
 
+---
+
+## Testes — Módulo de Notificações (Notifications)
+
+### Mapeamento de interações
+
+Origem: `src/frontend/notification/`, `src/frontend/services/notificationApi.ts`. Página única em `/notifications`.
+
+| ID | Interação | Componente | API back-end |
+|-----|--------------------------------------|------------------------------------------|---------------------------------------|
+| I8 | Listar notificações do usuário | `NotificationPage.tsx` | `GET /notifications` |
+| I9 | Exibir contador de não lidas (Badge) | `NotificationBell.tsx` | `GET /notifications/unread-count` |
+| I10 | Marcar notificação como lida | `NotificationPage.tsx` | `PATCH /notifications/{id}/read` |
+| I11 | Redirecionamento para a central | `Header.tsx` (Link no sino) | — |
+
+### Casos de teste
+
+#### Notifications — I8: Listagem
+
+##### TC-I8-01 · Carregar lista de notificações
+
+- **Pré-condições:**
+  - Back-end ativo.
+  - Usuário autenticado possui notificações enviadas.
+- **Passos:**
+  1. Abrir a página `/notifications`.
+- **Resultado esperado:**
+  - A tela exibe cards com: Mensagem, Data de recebimento e Status.
+  - Notificações não lidas possuem destaque visual diferenciado das lidas.
+
+---
+
+#### Notifications — I9: Contador
+
+##### TC-I9-01 · Visualizar badge no Header
+
+- **Pré-condições:**
+  - Usuário possui ≥ 1 notificação não lida.
+- **Passos:**
+  1. Observar o ícone de sino no cabeçalho em qualquer página.
+- **Resultado esperado:**
+  - Badge vermelho exibe o numeral correspondente ao total de mensagens pendentes.
+
+---
+
+#### Notifications — I10: Ações
+
+##### TC-I10-01 · Alterar status para lido
+
+- **Pré-condições:**
+  - Lista carregada com notificações não lidas.
+- **Passos:**
+  1. Clicar em "Marcar como lida" em um item da lista.
+- **Resultado esperado:**
+  - O card da notificação perde o destaque de "nova".
+  - O contador no Header (Badge) é atualizado subtraindo 1 unidade.
+
+---
+
+#### Notifications — I11: Navegação
+
+##### TC-I11-01 · Acesso via cabeçalho
+
+- **Pré-condições:**
+  - Usuário logado em qualquer rota do sistema.
+- **Passos:**
+  1. Clicar sobre o ícone do sino no Header.
+- **Resultado esperado:**
+  - O sistema redireciona o usuário para a página `/notifications`.
 # Referências
 
 Inclua todas as referências (livros, artigos, sites, etc) utilizados no desenvolvimento do trabalho.
