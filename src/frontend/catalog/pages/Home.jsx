@@ -88,4 +88,117 @@ export default function Home() {
           <p className="hero-sub">{cur.sub}</p>
           <div className="hero-line" style={{ background: cur.accent }} />
           <div className="hero-cta-row">
-            <Link to="/products" cl
+            <Link to="/products" className="hero-cta-primary">
+              Ver coleção
+            </Link>
+            {!user && (
+              <Link to="/login" className="hero-cta-ghost">
+                Entrar na conta
+              </Link>
+            )}
+          </div>
+        </div>
+
+        {/* dots */}
+        <div className="hero-dots">
+          {SLIDES.map((_, i) => (
+            <button
+              key={i}
+              className={`hero-dot${i === slide ? ' hero-dot-on' : ''}`}
+              style={i === slide ? { background: cur.accent } : {}}
+              onClick={() => goSlide(i)}
+              aria-label={`Slide ${i + 1}`}
+            />
+          ))}
+        </div>
+
+        {/* contador */}
+        <div className="hero-counter">
+          <span className="hero-counter-cur">{String(slide + 1).padStart(2, '0')}</span>
+          <span className="hero-counter-sep">/</span>
+          <span className="hero-counter-tot">{String(SLIDES.length).padStart(2, '0')}</span>
+        </div>
+
+        {/* seta scroll */}
+        <div className="hero-scroll-hint">
+          <span>↓</span>
+        </div>
+      </section>
+
+      {/* ── DESTAQUES ── */}
+      <section className="max-w-[1200px] mx-auto px-6 py-16">
+        <div className="flex items-baseline justify-between mb-8">
+          <h2 className="text-2xl font-bold tracking-tight">Em destaque</h2>
+          <Link to="/products" className="text-sm text-gray-500 hover:text-black transition-colors">
+            Ver todos →
+          </Link>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-px bg-gray-100 border border-gray-100">
+          {[
+            { label: 'Novidades',     desc: 'As últimas peças da temporada',  to: '/products' },
+            { label: 'Mais Vendidos', desc: 'O que todo mundo está usando',    to: '/products' },
+            { label: 'Categorias',    desc: 'Explore por estilo',              to: '/categories' },
+          ].map(({ label, desc, to }) => (
+            <Link
+              key={label}
+              to={to}
+              className="bg-white p-10 flex flex-col gap-2 group hover:bg-black hover:text-white transition-colors duration-200"
+            >
+              <span className="text-xl font-semibold">{label}</span>
+              <span className="text-sm text-gray-500 group-hover:text-gray-300">{desc}</span>
+              <span className="mt-4 text-sm font-medium group-hover:text-white">Explorar →</span>
+            </Link>
+          ))}
+        </div>
+      </section>
+
+      {/* ── BANNER CTA / BOAS-VINDAS ── */}
+      <section className="bg-black text-white">
+        <div className="max-w-[1200px] mx-auto px-6 py-20 flex flex-col sm:flex-row items-center justify-between gap-8">
+          {user ? (
+            <>
+              <div>
+                <p className="text-xs tracking-[0.25em] uppercase text-gray-400 mb-3">Insider</p>
+                <h2 className="text-3xl sm:text-4xl font-bold leading-tight">
+                  Olá, {user.name.split(' ')[0]}.<br />
+                  <span className="text-gray-300 text-2xl sm:text-3xl font-normal">O que você busca hoje?</span>
+                </h2>
+              </div>
+              <div className="flex flex-col sm:flex-row gap-3 shrink-0">
+                <Link
+                  to="/products"
+                  className="border border-white text-white px-8 py-3 text-sm font-semibold tracking-wide hover:bg-white hover:text-black transition-colors text-center"
+                >
+                  Ver produtos
+                </Link>
+                <Link
+                  to="/categories"
+                  className="border border-gray-600 text-gray-300 px-8 py-3 text-sm font-semibold tracking-wide hover:border-white hover:text-white transition-colors text-center"
+                >
+                  Categorias
+                </Link>
+              </div>
+            </>
+          ) : (
+            <>
+              <div>
+                <p className="text-xs tracking-[0.25em] uppercase text-gray-400 mb-3">Insider</p>
+                <h2 className="text-3xl sm:text-4xl font-bold leading-tight">
+                  Crie sua conta<br />e aproveite mais.
+                </h2>
+              </div>
+              <Link
+                to="/cadastro"
+                className="shrink-0 border border-white text-white px-10 py-3 text-sm font-semibold tracking-wide hover:bg-white hover:text-black transition-colors"
+              >
+                Criar conta grátis
+              </Link>
+            </>
+          )}
+        </div>
+      </section>
+
+    </main>
+  )
+}

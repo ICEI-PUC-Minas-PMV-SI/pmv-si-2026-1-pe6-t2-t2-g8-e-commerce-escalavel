@@ -147,12 +147,12 @@ export default function ProfilePage() {
           </div>
           <div className="pf-stat-div" />
           <div className="pf-stat">
-            <span className="pf-stat-val">{fmtCPF(user.cpf) ?? '—'}</span>
+            <span className="pf-stat-val">{fmtCPF(user.cpf ?? '') ?? '—'}</span>
             <span className="pf-stat-lbl">CPF</span>
           </div>
           <div className="pf-stat-div" />
           <div className="pf-stat">
-            <span className="pf-stat-val">{fmtPhone(user.phone) ?? '—'}</span>
+            <span className="pf-stat-val">{fmtPhone(user.phone ?? '') ?? '—'}</span>
             <span className="pf-stat-lbl">Telefone</span>
           </div>
           <div className="pf-stat-div" />
@@ -194,11 +194,11 @@ export default function ProfilePage() {
               <div className="pf-field pf-field-row">
                 <div>
                   <span className="pf-field-label">CPF</span>
-                  <span className="pf-field-value">{fmtCPF(user.cpf) ?? <em className="pf-empty">Não informado</em>}</span>
+                  <span className="pf-field-value">{fmtCPF(user.cpf ?? '') ?? <em className="pf-empty">Não informado</em>}</span>
                 </div>
                 <div>
                   <span className="pf-field-label">Telefone</span>
-                  <span className="pf-field-value">{fmtPhone(user.phone) ?? <em className="pf-empty">Não informado</em>}</span>
+                  <span className="pf-field-value">{fmtPhone(user.phone ?? '') ?? <em className="pf-empty">Não informado</em>}</span>
                 </div>
               </div>
             </div>

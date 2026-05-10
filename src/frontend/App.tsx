@@ -19,3 +19,11 @@ export default function App() {
           {CatalogRoutes}
           {UserRoutes}
           {NotificationRoutes}
+          {OrderRoutes}
+          {StockRoutes}
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </UIProvider>
+    </AuthProvider>
+  )
+}

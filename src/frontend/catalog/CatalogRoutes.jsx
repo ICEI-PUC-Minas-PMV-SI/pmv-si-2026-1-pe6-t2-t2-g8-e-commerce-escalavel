@@ -9,4 +9,4 @@ const CatalogRoutes = [
   <Route key="categories" path="/categories" element={<CategoriesPage />} />,
 ]
 
-export default Catalo
+export default CatalogRoutes

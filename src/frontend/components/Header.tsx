@@ -70,7 +70,7 @@ export default function Header() {
           <Link to="/notifications" className="header-link">
             <NotificationBell count={3} />
           </Link>
-          
+
           <Link to="/cart" className="header-link header-cart">
             <FaShoppingBag />
           </Link>
@@ -116,4 +116,21 @@ export default function Header() {
                       Alterar Senha
                     </Link>
                     <div className="hd-sep" />
-                    <button classNam
+                    <button className="hd-item hd-item-danger" onClick={handleLogout}>
+                      Sair
+                    </button>
+                  </div>
+                )}
+              </div>
+            </>
+          ) : (
+            <>
+              <Link to="/login" className="header-link header-btn-ghost">Entrar</Link>
+              <Link to="/cadastro" className="header-btn header-btn-accent">Criar conta</Link>
+            </>
+          )}
+        </nav>
+      </div>
+    </header>
+  )
+}

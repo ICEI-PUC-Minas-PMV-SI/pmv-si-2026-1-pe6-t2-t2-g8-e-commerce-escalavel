@@ -240,4 +240,202 @@ export default function RegisterPage() {
 
           {success ? (
             <div className="lv2-success">
-  
+              <div className="lv2-success-ring">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <polyline points="20 6 9 17 4 12"/>
+                </svg>
+              </div>
+              <p className="lv2-success-title">Conta criada!</p>
+              <p className="lv2-success-sub">Bem-vindo à INSIDER.</p>
+            </div>
+          ) : (
+            <>
+              {/* cabeçalho */}
+              <div className="lv2-head rg2-head">
+                <p className="lv2-eyebrow">Cadastro</p>
+                <h1 className="lv2-title">Criar conta</h1>
+                <p className="lv2-desc">Preencha os dados abaixo para começar</p>
+              </div>
+
+              {/* indicador de etapas */}
+              <div className="rg2-steps">
+                <div className="rg2-step-track">
+                  <div className={`rg2-step-node${step >= 1 ? ' rg2-step-done' : ''}`}>
+                    {step > 1 ? <IconCheck /> : '1'}
+                  </div>
+                  <div className={`rg2-step-line${step >= 2 ? ' rg2-step-line-done' : ''}`} />
+                  <div className={`rg2-step-node${step >= 2 ? ' rg2-step-done' : ' rg2-step-pending'}`}>
+                    2
+                  </div>
+                </div>
+                <div className="rg2-step-labels">
+                  <span className={step === 1 ? 'rg2-lbl-active' : 'rg2-lbl'}>Dados pessoais</span>
+                  <span className={step === 2 ? 'rg2-lbl-active' : 'rg2-lbl'}>Endereço</span>
+                </div>
+              </div>
+
+              {/* erro API */}
+              {apiError && (
+                <div className="lv2-api-error" style={{ marginBottom: 16 }}>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                  {apiError}
+                </div>
+              )}
+
+              {/* ── STEP 1 ── */}
+              {step === 1 && (
+                <div className={`rg2-step-content${slideClass}`}>
+                  <form onSubmit={handleNext} noValidate className="rg2-form">
+
+                    {/* Nome */}
+                    <div className={`lv2-field${fieldErr('name') ? ' lv2-field-error' : ''}${fieldOk('name') ? ' lv2-field-ok' : ''}`}>
+                      <label className="lv2-label" htmlFor="rg-name">Nome completo</label>
+                      <div className="lv2-input-wrap">
+                        <input ref={nameRef} id="rg-name" type="text" className="lv2-input"
+                          placeholder="Seu nome completo" value={form.name}
+                          onChange={set('name')} onBlur={blur('name')} autoComplete="name" />
+                        {fieldOk('name')  && <span className="lv2-status lv2-ok"><IconCheck /></span>}
+                        {fieldErr('name') && <span className="lv2-status lv2-err">
+                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                        </span>}
+                      </div>
+                      {fieldErr('name') && <p className="lv2-error-msg">{fieldErr('name')}</p>}
+                    </div>
+
+                    {/* E-mail */}
+                    <div className={`lv2-field${fieldErr('email') ? ' lv2-field-error' : ''}${fieldOk('email') ? ' lv2-field-ok' : ''}`}>
+                      <label className="lv2-label" htmlFor="rg-email">E-mail</label>
+                      <div className="lv2-input-wrap">
+                        <input id="rg-email" type="email" className="lv2-input"
+                          placeholder="seu@email.com" value={form.email}
+                          onChange={set('email')} onBlur={blur('email')} autoComplete="email" />
+                        {fieldOk('email')  && <span className="lv2-status lv2-ok"><IconCheck /></span>}
+                        {fieldErr('email') && <span className="lv2-status lv2-err">
+                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                        </span>}
+                      </div>
+                      {fieldErr('email') && <p className="lv2-error-msg">{fieldErr('email')}</p>}
+                    </div>
+
+                    {/* Senha */}
+                    <div className={`lv2-field${fieldErr('password') ? ' lv2-field-error' : ''}${fieldOk('password') ? ' lv2-field-ok' : ''}`}>
+                      <label className="lv2-label" htmlFor="rg-pass">Senha</label>
+                      <div className="lv2-input-wrap">
+                        <input id="rg-pass" type={showPass ? 'text' : 'password'}
+                          className="lv2-input lv2-input-icon"
+                          placeholder="Mínimo 8 caracteres" value={form.password}
+                          onChange={set('password')} onBlur={blur('password')}
+                          autoComplete="new-password" />
+                        {fieldOk('password')  && <span className="lv2-status lv2-ok" style={{ right: 44 }}><IconCheck /></span>}
+                        {fieldErr('password') && <span className="lv2-status lv2-err" style={{ right: 44 }}>
+                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                        </span>}
+                        <button type="button" className="lv2-eye" onClick={() => setShowPass(v => !v)}
+                          tabIndex={-1} aria-label={showPass ? 'Ocultar' : 'Ver senha'}>
+                          {showPass ? <IconEyeOff /> : <IconEyeOpen />}
+                        </button>
+                      </div>
+                      {fieldErr('password') && <p className="lv2-error-msg">{fieldErr('password')}</p>}
+                      {strength && !fieldErr('password') && (
+                        <div className="rg2-strength">
+                          <div className="rg2-bars">
+                            {[0, 1, 2, 3].map(i => (
+                              <div key={i} className="rg2-bar"
+                                style={{ background: i <= strength.level ? strength.color : '#e5e7eb' }} />
+                            ))}
+                          </div>
+                          <span className="rg2-str-label" style={{ color: strength.color }}>
+                            {strength.label}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* CPF + Telefone */}
+                    <div className="rg2-row">
+                      <div className="lv2-field">
+                        <label className="lv2-label" htmlFor="rg-cpf">CPF <span className="rg2-opt">(opcional)</span></label>
+                        <input id="rg-cpf" type="text" className="lv2-input"
+                          placeholder="000.000.000-00" value={form.cpf}
+                          onChange={e => setForm(prev => ({ ...prev, cpf: maskCPF(e.target.value) }))} />
+                      </div>
+                      <div className="lv2-field">
+                        <label className="lv2-label" htmlFor="rg-phone">Telefone <span className="rg2-opt">(opcional)</span></label>
+                        <input id="rg-phone" type="text" className="lv2-input"
+                          placeholder="(00) 00000-0000" value={form.phone}
+                          onChange={e => setForm(prev => ({ ...prev, phone: maskPhone(e.target.value) }))} />
+                      </div>
+                    </div>
+
+                    <button type="submit" className="lv2-submit rg2-submit">
+                      <span>Continuar</span> <IconArrow />
+                    </button>
+                  </form>
+                </div>
+              )}
+
+              {/* ── STEP 2 ── */}
+              {step === 2 && (
+                <div className={`rg2-step-content${slideClass}`}>
+                  <form onSubmit={handleSubmit} noValidate className="rg2-form">
+
+                    <p className="rg2-optional-note">
+                      Endereço é opcional — você pode pular e adicionar depois.
+                    </p>
+
+                    {/* Rua */}
+                    <div className="lv2-field">
+                      <label className="lv2-label" htmlFor="rg-street">Rua / Logradouro</label>
+                      <input id="rg-street" type="text" className="lv2-input"
+                        placeholder="Rua das Flores, 123" value={form.street} onChange={set('street')} />
+                    </div>
+
+                    {/* Cidade + Estado */}
+                    <div className="rg2-row">
+                      <div className="lv2-field" style={{ flex: 2 }}>
+                        <label className="lv2-label" htmlFor="rg-city">Cidade</label>
+                        <input id="rg-city" type="text" className="lv2-input"
+                          placeholder="Belo Horizonte" value={form.city} onChange={set('city')} />
+                      </div>
+                      <div className="lv2-field" style={{ flex: 1 }}>
+                        <label className="lv2-label" htmlFor="rg-state">UF</label>
+                        <input id="rg-state" type="text" className="lv2-input"
+                          placeholder="MG" maxLength={2} value={form.state} onChange={set('state')} />
+                      </div>
+                    </div>
+
+                    {/* CEP */}
+                    <div className="lv2-field">
+                      <label className="lv2-label" htmlFor="rg-zip">CEP</label>
+                      <input id="rg-zip" type="text" className="lv2-input"
+                        placeholder="00000-000" value={form.zip} onChange={set('zip')} />
+                    </div>
+
+                    {/* Ações */}
+                    <div className="rg2-actions">
+                      <button type="button" className="rg2-back-btn"
+                        onClick={() => transitionStep(1, 'back')}>
+                        <IconBack /> Voltar
+                      </button>
+                      <button type="submit" className="lv2-submit rg2-submit rg2-submit-flex"
+                        disabled={loading}>
+                        {loading
+                          ? <><span className="btn-spinner" /> Criando…</>
+                          : <><span>Criar conta</span> <IconArrow /></>}
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              )}
+
+              <p className="lv2-footer" style={{ marginTop: 20 }}>
+                Já tem conta?{' '}
+                <Link to="/login" className="lv2-link">Entrar</Link>
+              </p>
+            </>
+          )}
+        </div>
+      </div>
+    </div>
+  )
+}

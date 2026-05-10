@@ -102,4 +102,221 @@ export default function LoginPage() {
   /* erros de validação */
   const emailErr = (submitted || emailBlurred) ? validateEmail(email) : ''
   const passErr  = (submitted || passBlurred)  ? validatePassword(password) : ''
-  const emailOk  = 
+  const emailOk  = emailBlurred && !validateEmail(email) && !apiError
+  const passOk   = passBlurred  && !validatePassword(password) && !apiError
+
+  useEffect(() => {
+    if (isAuthenticated) navigate('/perfil', { replace: true })
+  }, [isAuthenticated, navigate])
+
+  /* autoplay */
+  useEffect(() => {
+    const iv = setInterval(() => {
+      setVisible(false)
+      setTimeout(() => { setSlide(s => (s + 1) % SLIDES.length); setVisible(true) }, 420)
+    }, 5000)
+    return () => clearInterval(iv)
+  }, [])
+
+  /* foca e-mail ao montar */
+  useEffect(() => { emailRef.current?.focus() }, [])
+
+  const goSlide = (i: number) => {
+    if (i === slide) return
+    setVisible(false)
+    setTimeout(() => { setSlide(i); setVisible(true) }, 350)
+  }
+
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault()
+    setSubmitted(true)
+    if (validateEmail(email) || validatePassword(password)) {
+      setShake(true); setTimeout(() => setShake(false), 520)
+      return
+    }
+    setApiError('')
+    setLoading(true)
+    try {
+      await login(email, password)
+      setSuccess(true)
+      setTimeout(() => navigate('/perfil'), 1100)
+    } catch (err: unknown) {
+      setApiError(err instanceof Error ? err.message : 'E-mail ou senha incorretos.')
+      setShake(true); setTimeout(() => setShake(false), 520)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const cur = SLIDES[slide]
+
+  return (
+    <div className="lv2-root">
+
+      {/* ══════════════════════════════
+          PAINEL ESQUERDO — identidade
+      ══════════════════════════════ */}
+      <div className="lv2-left" style={{ background: cur.bg }}>
+
+        {/* blobs */}
+        <div className="lv2-blob lv2-blob-a" style={{ background: cur.blob1 }} />
+        <div className="lv2-blob lv2-blob-b" style={{ background: cur.blob2 }} />
+
+        {/* grid */}
+        <div className="lv2-grid" />
+
+        {/* marca */}
+        <div className="lv2-brand">
+          <span className="lv2-brand-text">INSIDER</span>
+          <span className="lv2-brand-dot" style={{ background: cur.accent }} />
+        </div>
+
+        {/* slide */}
+        <div className={`lv2-slide${visible ? ' lv2-slide-in' : ' lv2-slide-out'}`}>
+          <span className="lv2-tag" style={{ color: cur.accent, borderColor: cur.accent }}>
+            {cur.tag}
+          </span>
+          <h2 className="lv2-headline">
+            {cur.headline.map((l, i) => <span key={i}>{l}</span>)}
+          </h2>
+          <p className="lv2-sub">{cur.sub}</p>
+          <div className="lv2-line" style={{ background: cur.accent }} />
+        </div>
+
+        {/* navegação */}
+        <div className="lv2-nav">
+          <div className="lv2-dots">
+            {SLIDES.map((_, i) => (
+              <button
+                key={i}
+                className={`lv2-dot${i === slide ? ' lv2-dot-on' : ''}`}
+                style={i === slide ? { background: cur.accent, width: 28 } : {}}
+                onClick={() => goSlide(i)}
+                aria-label={`Slide ${i + 1}`}
+              />
+            ))}
+          </div>
+          <span className="lv2-counter">
+            <b>{String(slide + 1).padStart(2, '0')}</b>
+            <span className="lv2-counter-sep"> / </span>
+            {String(SLIDES.length).padStart(2, '0')}
+          </span>
+        </div>
+      </div>
+
+      {/* ══════════════════════════════
+          PAINEL DIREITO — formulário
+      ══════════════════════════════ */}
+      <div className="lv2-right">
+        <div className={`lv2-card${shake ? ' auth-shake' : ''}`}>
+
+          {success ? (
+            /* ── Sucesso ── */
+            <div className="lv2-success">
+              <div className="lv2-success-ring">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <polyline points="20 6 9 17 4 12"/>
+                </svg>
+              </div>
+              <p className="lv2-success-title">Bem-vindo de volta!</p>
+              <p className="lv2-success-sub">Redirecionando…</p>
+            </div>
+
+          ) : (
+            <>
+              {/* cabeçalho */}
+              <div className="lv2-head">
+                <p className="lv2-eyebrow">Bem-vindo</p>
+                <h1 className="lv2-title">Entrar</h1>
+                <p className="lv2-desc">Acesse sua conta INSIDER</p>
+              </div>
+
+              {/* erro global da API */}
+              {apiError && (
+                <div className="lv2-api-error">
+                  <IconX /> {apiError}
+                </div>
+              )}
+
+              {/* formulário */}
+              <form onSubmit={handleSubmit} noValidate className="lv2-form">
+
+                {/* e-mail */}
+                <div className={`lv2-field${emailErr ? ' lv2-field-error' : ''}${emailOk ? ' lv2-field-ok' : ''}`}>
+                  <label className="lv2-label" htmlFor="lv2-email">E-mail</label>
+                  <div className="lv2-input-wrap">
+                    <input
+                      ref={emailRef}
+                      id="lv2-email"
+                      type="email"
+                      className="lv2-input"
+                      placeholder="seu@email.com"
+                      value={email}
+                      onChange={e => { setEmail(e.target.value); setApiError('') }}
+                      onBlur={() => setEmailBlurred(true)}
+                      autoComplete="email"
+                      aria-describedby={emailErr ? 'lv2-email-err' : undefined}
+                    />
+                    {emailOk  && <span className="lv2-status lv2-ok"><IconCheck /></span>}
+                    {emailErr && <span className="lv2-status lv2-err"><IconX /></span>}
+                  </div>
+                  {emailErr && <p id="lv2-email-err" className="lv2-error-msg">{emailErr}</p>}
+                </div>
+
+                {/* senha */}
+                <div className={`lv2-field${passErr ? ' lv2-field-error' : ''}${passOk ? ' lv2-field-ok' : ''}`}>
+                  <div className="lv2-label-row">
+                    <label className="lv2-label" htmlFor="lv2-pass">Senha</label>
+                  </div>
+                  <div className="lv2-input-wrap">
+                    <input
+                      id="lv2-pass"
+                      type={showPass ? 'text' : 'password'}
+                      className="lv2-input lv2-input-icon"
+                      placeholder="••••••••"
+                      value={password}
+                      onChange={e => { setPassword(e.target.value); setApiError('') }}
+                      onBlur={() => setPassBlurred(true)}
+                      autoComplete="current-password"
+                      aria-describedby={passErr ? 'lv2-pass-err' : undefined}
+                    />
+                    {passOk  && <span className="lv2-status lv2-ok" style={{ right: 44 }}><IconCheck /></span>}
+                    {passErr && <span className="lv2-status lv2-err" style={{ right: 44 }}><IconX /></span>}
+                    <button
+                      type="button"
+                      className="lv2-eye"
+                      onClick={() => setShowPass(v => !v)}
+                      tabIndex={-1}
+                      aria-label={showPass ? 'Ocultar senha' : 'Mostrar senha'}
+                    >
+                      {showPass ? <IconEyeOff /> : <IconEyeOpen />}
+                    </button>
+                  </div>
+                  {passErr && <p id="lv2-pass-err" className="lv2-error-msg">{passErr}</p>}
+                </div>
+
+                {/* submit */}
+                <button
+                  type="submit"
+                  className="lv2-submit"
+                  disabled={loading}
+                >
+                  {loading
+                    ? <><span className="btn-spinner" /> Entrando…</>
+                    : <><span>Entrar</span> <IconArrow /></>
+                  }
+                </button>
+              </form>
+
+              {/* rodapé */}
+              <p className="lv2-footer">
+                Não tem conta?{' '}
+                <Link to="/cadastro" className="lv2-link">Criar conta grátis</Link>
+              </p>
+            </>
+          )}
+        </div>
+      </div>
+    </div>
+  )
+}

@@ -232,7 +232,7 @@ export default function AdminUsersPage() {
           <div className="au-stat-sep" />
           <div className="au-stat">
             <span className="au-stat-num au-num-gold">{stats.admins}</span>
-            <span className="au-stat-lbl"><IcoShield style={{display:'inline',marginRight:3}} />Admins</span>
+            <span className="au-stat-lbl"><span style={{display:'inline',marginRight:3}}><IcoShield /></span>Admins</span>
           </div>
         </div>
       </div>
@@ -285,4 +285,118 @@ export default function AdminUsersPage() {
                   <th>Status</th>
                   <th>Cadastro</th>
                   <th style={{ textAlign: 'right' }}>Ações</th>
-                </
+                </tr>
+              </thead>
+              <tbody>
+                {filtered.length === 0 ? (
+                  <tr>
+                    <td colSpan={7} className="au-empty">
+                      <div className="au-empty-inner">
+                        <IcoSearch />
+                        <p>Nenhum usuário encontrado</p>
+                        {search && <button className="au-empty-clear" onClick={() => setSearch('')}>Limpar busca</button>}
+                      </div>
+                    </td>
+                  </tr>
+                ) : filtered.map(u => (
+                  <tr key={u.id} className={!u.active ? 'au-row-off' : ''}>
+                    <td>
+                      <div className="au-user-cell">
+                        <Avatar name={u.name} />
+                        <div className="au-user-info">
+                          <span className="au-user-name">{u.name}</span>
+                          <span className="au-user-email">{u.email}</span>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="au-mono">{fmtCPF(u.cpf ?? '') ?? <span className="au-dash">—</span>}</td>
+                    <td className="au-mono">{fmtPhone(u.phone ?? '') ?? <span className="au-dash">—</span>}</td>
+                    <td>
+                      <span className={`au-role ${u.role === 'admin' ? 'au-role-admin' : 'au-role-customer'}`}>
+                        {u.role === 'admin' ? <><IcoShield /> Admin</> : 'Cliente'}
+                      </span>
+                    </td>
+                    <td>
+                      <span className={`au-status ${u.active ? 'au-status-on' : 'au-status-off'}`}>
+                        <span className="au-status-dot" />
+                        {u.active ? 'Ativo' : 'Inativo'}
+                      </span>
+                    </td>
+                    <td className="au-date">
+                      {new Date(u.created_at).toLocaleDateString('pt-BR')}
+                    </td>
+                    <td>
+                      <div className="au-actions">
+                        {u.active ? (
+                          <button className="au-action-btn au-btn-warn" onClick={() => openModal(u, 'deactivate')} title="Desativar conta">
+                            <IcoPause /> Desativar
+                          </button>
+                        ) : (
+                          <button className="au-action-btn au-btn-green" onClick={() => openModal(u, 'reactivate')} title="Reativar conta">
+                            <IcoPlay /> Reativar
+                          </button>
+                        )}
+                        <button className="au-action-btn au-btn-delete" onClick={() => openModal(u, 'hard-delete')} title="Excluir permanentemente">
+                          <IcoTrash />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+        </div>
+
+        {/* rodapé da tabela */}
+        {!loading && filtered.length > 0 && (
+          <div className="au-table-footer">
+            Exibindo <strong>{filtered.length}</strong> de <strong>{stats.total}</strong> usuários
+          </div>
+        )}
+      </div>
+
+      {/* ══ MODAL ══ */}
+      {selectedUser && (
+        <div className="au-modal-overlay" onClick={() => !processing && setSelectedUser(null)}>
+          <div className="au-modal" onClick={e => e.stopPropagation()}>
+
+            {/* ícone */}
+            <div className={`au-modal-icon ${modalAction === 'reactivate' ? 'au-modal-icon-green' : modalAction === 'hard-delete' ? 'au-modal-icon-hard' : 'au-modal-icon-warn'}`}>
+              {modalAction === 'reactivate' ? <IcoPlay /> : <IcoWarn />}
+            </div>
+
+            {/* usuário alvo */}
+            <div className="au-modal-user">
+              <Avatar name={selectedUser.name} size={40} />
+              <div>
+                <p className="au-modal-uname">{selectedUser.name}</p>
+                <p className="au-modal-uemail">{selectedUser.email}</p>
+              </div>
+            </div>
+
+            <h2 className="au-modal-title">{modalMeta[modalAction].title}</h2>
+            <p className="au-modal-body">{modalMeta[modalAction].body(selectedUser.name)}</p>
+
+            {modalAction === 'hard-delete' && (
+              <div className="au-modal-warn-box">
+                <IcoWarn /> Esta ação é <strong>irreversível</strong>. Todos os dados serão removidos permanentemente.
+              </div>
+            )}
+
+            <div className="au-modal-actions">
+              <button className="au-modal-btn au-modal-cancel" onClick={() => setSelectedUser(null)} disabled={processing}>
+                Cancelar
+              </button>
+              <button className={modalMeta[modalAction].confirmClass} onClick={handleConfirm} disabled={processing}>
+                {processing ? <><span className="btn-spinner" /> Processando…</> : modalMeta[modalAction].confirmLabel}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <Toast toast={toast} onClose={() => setToast(null)} />
+    </div>
+  )
+}
