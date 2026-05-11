@@ -503,6 +503,322 @@ Origem: `src/frontend/order/`, `src/frontend/services/orderClientService.ts`.
 
 
 
+---
+
+## Testes — Módulo de Usuários (User)
+
+### Mapeamento de interações
+
+Origem: `src/frontend/user/pages/`, `src/frontend/services/userApi.ts`.
+
+| ID  | Interação                              | Componente                | API back-end                              |
+|-----|----------------------------------------|---------------------------|-------------------------------------------|
+| I25 | Login com e-mail e senha               | `LoginPage.tsx`           | `POST /auth/login`                        |
+| I26 | Cadastro de novo usuário               | `RegisterPage.tsx`        | `POST /auth/register`                     |
+| I27 | Visualizar perfil                      | `ProfilePage.tsx`         | `GET /users/{id}`                         |
+| I28 | Editar dados pessoais e endereço       | `EditProfilePage.tsx`     | `PUT /users/{id}`                         |
+| I29 | Alterar senha                          | `ChangePasswordPage.tsx`  | `PUT /users/{id}/password`                |
+| I30 | Desativar conta                        | `ProfilePage.tsx`         | `DELETE /users/{id}`                      |
+| I31 | Listar todos os usuários (admin)       | `AdminUsersPage.tsx`      | `GET /admin/users`                        |
+| I32 | Desativar / reativar usuário (admin)   | `AdminUsersPage.tsx`      | `DELETE /users/{id}` / `PUT /users/{id}/reactivate` |
+| I33 | Excluir usuário permanentemente (admin)| `AdminUsersPage.tsx`      | `DELETE /admin/users/{id}/hard`           |
+
+---
+
+### Casos de teste
+
+#### User — I25: Login
+
+##### TC-I25-01 · Login com credenciais válidas
+
+- **Pré-condições:**
+  - Usuário cadastrado e ativo no sistema.
+- **Passos:**
+  1. Acessar `/login`.
+  2. Preencher e-mail e senha corretos.
+  3. Clicar em **Entrar**.
+- **Resultado esperado:**
+  - Usuário é autenticado e redirecionado para `/products`.
+  - Header exibe avatar e nome do usuário.
+
+##### TC-I25-02 · Login com credenciais inválidas
+
+- **Pré-condições:**
+  - Página de login aberta.
+- **Passos:**
+  1. Preencher e-mail correto e senha errada.
+  2. Clicar em **Entrar**.
+- **Resultado esperado:**
+  - Mensagem de erro exibida abaixo do formulário.
+  - Usuário permanece na página de login.
+
+##### TC-I25-03 · Validação de campo e-mail
+
+- **Pré-condições:**
+  - Página de login aberta.
+- **Passos:**
+  1. Digitar um e-mail com formato inválido (ex.: `usuario@`).
+  2. Sair do campo (blur).
+- **Resultado esperado:**
+  - Ícone de erro exibido no campo e-mail.
+  - Mensagem de validação visível antes de submeter o formulário.
+
+##### TC-I25-04 · Redirecionar usuário já autenticado
+
+- **Pré-condições:**
+  - Usuário já autenticado.
+- **Passos:**
+  1. Tentar acessar `/login` diretamente pela URL.
+- **Resultado esperado:**
+  - Sistema redireciona automaticamente para `/products`.
+
+---
+
+#### User — I26: Cadastro
+
+##### TC-I26-01 · Cadastro em dois passos com dados válidos
+
+- **Pré-condições:**
+  - Nenhuma conta com o e-mail informado existe.
+- **Passos:**
+  1. Acessar `/cadastro`.
+  2. Passo 1: preencher nome (≥ 3 chars), e-mail válido, senha (≥ 8 chars).
+  3. Clicar em **Continuar**.
+  4. Passo 2: preencher CPF e telefone (opcionais) ou prosseguir em branco.
+  5. Clicar em **Criar conta**.
+- **Resultado esperado:**
+  - Conta criada com sucesso.
+  - Usuário é autenticado e redirecionado para `/products`.
+
+##### TC-I26-02 · Máscara automática de CPF
+
+- **Pré-condições:**
+  - Passo 2 do cadastro visível.
+- **Passos:**
+  1. Digitar 11 dígitos no campo CPF.
+- **Resultado esperado:**
+  - Campo exibe automaticamente o formato `000.000.000-00`.
+
+##### TC-I26-03 · Máscara automática de telefone
+
+- **Pré-condições:**
+  - Passo 2 do cadastro visível.
+- **Passos:**
+  1. Digitar 11 dígitos no campo Telefone.
+- **Resultado esperado:**
+  - Campo exibe automaticamente o formato `(00) 00000-0000`.
+
+##### TC-I26-04 · Barra de força de senha
+
+- **Pré-condições:**
+  - Campo Senha no passo 1 visível.
+- **Passos:**
+  1. Digitar senhas de diferentes complexidades (só letras, com número, com símbolo).
+- **Resultado esperado:**
+  - Barra de força muda de cor e nível (fraca → média → forte) conforme a complexidade.
+
+---
+
+#### User — I27: Visualizar Perfil
+
+##### TC-I27-01 · Carregar dados do perfil
+
+- **Pré-condições:**
+  - Usuário autenticado.
+- **Passos:**
+  1. Acessar `/perfil`.
+- **Resultado esperado:**
+  - Hero exibe nome, e-mail, data de membro e iniciais do avatar.
+  - Strip de estatísticas exibe CPF, telefone e cidade (ou `—` se não informado).
+  - Cards exibem dados pessoais, endereço, segurança e zona de perigo.
+
+##### TC-I27-02 · Acesso negado sem autenticação
+
+- **Pré-condições:**
+  - Usuário não autenticado.
+- **Passos:**
+  1. Tentar acessar `/perfil` diretamente pela URL.
+- **Resultado esperado:**
+  - Sistema redireciona para `/login`.
+
+---
+
+#### User — I28: Editar Perfil
+
+##### TC-I28-01 · Atualizar nome e e-mail
+
+- **Pré-condições:**
+  - Usuário autenticado em `/perfil/editar`.
+- **Passos:**
+  1. Alterar o campo **Nome completo**.
+  2. Alterar o campo **E-mail**.
+  3. Clicar em **Salvar alterações**.
+- **Resultado esperado:**
+  - Toast de sucesso exibido.
+  - Botão **Salvar** muda para **Salvo!** com ícone de check.
+  - Usuário é redirecionado para `/perfil` após 1,6 s.
+  - Header reflete o novo nome imediatamente.
+
+##### TC-I28-02 · Máscara de CEP
+
+- **Pré-condições:**
+  - Formulário de edição aberto.
+- **Passos:**
+  1. Digitar 8 dígitos no campo CEP.
+- **Resultado esperado:**
+  - Campo exibe automaticamente o formato `00000-000`.
+
+---
+
+#### User — I29: Alterar Senha
+
+##### TC-I29-01 · Alterar senha com dados válidos
+
+- **Pré-condições:**
+  - Usuário autenticado em `/perfil/senha`.
+- **Passos:**
+  1. Preencher **Senha atual** corretamente.
+  2. Preencher **Nova senha** (≥ 8 chars).
+  3. Repetir a nova senha em **Confirmar nova senha**.
+  4. Clicar em **Salvar nova senha**.
+- **Resultado esperado:**
+  - Toast de sucesso exibido.
+  - Formulário é resetado.
+
+##### TC-I29-02 · Confirmação de senha divergente
+
+- **Pré-condições:**
+  - Formulário de alteração de senha aberto.
+- **Passos:**
+  1. Preencher **Nova senha** e **Confirmar nova senha** com valores diferentes.
+  2. Clicar em **Salvar nova senha**.
+- **Resultado esperado:**
+  - Mensagem de erro indicando que as senhas não coincidem.
+  - Requisição não é enviada ao back-end.
+
+---
+
+#### User — I30: Desativar Conta
+
+##### TC-I30-01 · Desativar conta com confirmação
+
+- **Pré-condições:**
+  - Usuário autenticado na página `/perfil`.
+- **Passos:**
+  1. Clicar em **Desativar minha conta**.
+  2. Confirmar no modal clicando em **Confirmar**.
+- **Resultado esperado:**
+  - Toast de sucesso exibido.
+  - Usuário é deslogado e redirecionado para `/login` após 2 s.
+
+##### TC-I30-02 · Cancelar desativação
+
+- **Pré-condições:**
+  - Modal de confirmação aberto.
+- **Passos:**
+  1. Clicar em **Cancelar**.
+- **Resultado esperado:**
+  - Modal fecha sem nenhuma ação.
+  - Conta permanece ativa.
+
+---
+
+#### User — I31: Listagem de Usuários (Admin)
+
+##### TC-I31-01 · Carregar lista de usuários
+
+- **Pré-condições:**
+  - Usuário autenticado com perfil `admin`.
+- **Passos:**
+  1. Acessar `/admin/usuarios`.
+- **Resultado esperado:**
+  - Hero exibe estatísticas: total, ativos, inativos e admins.
+  - Tabela lista todos os usuários com nome, e-mail, CPF, telefone, cargo e status.
+
+##### TC-I31-02 · Filtrar por aba (Ativos / Inativos / Todos)
+
+- **Pré-condições:**
+  - Lista carregada com usuários ativos e inativos.
+- **Passos:**
+  1. Clicar na aba **Ativos**.
+- **Resultado esperado:**
+  - Tabela exibe apenas usuários com status ativo.
+  - Toast exibe contagem: `Exibindo N usuários ativos.`
+
+##### TC-I31-03 · Buscar usuário por nome ou e-mail
+
+- **Pré-condições:**
+  - Lista carregada.
+- **Passos:**
+  1. Digitar parte do nome ou e-mail no campo de busca.
+- **Resultado esperado:**
+  - Tabela filtra em tempo real exibindo apenas os registros correspondentes.
+
+##### TC-I31-04 · Atualizar lista manualmente
+
+- **Pré-condições:**
+  - Página de admin carregada.
+- **Passos:**
+  1. Clicar no botão **Atualizar**.
+- **Resultado esperado:**
+  - Ícone do botão gira enquanto carrega.
+  - Toast de sucesso exibe o total de usuários carregados.
+
+---
+
+#### User — I32: Desativar / Reativar Usuário (Admin)
+
+##### TC-I32-01 · Desativar usuário ativo
+
+- **Pré-condições:**
+  - Admin autenticado. Há ao menos 1 usuário ativo na lista.
+- **Passos:**
+  1. Clicar em **Desativar** na linha do usuário.
+  2. Confirmar no modal.
+- **Resultado esperado:**
+  - Status do usuário muda para **Inativo** na tabela sem recarregar a página.
+  - Toast de sucesso exibido.
+
+##### TC-I32-02 · Reativar usuário inativo
+
+- **Pré-condições:**
+  - Admin autenticado. Há ao menos 1 usuário inativo.
+- **Passos:**
+  1. Clicar na aba **Inativos**.
+  2. Clicar em **Reativar** na linha do usuário.
+  3. Confirmar no modal.
+- **Resultado esperado:**
+  - Status muda para **Ativo** na tabela.
+  - Toast de sucesso exibido.
+
+---
+
+#### User — I33: Excluir Usuário Permanentemente (Admin)
+
+##### TC-I33-01 · Excluir usuário com confirmação
+
+- **Pré-condições:**
+  - Admin autenticado. Há ao menos 1 usuário na lista.
+- **Passos:**
+  1. Clicar no ícone de lixeira (excluir) na linha do usuário.
+  2. Ler o aviso de ação irreversível no modal.
+  3. Clicar em **Excluir permanentemente**.
+- **Resultado esperado:**
+  - Usuário é removido da tabela imediatamente.
+  - Toast de sucesso exibido.
+  - Estatísticas do hero são atualizadas.
+
+##### TC-I33-02 · Acesso bloqueado para não-admin
+
+- **Pré-condições:**
+  - Usuário autenticado com perfil `customer`.
+- **Passos:**
+  1. Tentar acessar `/admin/usuarios` pela URL.
+- **Resultado esperado:**
+  - Sistema redireciona para `/`.
+
+---
+
 # Referências
 
 Inclua todas as referências (livros, artigos, sites, etc) utilizados no desenvolvimento do trabalho.
