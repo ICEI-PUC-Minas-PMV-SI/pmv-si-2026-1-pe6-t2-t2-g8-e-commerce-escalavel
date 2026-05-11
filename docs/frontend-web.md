@@ -501,6 +501,199 @@ Origem: `src/frontend/order/`, `src/frontend/services/orderClientService.ts`.
 
 ---
 
+  ---
+
+  ## Testes — Módulo de Catálogo: Produtos
+
+  ### Mapeamento de interações
+
+  Origem: `src/frontend/catalog/pages/ProductsPage.jsx`,
+  `src/frontend/services/api.js`. Página em `/products`.
+
+  | ID  | Interação                          | Componente                   |
+  API back-end                                                        |
+  |-----|------------------------------------|------------------------------|-
+  --------------------------------------------------------------------|
+  | I19 | Listar e filtrar produtos          | `ProductsPage.jsx`           |
+  `GET /catalog/products?name=&categoryId=&minPrice=&maxPrice=`       |
+  | I20 | Criar produto                      | `ProductModal` (admin)       |
+  `POST /catalog/products`                                            |
+  | I21 | Editar produto                     | `ProductModal` (admin)       |
+  `PUT /catalog/products/{id}`                                        |
+  | I22 | Deletar produto                    | `ConfirmModal` (admin)       |
+  `DELETE /catalog/products/{id}`                                     |
+
+  ### Casos de teste
+
+  #### Produtos — I19: Listagem e filtros
+
+  ##### TC-I19-01 · Carregar lista de produtos
+
+  - **Pré-condições:**
+    - Back-end ativo.
+    - Há ≥ 1 produto cadastrado.
+  - **Passos:**
+    1. Abrir `/products`.
+  - **Resultado esperado:**
+    - Cards de produto são exibidos com: imagem, categoria, nome, descrição
+  resumida e preço a partir de (formatado em BRL).
+    - Contador de resultados é exibido acima da grade.
+
+  ##### TC-I19-02 · Filtrar por nome
+
+  - **Pré-condições:**
+    - Lista carregada com ≥ 2 produtos de nomes distintos.
+  - **Passos:**
+    1. Digitar parte do nome de um produto no campo "Buscar por nome...".
+    2. Clicar em **Filtrar**.
+  - **Resultado esperado:**
+    - A grade exibe apenas produtos cujo nome contém o trecho informado.
+
+  ##### TC-I19-03 · Filtrar por categoria
+
+  - **Pré-condições:**
+    - Lista carregada com produtos de categorias distintas.
+  - **Passos:**
+    1. Selecionar uma categoria no campo de seleção.
+    2. Clicar em **Filtrar**.
+  - **Resultado esperado:**
+    - A grade exibe apenas produtos pertencentes à categoria selecionada.
+
+  ##### TC-I19-04 · Filtrar por faixa de preço
+
+  - **Pré-condições:**
+    - Existem produtos com preços variados.
+  - **Passos:**
+    1. Informar **Preço mínimo** e **Preço máximo**.
+    2. Clicar em **Filtrar**.
+  - **Resultado esperado:**
+    - A grade exibe apenas produtos com ao menos um SKU cujo preço está dentro
+   da faixa informada.
+
+  ##### TC-I19-05 · Limpar filtros
+
+  - **Pré-condições:**
+    - Filtros ativos com resultados parciais.
+  - **Passos:**
+    1. Clicar em **Limpar**.
+  - **Resultado esperado:**
+    - Campos de filtro são resetados e a lista completa de produtos é
+  recarregada.
+
+  ---
+
+  #### Produtos — I20: Criar produto
+
+  ##### TC-I20-01 · Criar produto com dados válidos (admin)
+
+  - **Pré-condições:**
+    - Usuário autenticado com perfil `admin`.
+  - **Passos:**
+    1. Clicar em **+ Novo Produto**.
+    2. Preencher **Nome**, **Descrição**, **URL da imagem** e selecionar uma
+  **Categoria**.
+    3. Clicar em **Criar produto**.
+  - **Resultado esperado:**
+    - Modal fecha.
+    - Novo card do produto aparece no início da grade sem recarregar a página.
+
+  ---
+
+  #### Produtos — I21: Editar produto
+
+  ##### TC-I21-01 · Editar produto existente (admin)
+
+  - **Pré-condições:**
+    - Usuário autenticado com perfil `admin`.
+    - Há ≥ 1 produto cadastrado.
+  - **Passos:**
+    1. Passar o cursor sobre o card do produto — botões **Editar** e
+  **Deletar** ficam visíveis.
+    2. Clicar em **Editar**.
+    3. Alterar ao menos um campo (ex.: nome).
+    4. Clicar em **Salvar alterações**.
+  - **Resultado esperado:**
+    - Modal fecha.
+    - Card do produto na grade reflete os novos dados sem recarregar a página.
+
+  ---
+
+  #### Produtos — I22: Deletar produto
+
+  ##### TC-I22-01 · Deletar produto com confirmação (admin)
+
+  - **Pré-condições:**
+    - Usuário autenticado com perfil `admin`.
+    - Há ≥ 1 produto cadastrado.
+  - **Passos:**
+    1. Passar o cursor sobre o card do produto.
+    2. Clicar em **Deletar**.
+    3. Clicar em **Deletar** no modal de confirmação.
+  - **Resultado esperado:**
+    - Modal de confirmação fecha.
+    - Card do produto é removido da grade imediatamente.
+
+  ##### TC-I22-02 · Cancelar exclusão
+
+  - **Pré-condições:**
+    - Modal de confirmação de exclusão aberto.
+  - **Passos:**
+    1. Clicar em **Cancelar** ou na área escurecida fora do modal.
+  - **Resultado esperado:**
+    - Modal fecha.
+    - Produto permanece na grade.
+
+  ---
+
+  ## Testes — Módulo de Catálogo: Categorias
+
+  ### Mapeamento de interações
+
+  Origem: `src/frontend/catalog/pages/CategoriesPage.jsx`,
+  `src/frontend/services/api.js`. Página em `/categories`.
+
+  | ID  | Interação                              | Componente
+     | API back-end               |
+  |-----|----------------------------------------|----------------------------
+  ---|----------------------------|
+  | I23 | Listar categorias                      | `CategoriesPage.jsx`
+     | `GET /catalog/categories`  |
+  | I24 | Navegar para produtos de uma categoria | `CategoriesPage.jsx` (Link)
+     | —                          |
+
+  ### Casos de teste
+
+  #### Categorias — I23: Listagem
+
+  ##### TC-I23-01 · Carregar lista de categorias
+
+  - **Pré-condições:**
+    - Back-end ativo.
+    - Há ≥ 1 categoria cadastrada.
+  - **Passos:**
+    1. Abrir `/categories`.
+  - **Resultado esperado:**
+    - Grade exibe cartões com nome e descrição (quando disponível) de cada
+  categoria.
+    - Cada cartão exibe o link **Ver produtos →**.
+
+  ---
+
+  #### Categorias — I24: Navegação
+
+  ##### TC-I24-01 · Clicar em categoria redireciona para lista de produtos
+  filtrada
+
+  - **Pré-condições:**
+    - Página `/categories` carregada com ≥ 1 categoria.
+  - **Passos:**
+    1. Clicar em qualquer cartão de categoria.
+  - **Resultado esperado:**
+    - Navegação para `/products?categoryId={id}` da categoria selecionada.
+    - Página de produtos abre já filtrada pela categoria correspondente.
+
+  ---
+
 
 
 # Referências
