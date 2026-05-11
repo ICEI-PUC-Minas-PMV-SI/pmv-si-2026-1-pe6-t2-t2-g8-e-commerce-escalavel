@@ -338,6 +338,171 @@ Origem: `src/frontend/notification/`, `src/frontend/services/notificationApi.ts`
   1. Clicar sobre o ícone do sino no Header.
 - **Resultado esperado:**
   - O sistema redireciona o usuário para a página `/notifications`.
+
+---
+
+# Testes — Módulo de Pedidos (Order)
+
+## Mapeamento de interações
+
+Origem: `src/frontend/order/`, `src/frontend/services/orderClientService.ts`.
+
+| ID  | Interação                         | Componente              | API back-end                      |
+|-----|----------------------------------|--------------------------|-----------------------------------|
+| I12 | Visualizar itens do carrinho     | `CartPage.tsx`          | `GET /cart`                       |
+| I13 | Adicionar item ao carrinho       | `ProductPage.tsx`       | `POST /cart/items`               |
+| I14 | Remover item do carrinho         | `CartPage.tsx`          | `DELETE /cart/items/{id}`        |
+| I15 | Alterar quantidade do item        | `CartPage.tsx`          | `PUT /cart/items/{id}`           |
+| I16 | Finalizar compra (checkout)      | `CheckoutPage.tsx`      | `POST /orders`                   |
+| I17 | Visualizar pedidos realizados     | `OrdersPage.tsx`        | `GET /orders`                    |
+| I18 | Visualizar detalhes de um pedido  | `OrderDetailsPage.tsx`   | `GET /orders/{id}`              |
+
+---
+
+## Casos de teste
+
+
+### Order — I12: Carrinho
+
+#### TC-I12-01 · Listar itens do carrinho
+
+- **Pré-condições:**
+  - Usuário possui itens no carrinho.
+
+- **Passos:**
+  1. Acessar a página do carrinho (`/cart`).
+
+- **Resultado esperado:**
+  - Lista de produtos exibida com:
+    - Imagem
+    - Nome
+    - Preço unitário
+    - Quantidade
+    - Subtotal
+
+---
+
+### Order — I13: Adicionar ao carrinho
+
+#### TC-I13-01 · Adicionar produto ao carrinho
+
+- **Pré-condições:**
+  - Usuário está na página de produto.
+
+- **Passos:**
+  1. Clicar em “Adicionar ao carrinho”.
+
+- **Resultado esperado:**
+  - Produto é adicionado ao carrinho.
+  - Carrinho é atualizado corretamente.
+
+---
+
+### Order — I14: Remover item
+
+#### TC-I14-01 · Remover item do carrinho
+
+- **Pré-condições:**
+  - Carrinho possui pelo menos 1 item.
+
+- **Passos:**
+  1. Clicar no ícone de lixeira no item do carrinho.
+  2. Clicar em "Remover" no modal de confirmação.
+
+- **Resultado esperado:**
+  - Item é removido da lista.
+  - Total do carrinho é atualizado.
+
+---
+
+### Order — I15: Alterar quantidade
+
+#### TC-I15-01 · Aumentar quantidade
+
+- **Pré-condições:**
+  - Item presente no carrinho.
+
+- **Passos:**
+  1. Clicar no botão com ícone "+" do item.
+
+- **Resultado esperado:**
+  - Subtotal e total são atualizados corretamente.
+
+---
+
+#### TC-I15-02 · Diminuir quantidade
+
+- **Pré-condições:**
+  - Item com quantidade ≥ 2.
+
+- **Passos:**
+  1. Clicar no botão com icone "-" do item.
+
+- **Resultado esperado:**
+  - Quantidade atualiza corretamente sem valores negativos.
+
+---
+
+### Order — I16: Checkout
+
+#### TC-I16-01 · Finalizar compra com sucesso
+
+- **Pré-condições:**
+  - Carrinho possui itens.
+  - Usuário autenticado.
+
+- **Passos:**
+  1. Acessar checkout.
+  2. Preencher informações de endereço.
+  3. Confirmar compra.
+
+- **Resultado esperado:**
+  - Pedido é criado com sucesso.
+  - Carrinho é esvaziado.
+  - Usuário é redirecionado para confirmação.
+
+---
+
+### Order — I17: Lista de pedidos
+
+#### TC-I17-01 · Listar pedidos do usuário
+
+- **Pré-condições:**
+  - Usuário possui pedidos realizados.
+
+- **Passos:**
+  1. Acessar página `/orders`.
+
+- **Resultado esperado:**
+  - Lista de pedidos exibida com:
+    - ID do pedido
+    - Data
+    - Status
+    - Valor total
+
+---
+
+### Order — I18: Detalhes do pedido
+
+#### TC-I18-01 · Visualizar detalhes do pedido
+
+- **Pré-condições:**
+  - Usuário possui pedidos.
+
+- **Passos:**
+  1. Clicar em um pedido da lista.
+
+- **Resultado esperado:**
+  - Tela de detalhes exibida com:
+    - Itens do pedido
+    - Quantidade
+    - Preços
+    - Status do pedido
+
+---
+
+
+
 # Referências
 
 Inclua todas as referências (livros, artigos, sites, etc) utilizados no desenvolvimento do trabalho.
