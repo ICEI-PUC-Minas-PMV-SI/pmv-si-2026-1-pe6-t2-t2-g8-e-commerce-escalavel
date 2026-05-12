@@ -510,18 +510,12 @@ Origem: `src/frontend/order/`, `src/frontend/services/orderClientService.ts`.
   Origem: `src/frontend/catalog/pages/ProductsPage.jsx`,
   `src/frontend/services/api.js`. Página em `/products`.
 
-  | ID  | Interação                          | Componente                   |
-  API back-end                                                        |
-  |-----|------------------------------------|------------------------------|-
-  --------------------------------------------------------------------|
-  | I19 | Listar e filtrar produtos          | `ProductsPage.jsx`           |
-  `GET /catalog/products?name=&categoryId=&minPrice=&maxPrice=`       |
-  | I20 | Criar produto                      | `ProductModal` (admin)       |
-  `POST /catalog/products`                                            |
-  | I21 | Editar produto                     | `ProductModal` (admin)       |
-  `PUT /catalog/products/{id}`                                        |
-  | I22 | Deletar produto                    | `ConfirmModal` (admin)       |
-  `DELETE /catalog/products/{id}`                                     |
+  | ID  | Interação | Componente | API back-end                                                                         |
+  |-----|-----------|------------|------------                                                                          |
+  | I19 | Listar e filtrar produtos | `ProductsPage.jsx` | `GET /catalog/products?name=&categoryId=&minPrice=&maxPrice=` |
+  | I20 | Criar produto  | `ProductModal` (admin)| `POST /catalog/products`                                             |
+  | I21 | Editar produto | `ProductModal` (admin) | `PUT /catalog/products/{id}`                                        |
+  | I22 | Deletar produto | `ConfirmModal` (admin) | `DELETE /catalog/products/{id}`                                     |
 
   ### Casos de teste
 
@@ -652,14 +646,17 @@ Origem: `src/frontend/order/`, `src/frontend/services/orderClientService.ts`.
   Origem: `src/frontend/catalog/pages/CategoriesPage.jsx`,
   `src/frontend/services/api.js`. Página em `/categories`.
 
-  | ID  | Interação                              | Componente
-     | API back-end               |
-  |-----|----------------------------------------|----------------------------
-  ---|----------------------------|
-  | I23 | Listar categorias                      | `CategoriesPage.jsx`
-     | `GET /catalog/categories`  |
-  | I24 | Navegar para produtos de uma categoria | `CategoriesPage.jsx` (Link)
-     | —                          |
+ Testes — Módulo de Catálogo: Categorias
+Mapeamento de interações
+Origem: src/frontend/catalog/pages/CategoriesPage.jsx, src/frontend/services/api.js. Página em /categories.
+
+ | ID  | Interação                      | Componente           | API back-end|
+  |-----|--------------------------------|----------------------|---------------------------------------|
+  | I23 | Listar categorias              | `CategoriesPage.jsx` | `GET /catalog/categories`             |
+  | I24 | Listar produtos das categorias | `CategoriesPage.jsx` | `GET /products?categoryId={id}`       |
+  | I25 | Criar categoria                | `CategoriesPage.jsx` | `POST /catalog/categories`            |
+  | I26 | Editar categoria               | `CategoriesPage.jsx` | `PUT  /catalog/categories/{id}`        |
+  | I27 | Deletar categoria              | `CategoriesPage.jsx` | `DELETE /catalog/categories/{id}`     |
 
   ### Casos de teste
 
@@ -673,16 +670,14 @@ Origem: `src/frontend/order/`, `src/frontend/services/orderClientService.ts`.
   - **Passos:**
     1. Abrir `/categories`.
   - **Resultado esperado:**
-    - Grade exibe cartões com nome e descrição (quando disponível) de cada
-  categoria.
+    - Grade exibe cartões com nome e descrição (quando disponível) de cada categoria.
     - Cada cartão exibe o link **Ver produtos →**.
 
   ---
 
   #### Categorias — I24: Navegação
 
-  ##### TC-I24-01 · Clicar em categoria redireciona para lista de produtos
-  filtrada
+  ##### TC-I24-01 · Clicar em categoria redireciona para lista de produtos filtrada
 
   - **Pré-condições:**
     - Página `/categories` carregada com ≥ 1 categoria.
@@ -694,6 +689,72 @@ Origem: `src/frontend/order/`, `src/frontend/services/orderClientService.ts`.
 
   ---
 
+  #### Categorias — I25: Criar
+
+  ##### TC-I25-01 · Criar categoria com dados válidos
+
+  - **Pré-condições:**
+    - Back-end ativo.
+  - **Passos:**
+    1. Clicar em **+ Nova Categoria**.
+    2. Preencher Nome = `Calçados`.
+    3. Preencher Descrição = `Tênis, sapatos e sandálias`.
+    4. Clicar em **Criar categoria**.
+  - **Resultado esperado:**
+    - Modal fecha.
+    - Grid é atualizado e exibe o novo card `Calçados` no topo.
+
+  ##### TC-I25-02 · Tentar criar sem nome
+
+  - **Pré-condições:**
+    - Modal de criação aberto.
+  - **Passos:**
+    1. Deixar o campo Nome vazio.
+    2. Clicar em **Criar categoria**.
+  - **Resultado esperado:**
+    - Mensagem de erro "Nome é obrigatório." exibida; modal permanece aberto.
+
+  ---
+
+  #### Categorias — I26: Editar
+
+  ##### TC-I26-01 · Editar nome de uma categoria
+
+  - **Pré-condições:**
+    - Lista carregada com ≥ 1 categoria.
+  - **Passos:**
+    1. Passar o cursor sobre um card para revelar os botões de ação.
+    2. Clicar em **Editar**.
+    3. Alterar o nome para `Acessórios`.
+    4. Clicar em **Salvar alterações**.
+  - **Resultado esperado:**
+    - Modal fecha.
+    - Card exibe o nome atualizado `Acessórios`.
+
+  ---
+
+  #### Categorias — I27: Deletar
+
+  ##### TC-I27-01 · Deletar categoria com confirmação
+
+  - **Pré-condições:**
+    - Lista carregada com ≥ 1 categoria.
+  - **Passos:**
+    1. Passar o cursor sobre um card para revelar os botões de ação.
+    2. Clicar em **Deletar**.
+    3. Confirmar no modal de confirmação.
+  - **Resultado esperado:**
+    - Modal fecha.
+    - Card removido do grid.
+
+  ##### TC-I27-02 · Cancelar exclusão
+
+  - **Pré-condições:**
+    - Modal de confirmação de exclusão aberto.
+  - **Passos:**
+    1. Clicar em **Cancelar**.
+  - **Resultado esperado:**
+    - Modal fecha sem alterações no grid.
 
 
 ---
