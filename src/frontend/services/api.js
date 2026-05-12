@@ -52,6 +52,34 @@ export const catalogApi = {
     })
     if (!response.ok) throw new Error('Erro ao deletar produto')
   },
+
+  createCategory: async (data) => {
+    const response = await fetch(`${BASE_URL}/catalog/categories`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('token')}` },
+      body: JSON.stringify(data),
+    })
+    if (!response.ok) throw new Error('Erro ao criar categoria')
+    return response.json()
+  },
+
+  updateCategory: async (id, data) => {
+    const response = await fetch(`${BASE_URL}/catalog/categories/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('token')}` },
+      body: JSON.stringify(data),
+    })
+    if (!response.ok) throw new Error('Erro ao atualizar categoria')
+    return response.json()
+  },
+
+  deleteCategory: async (id) => {
+    const response = await fetch(`${BASE_URL}/catalog/categories/${id}`, {
+      method: 'DELETE',
+      headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
+    })
+    if (!response.ok) throw new Error('Erro ao deletar categoria')
+  },
 }
 const getHeaders = () => ({
   'Content-Type': 'application/json',
