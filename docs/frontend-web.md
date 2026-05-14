@@ -1,39 +1,132 @@
 # Front-end Web
 
-[Inclua uma breve descrição do projeto e seus objetivos.]
+Interface web do e-commerce escalável. SPA React que consome microsserviços via gateway único. Cobre catálogo, carrinho/pedidos, estoque (admin), notificações e contas de usuário.
 
 ## Projeto da Interface Web
 
-[Descreva o projeto da interface Web da aplicação, incluindo o design visual, layout das páginas, interações do usuário e outros aspectos relevantes.]
+SPA renderizada no cliente. Roteamento por `react-router-dom`. Cada módulo de negócio (catalog, stock, order, user, notification) tem pasta própria em `src/frontend/<modulo>/` com `pages/`, `components/` e rotas locais (`*Routes.tsx`) montadas em `App.tsx`. Estilização via Tailwind CSS v4 (utility-first); sem biblioteca de componentes — componentes próprios em `src/frontend/components/` (Toast, Modal, Header, etc.).
 
 ### Wireframes
 
-[Inclua os wireframes das páginas principais da interface, mostrando a disposição dos elementos na página.]
+#### Estoque — `/stock` (admin)
+
+![Wireframe Estoque](img/wireframe-stock.png)
+
+Elementos da tela:
+
+- **Header (topo):** logo, navegação (Catálogo, Estoque, Pedidos), sino de notificações com badge, avatar do usuário.
+- **Cabeçalho da página:** título "Estoque" e botão primário "+ Novo item".
+- **Busca:** input full-width filtrando por SKU, nome ou código.
+- **Tabela:** imagem | produto (nome + código + tamanho) | SKU (clicável para copiar) | Disponível | Reservado | Custo (BRL) | Ações (Reabastecer, Ajustar, Histórico).
+- **Modais:** Novo item (SKU UUID, quantidade, custo), Reabastecer (quantidade), Ajustar (delta, motivo).
+- **Drawer lateral (Histórico):** lista de movimentos com tipo, quantidade com sinal, data e — quando aplicável — pedido associado ou motivo.
+
+**Como implementar:**
+- Página em `src/frontend/stock/pages/stockListPage.tsx`.
+- Tabela alimentada por `GET /stock/detailed-items` via `stockClientService.getAllStockItemsDetailed()`.
+- Busca client-side com `useMemo` filtrando por `skuId`, `product.name`, `product.code`.
+- Modais (`CreateStockModal`, `RestockModal`, `AdjustModal`) controlados por estado local; `onSuccess` recebe o `StockItem` atualizado e faz merge na lista sem refetch.
+- Histórico como `HistoryDrawer` (overlay + painel à direita); carrega via `GET /stock/{skuId}/history` ao abrir.
 
 ### Design Visual
 
-[Descreva o estilo visual da interface, incluindo paleta de cores, tipografia, ícones e outros elementos gráficos.]
+| Item        | Definição                                                         |
+|-------------|-------------------------------------------------------------------|
+| Cores       | Tailwind defaults: `slate-*` (texto/bg), `indigo-600` (primary), `emerald-500` (sucesso), `rose-500` (erro/perigo), `amber-500` (alerta). |
+| Tipografia  | Stack `system-ui, sans-serif`. Pesos: 400 corpo, 600 títulos, 700 hero. Tamanhos via escala Tailwind (`text-sm` a `text-3xl`). |
+| Ícones      | `react-icons` (Feather/Heroicons via `Fi*`).                      |
+| Layout      | Container central `max-w-7xl mx-auto px-4`. Cards `rounded-2xl shadow-sm`. Modais via portal próprio, overlay `bg-black/40`. |
+| Moeda/data  | `Intl.NumberFormat('pt-BR', {style:'currency',currency:'BRL'})`, `Intl.DateTimeFormat('pt-BR')`. |
+| Feedback    | Toast (`components/Toast.tsx`) com tipos `success`/`error`/`info`, auto-dismiss. |
+
+**Como implementar:** classes utilitárias Tailwind direto no JSX. Sem CSS custom além de `index.css` (reset + variáveis Tailwind v4). Tokens visuais consistentes via reuso de classes (`btn-primary`, etc.) — não há config de tema custom; valores literais.
 
 ## Fluxo de Dados
 
-[Diagrama ou descrição do fluxo de dados na aplicação.]
+```
+React (browser)
+      │
+      │  fetch  →  VITE_API_URL
+      ▼
+Gateway Nginx — roteia por prefixo de URL
+      │
+      ├─► /api/catalog/*       → catalogapi
+      ├─► /api/stock/*         → stockapi
+      ├─► /api/orders/*        → orderapi   ──► reserve/confirm/release em stockapi
+      ├─► /api/users/*         → usersapi
+      ├─► /api/auth/*          → usersapi
+      └─► /api/notifications/* → notificationworker
+
+Estado no cliente:
+- useState/useEffect locais por página (sem Redux/Zustand).
+- Sessão (token + perfil) em LocalStorage, lido por authHeader().
+```
+
+**Como implementar:**
+- Camada de acesso em `src/frontend/services/*ClientService.ts` (um por domínio). Todas usam `HttpClient` (`services/httpClient.ts`) que injeta base URL, headers e faz parse de erro.
+- `VITE_API_URL` definido em `.env` aponta para o gateway. Frontend não conhece serviços individuais — só fala com o gateway.
+- Autenticação: `authHeader()` lê token do storage e devolve `{ Authorization: 'Bearer ...' }`.
+- Erros do backend chegam como JSON `{error, message}` — `HttpClient` lança `Error` com a mensagem; páginas exibem via Toast.
 
 ## Tecnologias Utilizadas
-[Lista das tecnologias principais que serão utilizadas no projeto.]
+
+| Camada          | Tecnologia                                  | Por quê                                       |
+|-----------------|---------------------------------------------|-----------------------------------------------|
+| UI framework    | React 19                                    | Equipe familiar; ecossistema maduro.          |
+| Build/dev       | Vite 8                                      | HMR rápido, build leve, TS nativo.            |
+| Linguagem       | TypeScript 5                                | Tipos compartilhados com DTOs do backend.     |
+| Roteamento      | react-router-dom 7                          | Rotas aninhadas por módulo.                   |
+| Estilo          | Tailwind CSS 4 (`@tailwindcss/vite`)        | Utility-first; zero CSS custom relevante.     |
+| Ícones          | react-icons                                 | Cobertura ampla (Feather, Hero, etc.).        |
+| HTTP            | `fetch` nativo + wrapper `HttpClient`       | Sem dependência extra (axios).                |
+| Lint            | ESLint 10 + typescript-eslint               | Regras hooks/refresh.                         |
+| Gateway         | Nginx (containerizado)                      | Único host:porta para a SPA; CORS evitado.    |
+
+**Como implementar:** `cd src/frontend && npm install && npm run dev` (porta 3000 ou 3001). Build de produção: `npm run build` (gera `dist/`).
 
 ## Considerações de Segurança
 
-[Discuta as considerações de segurança relevantes para a aplicação distribuída, como autenticação, autorização, proteção contra ataques, etc.]
+| Tópico               | Estado atual / como implementar                                                         |
+|----------------------|------------------------------------------------------------------------------------------|
+| Autenticação         | `POST /auth/login` → token JWT salvo em LocalStorage. `authHeader()` injeta em chamadas autenticadas. |
+| Autorização          | Rotas admin (`/stock`, `/admin/usuarios`) protegidas por `RequireAuth`/`RequireAdmin` (HOC em `user/`) que checam `role` do perfil decodificado. |
+| Transporte           | HTTPS obrigatório em produção (terminação no gateway). Em dev usa HTTP local.            |
+| CORS                 | Gateway expõe single-origin → sem CORS cross-domain no browser.                          |
+| XSS                  | React faz escape automático em `{}`; evitar `dangerouslySetInnerHTML`. Nenhum uso atual. |
+| Storage de token     | LocalStorage (aceitável para projeto acadêmico). Migrar para cookie httpOnly em produção. |
+| Validação            | Client valida campos antes de submit (CPF, e-mail, senha ≥ 8); backend revalida.         |
+| Erros sensíveis      | Mensagens do backend exibidas via Toast sem stack trace; logs detalhados ficam no servidor. |
 
 ## Implantação
 
-[Instruções para implantar a aplicação distribuída em um ambiente de produção.]
+Atualmente a aplicação roda apenas em ambiente local via Docker Compose. Implantação em produção (provedor de nuvem, domínio público, HTTPS) ainda não foi configurada e está fora do escopo desta etapa.
 
-1. Defina os requisitos de hardware e software necessários para implantar a aplicação em um ambiente de produção.
-2. Escolha uma plataforma de hospedagem adequada, como um provedor de nuvem ou um servidor dedicado.
-3. Configure o ambiente de implantação, incluindo a instalação de dependências e configuração de variáveis de ambiente.
-4. Faça o deploy da aplicação no ambiente escolhido, seguindo as instruções específicas da plataforma de hospedagem.
-5. Realize testes para garantir que a aplicação esteja funcionando corretamente no ambiente de produção.
+**Execução local:**
+
+1. Pré-requisitos: Docker Desktop e Node.js 20+ instalados.
+2. Na raiz do repositório, subir o stack completo:
+   ```
+   cd src
+   docker compose up -d
+   ```
+   Isso sobe gateway, banco, serviços de backend e RabbitMQ.
+3. Em outro terminal, rodar o frontend em modo dev (HMR):
+   ```
+   cd src/frontend
+   npm install
+   npm run dev
+   ```
+4. Acessar a aplicação no endereço informado pelo Vite (`http://localhost:3000` ou `:3001`).
+5. Build de produção local (gera `dist/`):
+   ```
+   npm run build
+   ```
+
+**Verificação após subir:**
+- Login com usuário cadastrado.
+- Abrir `/products` e confirmar que a lista carrega.
+- Abrir `/stock` como admin e confirmar que itens aparecem.
+- Adicionar item ao carrinho e finalizar pedido.
 
 ## Testes
 

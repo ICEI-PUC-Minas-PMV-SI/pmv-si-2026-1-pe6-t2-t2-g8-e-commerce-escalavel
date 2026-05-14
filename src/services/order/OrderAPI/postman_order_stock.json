@@ -1,0 +1,171 @@
+{
+  "info": {
+    "name": "Order x Stock Integration",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "gw", "value": "http://localhost:7000/api" },
+    { "key": "sku", "value": "4ee89568-951f-4442-93bd-c703350af1f3" },
+    { "key": "customer", "value": "11111111-1111-1111-1111-111111111111" },
+    { "key": "orderId", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "1. Baseline stock",
+      "request": {
+        "method": "GET",
+        "url": { "raw": "{{gw}}/stock/{{sku}}", "host": ["{{gw}}"], "path": ["stock", "{{sku}}"] }
+      }
+    },
+    {
+      "name": "2. Create order qty 2",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('200', () => pm.response.to.have.status(200));",
+              "const j = pm.response.json();",
+              "pm.collectionVariables.set('orderId', j.id);"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": { "raw": "{{gw}}/orders/", "host": ["{{gw}}"], "path": ["orders", ""] },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"customerId\": \"{{customer}}\",\n  \"items\": [\n    { \"skuId\": \"{{sku}}\", \"quantity\": 2 }\n  ]\n}"
+        }
+      }
+    },
+    {
+      "name": "3. Stock after create (reserved +2)",
+      "request": {
+        "method": "GET",
+        "url": { "raw": "{{gw}}/stock/{{sku}}", "host": ["{{gw}}"], "path": ["stock", "{{sku}}"] }
+      }
+    },
+    {
+      "name": "4. Pay order (PAID -> confirm)",
+      "request": {
+        "method": "PATCH",
+        "url": {
+          "raw": "{{gw}}/orders/{{orderId}}/status?status=PAID",
+          "host": ["{{gw}}"],
+          "path": ["orders", "{{orderId}}", "status"],
+          "query": [{ "key": "status", "value": "PAID" }]
+        }
+      }
+    },
+    {
+      "name": "5. Stock after PAID (reserved -2)",
+      "request": {
+        "method": "GET",
+        "url": { "raw": "{{gw}}/stock/{{sku}}", "host": ["{{gw}}"], "path": ["stock", "{{sku}}"] }
+      }
+    },
+    {
+      "name": "6. Insufficient stock -> 409",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": { "raw": "{{gw}}/orders/", "host": ["{{gw}}"], "path": ["orders", ""] },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"customerId\": \"{{customer}}\",\n  \"items\": [\n    { \"skuId\": \"{{sku}}\", \"quantity\": 9999 }\n  ]\n}"
+        }
+      }
+    },
+    {
+      "name": "7. Create order qty 1 (to cancel)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "const j = pm.response.json();",
+              "pm.collectionVariables.set('orderId', j.id);"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": { "raw": "{{gw}}/orders/", "host": ["{{gw}}"], "path": ["orders", ""] },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"customerId\": \"{{customer}}\",\n  \"items\": [\n    { \"skuId\": \"{{sku}}\", \"quantity\": 1 }\n  ]\n}"
+        }
+      }
+    },
+    {
+      "name": "8. Cancel order (release)",
+      "request": {
+        "method": "POST",
+        "url": {
+          "raw": "{{gw}}/orders/{{orderId}}/cancel",
+          "host": ["{{gw}}"],
+          "path": ["orders", "{{orderId}}", "cancel"]
+        }
+      }
+    },
+    {
+      "name": "9. Stock after cancel (reserved -1, avail +1)",
+      "request": {
+        "method": "GET",
+        "url": { "raw": "{{gw}}/stock/{{sku}}", "host": ["{{gw}}"], "path": ["stock", "{{sku}}"] }
+      }
+    },
+    {
+      "name": "10. Cancel after PAID -> 500 (out of scope)",
+      "request": {
+        "method": "POST",
+        "url": {
+          "raw": "{{gw}}/orders/{{orderId}}/cancel",
+          "host": ["{{gw}}"],
+          "path": ["orders", "{{orderId}}", "cancel"]
+        }
+      }
+    },
+    {
+      "name": "Aux: list orders",
+      "request": {
+        "method": "GET",
+        "url": { "raw": "{{gw}}/orders/", "host": ["{{gw}}"], "path": ["orders", ""] }
+      }
+    },
+    {
+      "name": "Aux: get order by id",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{gw}}/orders/{{orderId}}",
+          "host": ["{{gw}}"],
+          "path": ["orders", "{{orderId}}"]
+        }
+      }
+    },
+    {
+      "name": "Aux: manual stock release (cleanup orphan)",
+      "request": {
+        "method": "PUT",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": {
+          "raw": "{{gw}}/stock/{{sku}}/release/{{orderId}}",
+          "host": ["{{gw}}"],
+          "path": ["stock", "{{sku}}", "release", "{{orderId}}"]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{ \"quantity\": 1 }"
+        }
+      }
+    }
+  ]
+}
