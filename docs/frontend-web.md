@@ -434,140 +434,254 @@ Origem: `src/frontend/notification/`, `src/frontend/services/notificationApi.ts`
 
 ---
 
-# Testes — Módulo de Pedidos (Order)
+## Testes — Módulo de Pedidos (Order)
 
-## Mapeamento de interações
+### Mapeamento de interações
 
-Origem: `src/frontend/order/`, `src/frontend/services/orderClientService.ts`.
+Origem: `src/frontend/order/`, `src/frontend/services/orderApi.js`  
+Páginas: `/CartPage`, `/CheckoutPage`, `/OrdersPage`, `/orders/:id`
 
-| ID  | Interação                         | Componente              | API back-end                      |
-|-----|----------------------------------|--------------------------|-----------------------------------|
-| I12 | Visualizar itens do carrinho     | `CartPage.tsx`          | `GET /cart`                       |
-| I13 | Adicionar item ao carrinho       | `ProductPage.tsx`       | `POST /cart/items`               |
-| I14 | Remover item do carrinho         | `CartPage.tsx`          | `DELETE /cart/items/{id}`        |
-| I15 | Alterar quantidade do item        | `CartPage.tsx`          | `PUT /cart/items/{id}`           |
-| I16 | Finalizar compra (checkout)      | `CheckoutPage.tsx`      | `POST /orders`                   |
-| I17 | Visualizar pedidos realizados     | `OrdersPage.tsx`        | `GET /orders`                    |
-| I18 | Visualizar detalhes de um pedido  | `OrderDetailsPage.tsx`   | `GET /orders/{id}`              |
+| ID  | Interação                          | Componente              | API back-end |
+|-----|-----------------------------------|--------------------------|--------------|
+| I12 | Visualizar itens do carrinho      | `CartPage.tsx`          | `GET /cart` |
+| I13 | Adicionar item ao carrinho        | `ProductPage.tsx`       | `POST /cart/items` |
+| I14 | Remover item do carrinho          | `CartPage.tsx`          | `DELETE /cart/items/{id}` |
+| I15 | Alterar quantidade do item        | `CartPage.tsx`          | `PUT /cart/items/{id}` |
+| I16 | Finalizar compra (checkout)       | `CheckoutPage.tsx`      | `POST /orders` |
+| I17 | Listar pedidos do usuário         | `OrdersPage.tsx`        | `GET /orders/user/{userId}` |
+| I18 | Visualizar detalhes do pedido     | `OrderDetailsPage.tsx`  | `GET /orders/{id}` |
+| I19 | Cancelar pedido                   | `OrderDetailsPage.tsx`  | `POST /orders/{id}/cancel` |
 
 ---
 
-## Casos de teste
+### Casos de teste
 
+### Pedido — I12: Carrinho
 
-### Order — I12: Carrinho
-
-#### TC-I12-01 · Listar itens do carrinho
+#### TC-I12-01 · Listar itens do carrinho (com itens)
 
 - **Pré-condições:**
-  - Usuário possui itens no carrinho.
+  - Carrinho possui ≥ 1 item.
 
 - **Passos:**
-  1. Acessar a página do carrinho (`/cart`).
+  1. Acessar `/CartPage`.
 
 - **Resultado esperado:**
-  - Lista de produtos exibida com:
-    - Imagem
+  - Lista de itens exibida contendo:
+    - Imagem do produto
     - Nome
     - Preço unitário
     - Quantidade
-    - Subtotal
+    - Subtotal por item
+  - Total geral do carrinho calculado corretamente.
 
 ---
 
-### Order — I13: Adicionar ao carrinho
+#### TC-I12-02 · Carrinho vazio (empty state)
+
+- **Pré-condições:**
+  - Carrinho sem itens.
+
+- **Passos:**
+  1. Acessar `/CartPage`.
+
+- **Resultado esperado:**
+  - Mensagem de carrinho vazio exibida.
+  - Botão “Voltar as compras” visível.
+
+---
+
+### Pedido — I13: Adicionar ao carrinho
 
 #### TC-I13-01 · Adicionar produto ao carrinho
 
 - **Pré-condições:**
-  - Usuário está na página de produto.
+  - Produto disponível.
 
 - **Passos:**
-  1. Clicar em “Adicionar ao carrinho”.
+  1. Acessar `frontend/catalog/pages/ProductPage`.
+  2. Selecionar a quantidade, cor e tamanho do produto. 
+  3. Clicar em **Adicionar ao carrinho**.
 
 - **Resultado esperado:**
-  - Produto é adicionado ao carrinho.
-  - Carrinho é atualizado corretamente.
+  - Produto adicionado ao carrinho.
+  - Carrinho atualizado em tempo real.
+  - Modal informando que o produto foi adicionado ao carrinho
+  - Modal exibe botões "Ver carrinho" e "Continuar comprando"
 
 ---
 
-### Order — I14: Remover item
-
-#### TC-I14-01 · Remover item do carrinho
+#### TC-I13-02 · Produto já existente no carrinho
 
 - **Pré-condições:**
-  - Carrinho possui pelo menos 1 item.
+  - Produto já presente no carrinho.
 
 - **Passos:**
-  1. Clicar no ícone de lixeira no item do carrinho.
-  2. Clicar em "Remover" no modal de confirmação.
+  1. Clicar novamente em **Adicionar ao carrinho**.
 
 - **Resultado esperado:**
-  - Item é removido da lista.
-  - Total do carrinho é atualizado.
+  - Quantidade do item é incrementada.
+  - Nenhum item duplicado é criado.
 
 ---
 
-### Order — I15: Alterar quantidade
+### Pedido — I14: Remover item
 
-#### TC-I15-01 · Aumentar quantidade
+#### TC-I14-01 · Remover item com confirmação
 
 - **Pré-condições:**
-  - Item presente no carrinho.
+  - Carrinho possui ≥ 1 item.
 
 - **Passos:**
-  1. Clicar no botão com ícone "+" do item.
+  1. Acessar `/CartPage`.
+  2. Clicar no ícone de lixeira.
+  3. Confirmar remoção no modal.
 
 - **Resultado esperado:**
-  - Subtotal e total são atualizados corretamente.
+  - Item removido da lista.
+  - Total recalculado corretamente.
+  - UI atualizada imediatamente.
 
 ---
 
-#### TC-I15-02 · Diminuir quantidade
+#### TC-I14-02 · Cancelar remoção
 
 - **Pré-condições:**
-  - Item com quantidade ≥ 2.
+  - Modal de confirmação aberto.
 
 - **Passos:**
-  1. Clicar no botão com icone "-" do item.
+  1. Clicar em **Cancelar** ou fora do modal.
 
 - **Resultado esperado:**
-  - Quantidade atualiza corretamente sem valores negativos.
+  - Modal fechado.
+  - Nenhuma alteração no carrinho.
 
 ---
 
-### Order — I16: Checkout
+### Pedido — I15: Alterar quantidade
+
+#### TC-I15-01 · Incrementar quantidade
+
+- **Pré-condições:**
+  - Carrinho possui ≥ 1 item.
+
+- **Passos:**
+  1. Clicar em **+**.
+
+- **Resultado esperado:**
+  - Quantidade incrementada.
+  - Subtotal atualizado.
+  - Total recalculado.
+
+---
+
+#### TC-I15-02 · Decrementar quantidade
+
+- **Pré-condições:**
+  - Quantidade ≥ 2.
+
+- **Passos:**
+  1. Clicar em **-**.
+
+- **Resultado esperado:**
+  - Quantidade reduzida.
+  - Não permite valor menor que 1.
+  - Totais atualizados corretamente.
+
+---
+
+#### TC-I15-03 · Tentativa de reduzir abaixo de 1
+
+- **Pré-condições:**
+  - Quantidade = 1.
+
+- **Passos:**
+  1. Clicar em **-**.
+
+- **Resultado esperado:**
+  - Quantidade não é alterada.
+  - Nenhum erro exibido.
+
+---
+
+#### TC-I15-04 · Quantidade decrementada antes do checkout quando há ≥ 2 itens
+
+- **Pré-condições:**
+  - Carrinho possui ≥ 2 itens.
+
+- **Passos:**
+  1. Clicar em botão "check".
+
+- **Resultado esperado:**
+  - Quantidade decrementada.
+  - Subtotal atualizado.
+  - Total recalculado.
+
+#### TC-I15-05 · Remoção de item antes do checkout quando há 1 item
+
+- **Pré-condições:**
+  - Quantidade = 1.
+
+- **Passos:**
+  1. Clicar em botão "check".
+
+- **Resultado esperado:**
+  - Quantidade decrementada.
+  - Subtotal atualizado.
+  - Total recalculado.
+  - Impossibilidade de proseguir para o checkout.
+
+---
+
+### Pedido — I16: Checkout
 
 #### TC-I16-01 · Finalizar compra com sucesso
 
 - **Pré-condições:**
-  - Carrinho possui itens.
   - Usuário autenticado.
+  - Carrinho possui ≥ 1 item.
+  - Botão "check" marcado em `/CartPage`
 
 - **Passos:**
-  1. Acessar checkout.
-  2. Preencher informações de endereço.
+  1. Acessar `/CheckoutPage`.
+  2. Preencher formulário de informações pessoais.
   3. Confirmar compra.
 
 - **Resultado esperado:**
-  - Pedido é criado com sucesso.
-  - Carrinho é esvaziado.
-  - Usuário é redirecionado para confirmação.
+  - Pedido criado.
+  - Modal exibe mensagem "Pedido realizado com sucesso!"
+  - Item comprado é removido automaticamente de `CartPage` e enviado para `OrdersPage`.
+  - Usuário redirecionado para `/OrdersPage`.
 
 ---
 
-### Order — I17: Lista de pedidos
+#### TC-I16-02 · Checkout com carrinho vazio
+
+- **Pré-condições:**
+  - Carrinho vazio.
+
+- **Passos:**
+  1. Tentar acessar `/checkout`.
+
+- **Resultado esperado:**
+  - Usuário impedido de continuar.
+  - Redirecionamento ou mensagem de aviso.
+
+---
+
+### Pedido — I17: Listagem de pedidos
 
 #### TC-I17-01 · Listar pedidos do usuário
 
 - **Pré-condições:**
-  - Usuário possui pedidos realizados.
+  - Usuário autenticado.
+  - Usuário possui ≥ 1 pedidos.
 
 - **Passos:**
-  1. Acessar página `/orders`.
+  1. Acessar `/OrdersCard`.
 
 - **Resultado esperado:**
-  - Lista de pedidos exibida com:
+  - Lista exibida contendo:
     - ID do pedido
     - Data
     - Status
@@ -575,26 +689,67 @@ Origem: `src/frontend/order/`, `src/frontend/services/orderClientService.ts`.
 
 ---
 
-### Order — I18: Detalhes do pedido
-
-#### TC-I18-01 · Visualizar detalhes do pedido
+#### TC-I17-02 · Usuário sem pedidos (empty state)
 
 - **Pré-condições:**
-  - Usuário possui pedidos.
+  - Usuário autenticado.
+  - Usuário sem pedidos.
 
 - **Passos:**
-  1. Clicar em um pedido da lista.
+  1. Acessar `/OrdersCard`.
 
 - **Resultado esperado:**
-  - Tela de detalhes exibida com:
-    - Itens do pedido
-    - Quantidade
-    - Preços
-    - Status do pedido
+  - Mensagem “Você não tem pedidos.”.
+  - Exibição de botão "voltar a pagina inicial".
 
+#### TC-I17-03 · Excluir pedido
+
+- **Pré-condições:**
+  - Usuário autenticado.
+  - Usuário sem pedidos.
+  - Pedido com status diferente de "Entregue".
+
+- **Passos:**
+  1. Acessar `/OrdersCard`.
+  2. Clicar em "cancelar pedido"
+  3. Confirmar cancelamento de pedido
+
+- **Resultado esperado:**
+  - Pedido removido.
+  - Pagina atualizada.
+    
 ---
 
-  ---
+#### TC-I17-04 · Tentativa de cancelar pedido entregue
+
+- **Pré-condições:**
+  - Usuário autenticado.
+  - Pedido com status "Entregue".
+
+- **Passos:**
+  1. Acessar `/OrdersCard`.
+  2. Clicar em "cancelar pedido"
+
+- **Resultado esperado:**
+  - Exibição de mensagem "Pedidos já entregues não podem ser cancelados.".
+    
+---
+
+#### TC-I17-05 · Remover pedido cancelado
+
+- **Pré-condições:**
+  - Usuário autenticado.
+  - Pedido já cancelado.
+
+- **Passos:**
+  1. Acessar `/OrdersCard`.
+  2. Clicar em "Excluir pedido"
+
+- **Resultado esperado:**
+  - Pedido é removida da lista de cancelados.
+  - Pagina atualizada.
+
+---
 
   ## Testes — Módulo de Catálogo: Produtos
 
