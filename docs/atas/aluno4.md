@@ -12,12 +12,12 @@
 | 16/03 - 22/03 | APIs e Web Services - Unidade 2 | ✅ | Estudo do microfundamento | Estudo do microfundamento |
 | 23/03 - 29/03 | APIs e Web Services - Unidade 2 | ✅ | Estudo do microfundamento | Estudo do microfundamento |
 | 30/03 - 05/04 | Recuperação de Informação na Web e Redes Sociais - Unidade 1 | ✅ | Implementação das funcionalidades da OrderAPI | Implementação das funcionalidades da OrderAPI |
-| 06/04 - 12/04 | Recuperação de Informação na Web e Redes Sociais - Unidade 2 | ⬜ |  |  |
-| 13/04 - 19/04 | Computação Ubíqua e Pervasiva e IoT - Unidade 1 | ⬜ |  |  |
-| 20/04 - 26/04 | Computação Ubíqua e Pervasiva e IoT - Unidade 2 | ⬜ |  |  |
-| 27/04 - 03/05 | Desenvolvimento de Aplicações Móveis - Unidade 1 | ⬜ |  |  |
-| 04/05 - 10/05 | Desenvolvimento de Aplicações Móveis - Unidade 2 | ⬜ |  |  |
-| 11/05 - 17/05 | Desenvolvimento de Aplicações Móveis - Unidade 2 | ⬜ |  |  |
+| 06/04 - 12/04 | Recuperação de Informação na Web e Redes Sociais - Unidade 2 | ✅ | Implementação de novas funcionalidades da OrderAPI, testes e documentação | Implementação de novas funcionalidades da OrderAPI, testes e documentação |
+| 13/04 - 19/04 | Computação Ubíqua e Pervasiva e IoT - Unidade 1 | ✅ | Estudo das tecnologias frontend | Estudo das tecnologias frontend |
+| 20/04 - 26/04 | Computação Ubíqua e Pervasiva e IoT - Unidade 2 | ✅ | Estudo das tecnologias frontend | Estudo das tecnologias frontend |
+| 27/04 - 03/05 | Desenvolvimento de Aplicações Móveis - Unidade 1 | ✅ | Desenvolvimento do frontend order | Desenvolvimento do frontend order |
+| 04/05 - 10/05 | Desenvolvimento de Aplicações Móveis - Unidade 2 | ✅ | Desenvolvimento do frontend order e testes | Desenvolvimento do frontend order e testes |
+| 11/05 - 17/05 | Desenvolvimento de Aplicações Móveis - Unidade 2 | ✅ | Correção da documentação frontend | Correção da documentação frontend |
 | 18/05 - 24/05 | Fundamentos de Projeto e Análise de Algoritmos - Unidade 1 | ⬜ |  |  |
 | 25/05 - 31/05 | Fundamentos de Projeto e Análise de Algoritmos - Unidade 2 | ⬜ |  |  |
 | 01/06 - 07/06 |  | ⬜ |  |  |
