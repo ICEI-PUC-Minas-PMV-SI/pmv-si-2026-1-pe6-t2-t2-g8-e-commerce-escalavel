@@ -166,6 +166,7 @@ Origem: `src/frontend/stock/`, `src/frontend/services/stockClientService.ts`. P�
 - **Resultado esperado:**
   - Tabela exibe colunas: Produto, SKU, Disponível, Reservado, Custo, Ações.
   - Cada linha mostra imagem, nome, código/tamanho, quantidades e custo formatado em BRL.
+- **Evidência:** ![TC-I1-01](img/testes-front/stock/TC-I1-01.png)
 
 ---
 
@@ -179,6 +180,7 @@ Origem: `src/frontend/stock/`, `src/frontend/services/stockClientService.ts`. P�
   1. Digitar um trecho do SKU de um item no campo de busca.
 - **Resultado esperado:**
   - Tabela mantém apenas linhas cujo SKU contém o trecho informado.
+- **Evidência:** ![TC-I2-01](img/testes-front/stock/TC-I2-01.png)
 
 ##### TC-I2-02 · Filtrar por nome do produto
 
@@ -188,15 +190,17 @@ Origem: `src/frontend/stock/`, `src/frontend/services/stockClientService.ts`. P�
   1. Digitar parte do nome de um produto no campo de busca.
 - **Resultado esperado:**
   - Tabela exibe apenas itens cujo nome contém o trecho.
+- **Evidência:** ![TC-I2-02](img/testes-front/stock/TC-I2-02.png)
 
-##### TC-I2-03 · Filtrar por código do produto
+##### TC-I2-03 · Filtrar por SKU do produto
 
 - **Pré-condições:**
-  - Lista carregada com produtos que possuem `code` definido.
+  - Lista carregada com produtos que possuem `SKU` definido.
 - **Passos:**
   1. Digitar parte de um código no campo de busca.
 - **Resultado esperado:**
   - Tabela exibe apenas itens cujo código contém o trecho.
+- **Evidência:** ![TC-I2-03](img/testes-front/stock/TC-I2-03.png)
 
 ##### TC-I2-04 · Limpar busca
 
@@ -206,6 +210,7 @@ Origem: `src/frontend/stock/`, `src/frontend/services/stockClientService.ts`. P�
   1. Apagar o conteúdo do campo de busca.
 - **Resultado esperado:**
   - Tabela retorna ao conjunto completo de itens.
+- **Evidência:** ![TC-I2-04](img/testes-front/stock/TC-I1-01.png)
 
 ---
 
@@ -219,6 +224,7 @@ Origem: `src/frontend/stock/`, `src/frontend/services/stockClientService.ts`. P�
   1. Clicar sobre o SKU exibido em uma linha.
 - **Resultado esperado:**
   - Conteúdo do SKU é gravado no clipboard do sistema.
+- **Evidência:** ![TC-I3-01](img/testes-front/stock/TC-I3-01.png)
 
 ---
 
@@ -232,23 +238,15 @@ Origem: `src/frontend/stock/`, `src/frontend/services/stockClientService.ts`. P�
   1. Clicar em **Novo item**.
   2. Informar o SKU UUID válido.
   3. Definir Quantidade inicial = `10`.
-  4. Definir Custo = `19.90`.
+  4. Definir Custo = `40`.
   5. Clicar em **Criar**.
 - **Resultado esperado:**
   - Modal fecha.
   - Lista é recarregada e exibe o novo item com `quantityAvailable = 10` e custo R$ 19,90.
+- **Evidência:**
+  ![TC-I4-01](img/testes-front/stock/TC-I4-01.png)
+  ![TC-I4-01-B](img/testes-front/stock/TC-I4-01-B.png)
 
-##### TC-I4-02 · Resetar campos ao reabrir
-
-- **Pré-condições:**
-  - Modal aberto com campos preenchidos.
-- **Passos:**
-  1. Clicar em **Cancelar**.
-  2. Reabrir **Novo item**.
-- **Resultado esperado:**
-  - Campos retornam aos defaults: SKU vazio, quantidade `0`, custo `0`.
-
----
 
 #### Stock — I5: Reabastecer
 
@@ -263,17 +261,10 @@ Origem: `src/frontend/stock/`, `src/frontend/services/stockClientService.ts`. P�
 - **Resultado esperado:**
   - Modal fecha.
   - Linha do item passa a exibir `quantityAvailable = N + 5`.
+- **Evidência:**
+  ![TC-I5-01](img/testes-front/stock/TC-I5-01.png)
+  ![TC-I5-01-B](img/testes-front/stock/TC-I5-01-B.png)
 
-##### TC-I5-02 · SKU exibido bloqueado
-
-- **Pré-condições:**
-  - Modal de reabastecer aberto.
-- **Passos:**
-  1. Tentar editar o campo SKU.
-- **Resultado esperado:**
-  - Campo permanece somente-leitura, mostrando o SKU do item alvo.
-
----
 
 #### Stock — I6: Ajustar
 
@@ -289,6 +280,7 @@ Origem: `src/frontend/stock/`, `src/frontend/services/stockClientService.ts`. P�
 - **Resultado esperado:**
   - Modal fecha.
   - Linha do item passa a exibir `quantityAvailable = N + 3`.
+- **Evidência:** ![TC-I6-01](img/testes-front/stock/TC-I6-01.png)
 
 ##### TC-I6-02 · Ajuste negativo dentro do disponível
 
@@ -302,6 +294,7 @@ Origem: `src/frontend/stock/`, `src/frontend/services/stockClientService.ts`. P�
 - **Resultado esperado:**
   - Modal fecha.
   - Linha do item passa a exibir `quantityAvailable = N - 2`.
+- **Evidência:** ![TC-I6-02](img/testes-front/stock/TC-I6-02.png)
 
 ---
 
@@ -316,6 +309,7 @@ Origem: `src/frontend/stock/`, `src/frontend/services/stockClientService.ts`. P�
 - **Resultado esperado:**
   - Drawer lateral abre.
   - Lista exibe cada movimento com tipo, quantidade (com sinal) e data formatada em pt-BR.
+- **Evidência:** ![TC-I7](img/testes-front/stock/TC-I7.png)
 
 ##### TC-I7-02 · Movimento com pedido associado
 
@@ -325,6 +319,7 @@ Origem: `src/frontend/stock/`, `src/frontend/services/stockClientService.ts`. P�
   1. Abrir o histórico do SKU correspondente.
 - **Resultado esperado:**
   - Item do histórico exibe a linha `Pedido: <uuid>`.
+- **Evidência:** ![TC-I7](img/testes-front/stock/TC-I7.png)
 
 ##### TC-I7-03 · Movimento com motivo
 
@@ -334,6 +329,7 @@ Origem: `src/frontend/stock/`, `src/frontend/services/stockClientService.ts`. P�
   1. Abrir o histórico do SKU correspondente.
 - **Resultado esperado:**
   - Item do histórico exibe a linha `Motivo: <texto>`.
+- **Evidência:** ![TC-I7](img/testes-front/stock/TC-I7.png)
 
 ##### TC-I7-04 · Rótulos por tipo de movimento
 
@@ -343,26 +339,8 @@ Origem: `src/frontend/stock/`, `src/frontend/services/stockClientService.ts`. P�
   1. Abrir o histórico.
 - **Resultado esperado:**
   - Cada movimento exibe o rótulo PT-BR correspondente: Reserva, Liberação, Confirmação, Reabastecimento, Ajuste.
+- **Evidência:** ![TC-I7](img/testes-front/stock/TC-I7.png)
 
-##### TC-I7-05 · Fechar drawer
-
-- **Pré-condições:**
-  - Drawer aberto.
-- **Passos:**
-  1. Clicar no botão `×` do cabeçalho **ou** na área escurecida fora do painel.
-- **Resultado esperado:**
-  - Drawer fecha.
-
-##### TC-I7-06 · Reabrir mesmo SKU recarrega histórico
-
-- **Pré-condições:**
-  - Drawer fechado após visualização.
-- **Passos:**
-  1. Clicar em **Histórico** novamente na mesma linha.
-- **Resultado esperado:**
-  - Drawer abre e refaz a chamada de carga, exibindo a lista atualizada de movimentos.
-
----
 
 ## Testes — Módulo de Notificações (Notifications)
 
