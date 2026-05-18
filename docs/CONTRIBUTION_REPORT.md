@@ -13,17 +13,17 @@
 | Hugo Freitas          |        28 |       481 |        90 |         14 |             16 |               6 |
 | João Gabriel Perez    |        24 |      4555 |      1452 |         81 |              6 |               2 |
 | Nicolas               |         5 |      6350 |       876 |         80 |              1 |               1 |
-| Vitor Linas           |        31 |       940 |       279 |         16 |             12 |               3 |
+| Vitor Linas           |        32 |       940 |       279 |         17 |             13 |               3 |
 | gabriel               |        13 |      5514 |       752 |         75 |              0 |               0 |
 | gabrielcambraia       |        18 |       953 |        51 |          4 |             10 |               3 |
-| github-actions[bot]   |       115 |       856 |       837 |          3 |            110 |               1 |
+| github-actions[bot]   |       116 |       860 |       841 |          3 |            111 |               1 |
 | github-classroom[bot] |         1 |      2152 |         0 |         45 |              1 |              13 |
 | nicolaspborges96      |        60 |     31462 |      5151 |        283 |             21 |               5 |
 
 
 ## 📅 Contribuições Semanais (Todo o Semestre)
 
-**2026-05-11**: João Gabriel Perez: 2, Vitor Linas: 5, gabriel: 1, gabrielcambraia: 2, github-actions[bot]: 10, nicolaspborges96: 4
+**2026-05-11**: João Gabriel Perez: 2, Vitor Linas: 6, gabriel: 1, gabrielcambraia: 2, github-actions[bot]: 11, nicolaspborges96: 4
 
 **2026-05-04**: Dev-Vinicio: 6, João Gabriel Perez: 8, Vitor Linas: 12, gabriel: 2, gabrielcambraia: 3, github-actions[bot]: 30, nicolaspborges96: 6
 
