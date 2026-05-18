@@ -559,59 +559,6 @@ Cenarios de erro importantes:
 
 ---
 
-## NotificationService
-
-### Objetivos do Worker
-
-O NotificationService e responsavel por processar eventos de pedidos e realizar o envio de notificacoes de forma assincrona dentro da arquitetura distribuida.
-
-Objetivos principais:
-
-* Consumir eventos de pedidos via RabbitMQ.
-* Processar notificacoes de forma desacoplada.
-* Simular envio de e-mails para clientes.
-* Registrar notificacoes no banco de dados.
-
----
-
-### Modelagem da Aplicacao
-
-Entidades principais (schema `notifications`):
-
-* `notifications`: registro das notificacoes processadas (id, message, sentAt).
-
-Regras de negocio centrais:
-
-* Cada mensagem recebida gera um registro de notificacao.
-* O processamento e assincrono e nao depende de resposta imediata.
-* Mensagens invalidas nao devem gerar persistencia no banco.
-
----
-
-### Tecnologias Utilizadas
-
-* .NET 8 (Worker Service)
-* MassTransit
-* RabbitMQ
-* Entity Framework Core
-* PostgreSQL (Npgsql)
-
----
-
-### Arquitetura
-
-O NotificationService nao expoe endpoints HTTP, funcionando como um Worker que consome mensagens da fila RabbitMQ.
-
-Fluxo:
-
-1. Um evento e publicado na fila `notifications`
-2. O NotificationService consome a mensagem
-3. Processa o evento
-4. Salva no banco de dados
-5. Exibe log no console
-
----
-
 ### Estrutura da Mensagem
 
 Formato esperado:
@@ -1370,3 +1317,165 @@ Cenários de erro importantes:
 - `services/payment/Dockerfile`
 - `gateway/nginx.conf`
 
+
+
+
+----
+
+# NotificationService
+
+## Objetivos do Serviço
+
+O `NotificationService` é responsável por processar eventos dos demais serviços e disponibilizar notificações em tempo real para o frontend, dentro da arquitetura distribuída do e-commerce.
+
+**Objetivos principais:**
+
+- Consumir eventos de pedidos, pagamentos e estoque via RabbitMQ.
+- Persistir notificações no banco de dados PostgreSQL.
+- Expor endpoints HTTP para consumo pelo frontend React.
+- Suportar marcação de notificações como lidas.
+- Fornecer endpoints de demonstração para validação funcional.
+
+---
+
+## Modelagem da Aplicação
+
+### Entidade principal — tabela `Notifications`
+
+| Campo | Tipo | Descrição |
+|---|---|---|
+| `Id` | int | Identificador único (auto-incremento) |
+| `Title` | string | Título da notificação |
+| `Message` | string | Corpo da mensagem |
+| `Type` | string | Categoria: `info`, `success`, `warning`, `error` |
+| `IsRead` | bool | Indica se foi lida pelo usuário |
+| `CreatedAt` | DateTime | Data e hora de criação (UTC) |
+
+### Eventos de integração consumidos via RabbitMQ
+
+| Evento | Fila | Tipo gerado |
+|---|---|---|
+| `OrderCreatedEvent` | `fila-notificacoes-geral` | `info` |
+| `PaymentConfirmedEvent` | `fila-notificacoes-geral` | `success` |
+| `StockLowEvent` | `fila-notificacoes-geral` | `warning` |
+
+---
+
+## Endpoints HTTP
+
+### Consulta e ações
+
+| Método | Rota | Descrição |
+|---|---|---|
+| `GET` | `/api/notifications` | Lista todas as notificações (mais recentes primeiro) |
+| `GET` | `/api/notifications/unread-count` | Retorna contagem de não lidas `{ count: N }` |
+| `PUT` | `/api/notifications/mark-all-read` | Marca todas as notificações como lidas |
+
+### Endpoints de demonstração
+
+> Utilizados para validação funcional sem dependência do RabbitMQ.
+
+| Método | Rota | Notificação gerada |
+|---|---|---|
+| `POST` | `/api/demo/login` | Novo login detectado (`info`) |
+| `POST` | `/api/demo/order` | Pedido criado (`info`) |
+| `POST` | `/api/demo/payment` | Pagamento aprovado (`success`) |
+| `POST` | `/api/demo/stock` | Alerta de estoque baixo (`warning`) |
+
+---
+
+## Tecnologias Utilizadas
+
+- .NET 8 (Minimal API)
+- MassTransit 8.2
+- RabbitMQ
+- Entity Framework Core 8
+- PostgreSQL (Npgsql)
+- Swashbuckle (Swagger UI)
+
+---
+
+## Arquitetura
+
+```
+Outros Serviços              NotificationService            Frontend (React)
+(Order, Payment,   ──────►  ┌──────────────────────┐  ◄── polling 5s
+ Stock)                     │  RabbitMQ Consumer    │
+       │                    │  (MassTransit)        │      🔔 NotificationBell
+       │  publica evento     │         ↓             │      📄 NotificationPage
+       └────────────────►   │  PostgreSQL (EF Core)  │
+                            │         ↓             │
+                            │  GET /api/notifications│──► lista completa
+                            │  GET /unread-count    │──► badge do sino
+                            │  PUT /mark-all-read   │──► marcar lidas
+                            │  POST /demo/*         │──► demo ao vivo
+                            └──────────────────────┘
+```
+
+**Fluxo principal:**
+
+1. Um serviço publica um evento na fila `fila-notificacoes-geral`
+2. O `NotificationConsumer` consome a mensagem via MassTransit
+3. A notificação é persistida no banco PostgreSQL
+4. O frontend faz polling a cada 5 segundos em `GET /api/notifications`
+5. O sino e a página são atualizados automaticamente
+
+---
+
+## Tecnologias e Infraestrutura
+
+### Variáveis de ambiente
+
+| Variável | Descrição | Padrão (dev local) |
+|---|---|---|
+| `ConnectionStrings__Default` | String de conexão PostgreSQL | `Host=localhost;Database=ecommerce;Username=ecom;Password=ecom123` |
+| `RabbitMQ__Host` | Host do RabbitMQ | `localhost` |
+
+### Dependências de infraestrutura
+
+- PostgreSQL ativo e acessível
+- RabbitMQ ativo (opcional — serviço sobe mesmo sem ele, apenas sem consumo de filas)
+
+---
+
+## Comandos principais
+
+```bash
+# Subir banco isolado para desenvolvimento
+docker run -d --name postgres_notif \
+  -e POSTGRES_DB=ecommerce \
+  -e POSTGRES_USER=ecom \
+  -e POSTGRES_PASSWORD=ecom123 \
+  -p 5432:5432 postgres:16-alpine
+
+# Rodar o serviço localmente
+dotnet run
+
+# Subir via Docker Compose (projeto completo)
+docker compose up --build notification-service
+```
+
+---
+
+## Considerações de Segurança
+
+**Estado atual:**
+- Não há autenticação ou autorização aplicada nos endpoints.
+- O serviço consome mensagens diretamente da fila sem validação de origem.
+
+**Recomendações:**
+- Implementar autenticação JWT nos endpoints de leitura/escrita.
+- Filtrar notificações por usuário autenticado.
+- Validar integridade das mensagens recebidas via RabbitMQ.
+
+---
+
+## Referências
+
+- `src/services/notification/Program.cs`
+- `src/services/notification/NotificationService.csproj`
+- `src/services/notification/Dockerfile`
+- `src/frontend/notification/NotificationPage.tsx`
+- `src/frontend/notification/NotificationBell.jsx`
+- `src/frontend/notification/NotificationRoutes.jsx`
+- `docker-compose.yml`
