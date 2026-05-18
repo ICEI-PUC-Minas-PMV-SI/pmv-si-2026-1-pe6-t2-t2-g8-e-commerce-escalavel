@@ -1354,7 +1354,7 @@ Inclua todas as referências (livros, artigos, sites, etc) utilizados no desenvo
   - O sistema redireciona o usuário para a página `/notifications`.
   - A lista de notificações é carregada corretamente.
 - **Evidência:**
-![TC-I7](img/testes-front/stock/TC-I7.png)
+![TC-I7](img/evidenciaNotification.png)
 
 ---
 
