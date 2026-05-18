@@ -341,75 +341,6 @@ Origem: `src/frontend/stock/`, `src/frontend/services/stockClientService.ts`. P�
   - Cada movimento exibe o rótulo PT-BR correspondente: Reserva, Liberação, Confirmação, Reabastecimento, Ajuste.
 - **Evidência:** ![TC-I7](img/testes-front/stock/TC-I7.png)
 
-
-## Testes — Módulo de Notificações (Notifications)
-
-### Mapeamento de interações
-
-Origem: `src/frontend/notification/`, `src/frontend/services/notificationApi.ts`. Página única em `/notifications`.
-
-| ID | Interação | Componente | API back-end |
-|-----|--------------------------------------|------------------------------------------|---------------------------------------|
-| I8 | Listar notificações do usuário | `NotificationPage.tsx` | `GET /notifications` |
-| I9 | Exibir contador de não lidas (Badge) | `NotificationBell.tsx` | `GET /notifications/unread-count` |
-| I10 | Marcar notificação como lida | `NotificationPage.tsx` | `PATCH /notifications/{id}/read` |
-| I11 | Redirecionamento para a central | `Header.tsx` (Link no sino) | — |
-
-### Casos de teste
-
-#### Notifications — I8: Listagem
-
-##### TC-I8-01 · Carregar lista de notificações
-
-- **Pré-condições:**
-  - Back-end ativo.
-  - Usuário autenticado possui notificações enviadas.
-- **Passos:**
-  1. Abrir a página `/notifications`.
-- **Resultado esperado:**
-  - A tela exibe cards com: Mensagem, Data de recebimento e Status.
-  - Notificações não lidas possuem destaque visual diferenciado das lidas.
-
----
-
-#### Notifications — I9: Contador
-
-##### TC-I9-01 · Visualizar badge no Header
-
-- **Pré-condições:**
-  - Usuário possui ≥ 1 notificação não lida.
-- **Passos:**
-  1. Observar o ícone de sino no cabeçalho em qualquer página.
-- **Resultado esperado:**
-  - Badge vermelho exibe o numeral correspondente ao total de mensagens pendentes.
-
----
-
-#### Notifications — I10: Ações
-
-##### TC-I10-01 · Alterar status para lido
-
-- **Pré-condições:**
-  - Lista carregada com notificações não lidas.
-- **Passos:**
-  1. Clicar em "Marcar como lida" em um item da lista.
-- **Resultado esperado:**
-  - O card da notificação perde o destaque de "nova".
-  - O contador no Header (Badge) é atualizado subtraindo 1 unidade.
-
----
-
-#### Notifications — I11: Navegação
-
-##### TC-I11-01 · Acesso via cabeçalho
-
-- **Pré-condições:**
-  - Usuário logado em qualquer rota do sistema.
-- **Passos:**
-  1. Clicar sobre o ícone do sino no Header.
-- **Resultado esperado:**
-  - O sistema redireciona o usuário para a página `/notifications`.
-
 ---
 
 ## Testes — Módulo de Pedidos (Order)
@@ -1302,3 +1233,154 @@ Origem: `src/frontend/user/pages/`, `src/frontend/services/userApi.ts`.
 # Referências
 
 Inclua todas as referências (livros, artigos, sites, etc) utilizados no desenvolvimento do trabalho.
+
+
+---
+
+# Testes — Módulo de Notificações (Notifications)
+
+## Mapeamento de interações
+
+**Origem:** `src/frontend/notification/`, `src/services/notification/Program.cs`  
+**Página principal:** `/notifications`
+
+| ID | Interação | Componente | API back-end |
+|---|---|---|---|
+| I8 | Listar notificações do usuário | `NotificationPage.tsx` | `GET /api/notifications` |
+| I9 | Exibir contador de não lidas (Badge) | `NotificationBell.jsx` | `GET /api/notifications/unread-count` |
+| I10 | Marcar todas as notificações como lidas | `NotificationPage.tsx` | `PUT /api/notifications/mark-all-read` |
+| I11 | Redirecionamento para a central | `Header` (sino) | — |
+
+> **Observação:** A implementação atual marca **todas** as notificações como lidas de uma vez (`mark-all-read`), não individualmente.
+
+---
+
+## Casos de teste
+
+#### Notifications — I8: Listagem
+
+##### TC-I8-01 · Carregar lista de notificações
+
+- **Pré-condições:**
+  - Back-end (`NotificationService`) ativo em `http://localhost:5000`.
+  - Ao menos uma notificação registrada no banco.
+- **Passos:**
+  1. Abrir a página `/notifications`.
+- **Resultado esperado:**
+  - A tela exibe cards com: Título, Mensagem, Data de recebimento e Tipo (`info`, `success`, `warning`).
+  - Notificações não lidas possuem destaque visual com ponto azul e opacidade plena.
+  - Notificações lidas aparecem com opacidade reduzida (60%).
+  - O rodapé do card exibe a data/hora formatada em pt-BR.
+
+---
+
+##### TC-I8-02 · Atualização automática por polling
+
+- **Pré-condições:**
+  - Back-end ativo.
+  - Página `/notifications` aberta no navegador.
+- **Passos:**
+  1. Sem recarregar a página, disparar uma nova notificação via `POST /api/demo/payment`.
+  2. Aguardar até 5 segundos.
+- **Resultado esperado:**
+  - O novo card aparece automaticamente no topo da lista sem necessidade de recarregar a página.
+  - O texto "Atualizado às HH:MM:SS · atualiza a cada 5s" é atualizado.
+
+---
+
+##### TC-I8-03 · Estado com backend indisponível
+
+- **Pré-condições:**
+  - Back-end inativo.
+- **Passos:**
+  1. Abrir a página `/notifications` com o serviço parado.
+- **Resultado esperado:**
+  - Exibe mensagem de erro: `⚠ Sem conexão com o servidor. Tentando reconectar...`
+  - Notificações previamente carregadas permanecem visíveis (não são apagadas).
+
+---
+
+#### Notifications — I9: Contador
+
+##### TC-I9-01 · Visualizar badge no Header
+
+- **Pré-condições:**
+  - Back-end ativo.
+  - Usuário possui ≥ 1 notificação não lida.
+- **Passos:**
+  1. Observar o ícone de sino no cabeçalho em qualquer página.
+- **Resultado esperado:**
+  - Badge vermelho exibe o numeral correspondente ao total de notificações não lidas.
+  - O badge atualiza automaticamente a cada 5 segundos sem recarregar a página.
+
+---
+
+##### TC-I9-02 · Badge ausente sem notificações não lidas
+
+- **Pré-condições:**
+  - Todas as notificações marcadas como lidas ou banco vazio.
+- **Passos:**
+  1. Observar o ícone de sino no cabeçalho.
+- **Resultado esperado:**
+  - O sino é exibido sem badge vermelho.
+
+---
+
+#### Notifications — I10: Ações
+
+##### TC-I10-01 · Marcar todas como lidas
+
+- **Pré-condições:**
+  - Lista carregada com ao menos uma notificação não lida.
+- **Passos:**
+  1. Verificar que o botão `Marcar todas como lidas (N)` está visível no cabeçalho da página.
+  2. Clicar no botão.
+- **Resultado esperado:**
+  - Todos os cards perdem o destaque visual de "não lida" (ponto azul some, opacidade reduz).
+  - O botão "Marcar todas como lidas" desaparece da interface.
+  - O badge do sino no Header é zerado.
+
+---
+
+#### Notifications — I11: Navegação
+
+##### TC-I11-01 · Acesso via cabeçalho
+
+- **Pré-condições:**
+  - Usuário em qualquer rota do sistema.
+- **Passos:**
+  1. Clicar sobre o ícone do sino no Header.
+- **Resultado esperado:**
+  - O sistema redireciona o usuário para a página `/notifications`.
+  - A lista de notificações é carregada corretamente.
+- **Evidência:**
+![TC-I7](img/testes-front/stock/TC-I7.png)
+
+---
+
+## Fluxo de validação funcional (demo)
+
+Para validar o módulo completo sem depender dos demais serviços:
+
+```powershell
+# 1. Disparar eventos de demonstração
+Invoke-WebRequest -Uri http://localhost:5000/api/demo/login   -Method POST
+Invoke-WebRequest -Uri http://localhost:5000/api/demo/order   -Method POST
+Invoke-WebRequest -Uri http://localhost:5000/api/demo/payment -Method POST
+Invoke-WebRequest -Uri http://localhost:5000/api/demo/stock   -Method POST
+
+# 2. Verificar resposta da API
+# Acessar no navegador: http://localhost:5000/api/notifications
+```
+
+**Resultado esperado:** 4 notificações retornadas em JSON, visíveis em `http://localhost:3000/notifications`.
+
+---
+
+## Referências
+
+- `src/services/notification/Program.cs`
+- `src/frontend/notification/NotificationPage.tsx`
+- `src/frontend/notification/NotificationBell.jsx`
+- `src/frontend/notification/NotificationRoutes.jsx`
+- `src/frontend/App.tsx`
