@@ -12,6 +12,7 @@ import UserRoutes from './user/UserRoutes'
 import OrderRoutes from './Order/OrderRoutes'
 
 import StockRoutes from './stock/StockRoutes'
+import NotificationRoutes from './notification/NotificationRoutes'
 
 export default function App() {
   return (
@@ -26,6 +27,7 @@ export default function App() {
             {UserRoutes}
             {OrderRoutes}
             {StockRoutes}
+            {NotificationRoutes}
           </Routes>
         </UIProvider>
       </CartProvider>
