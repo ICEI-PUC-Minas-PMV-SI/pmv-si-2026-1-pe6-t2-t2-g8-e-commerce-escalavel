@@ -10,11 +10,34 @@ This is an [Expo](https://expo.dev) project created with [`create-expo-app`](htt
    npm install
    ```
 
-2. Start the app
+2. Configure the API URL
+
+   Copy `.env.example` to `.env` and adjust `EXPO_PUBLIC_API_URL`:
+
+   ```bash
+   cp .env.example .env
+   ```
+
+   - Web/simulator/emulator: `http://localhost:7000/api` (default).
+   - Physical device on the same Wi-Fi: use the dev machine LAN IP, e.g. `http://192.168.1.42:7000/api`.
+
+   The backend gateway must be running on port `7000` (see repo-level local stack notes).
+
+3. Start the app
 
    ```bash
    npx expo start
    ```
+
+## Project layout
+
+- `app/` — expo-router screens (file-based routing). Keep business logic OUT of this folder.
+- `src/config/` — runtime config (API URL).
+- `src/services/` — HTTP client and per-module API services (`catalogService`, `stockService`).
+- `src/types/` — shared TS types mirrored from the web frontend.
+- `src/components/` — reusable presentational components.
+
+The `@/*` path alias resolves to the `src/mobile/` root, so imports look like `@/src/services/catalogService`.
 
 In the output, you'll find options to open the app in a
 
