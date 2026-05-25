@@ -2,6 +2,7 @@ import { useEffect, useState } from "react"
 import { useParams, useNavigate } from "react-router-dom"
 import { catalogApi } from "../../services/api"
 import { useCart } from "../../contexts/CartContext"
+import { resolveImageUri } from "../../shared/helpers/imageResolver"
 
 const PRICE_FORMATTER = new Intl.NumberFormat("pt-BR", {
     style: "currency",
@@ -74,7 +75,9 @@ export default function ProductDetails() {
 
             {/* IMAGEM */}
             <div className="border bg-gray-50 aspect-square flex items-center justify-center">
-                <img src={product.urlImg} className="w-full h-full object-cover" />
+                {resolveImageUri(product.urlImg)
+                    ? <img src={resolveImageUri(product.urlImg)} alt={product.name} className="w-full h-full object-cover" />
+                    : <span className="text-gray-300 text-6xl">◻</span>}
             </div>
 
             {/* INFO */}

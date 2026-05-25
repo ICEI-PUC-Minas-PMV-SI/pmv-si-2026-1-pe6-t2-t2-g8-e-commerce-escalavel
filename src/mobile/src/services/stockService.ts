@@ -9,36 +9,85 @@ import type {
 } from '@/src/types/stock';
 import { HttpClient, authHeader } from './httpClient';
 
-// Stubs only — surface area matches src/frontend/services/stockClientService.ts.
-// Bodies will be implemented in the upcoming stock module work.
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const http = new HttpClient(API_URL);
 
-function notImplemented(method: string): never {
-  throw new Error(`stockService.${method} not implemented`);
+type Envelope<T> = { data?: T };
+
+function unwrapArray<T>(payload: T[] | Envelope<T[]>): T[] {
+  if (Array.isArray(payload)) return payload;
+  const inner = (payload as Envelope<T[]>)?.data;
+  return Array.isArray(inner) ? inner : [];
+}
+
+function unwrapObject<T>(payload: T | Envelope<T>, fallback: T): T {
+  if (payload && typeof payload === 'object' && 'data' in (payload as object)) {
+    const inner = (payload as Envelope<T>).data;
+    return inner ?? fallback;
+  }
+  return (payload as T) ?? fallback;
 }
 
 export const stockService = {
-  list(_signal?: AbortSignal): Promise<StockItem[]> {
-    notImplemented('list');
+  async list(signal?: AbortSignal): Promise<StockItem[]> {
+    const raw = await http.get<StockItem[] | Envelope<StockItem[]>>('/stock/', {
+      signal,
+      headers: authHeader(),
+    });
+    return unwrapArray<StockItem>(raw);
   },
-  listDetailed(_signal?: AbortSignal): Promise<StockItemDetailed[]> {
-    notImplemented('listDetailed');
+
+  async listDetailed(signal?: AbortSignal): Promise<StockItemDetailed[]> {
+    const raw = await http.get<StockItemDetailed[] | Envelope<StockItemDetailed[]>>(
+      '/stock/detailed-items',
+      { signal, headers: authHeader() }
+    );
+    return unwrapArray<StockItemDetailed>(raw);
   },
-  getBySku(_skuId: string, _signal?: AbortSignal): Promise<StockItem | null> {
-    notImplemented('getBySku');
+
+  async getBySku(skuId: string, signal?: AbortSignal): Promise<StockItem | null> {
+    try {
+      const raw = await http.get<StockItem | Envelope<StockItem>>(`/stock/${skuId}`, {
+        signal,
+        headers: authHeader(),
+      });
+      return unwrapObject<StockItem>(raw, null as unknown as StockItem) || null;
+    } catch (err) {
+      if (err instanceof Error && /404/.test(err.message)) return null;
+      throw err;
+    }
   },
-  create(_payload: CreateStockPayload): Promise<StockItem> {
-    notImplemented('create');
+
+  async create(payload: CreateStockPayload): Promise<StockItem> {
+    const raw = await http.post<StockItem | Envelope<StockItem>>('/stock/', payload, {
+      headers: authHeader(),
+    });
+    return unwrapObject<StockItem>(raw, raw as StockItem);
   },
-  restock(_skuId: string, _payload: RestockPayload): Promise<StockItem> {
-    notImplemented('restock');
+
+  async restock(skuId: string, payload: RestockPayload): Promise<StockItem> {
+    const raw = await http.put<StockItem | Envelope<StockItem>>(
+      `/stock/${skuId}/restock`,
+      payload,
+      { headers: authHeader() }
+    );
+    return unwrapObject<StockItem>(raw, raw as StockItem);
   },
-  adjust(_skuId: string, _payload: AdjustPayload): Promise<StockItem> {
-    notImplemented('adjust');
+
+  async adjust(skuId: string, payload: AdjustPayload): Promise<StockItem> {
+    const raw = await http.put<StockItem | Envelope<StockItem>>(
+      `/stock/${skuId}/adjust`,
+      payload,
+      { headers: authHeader() }
+    );
+    return unwrapObject<StockItem>(raw, raw as StockItem);
   },
-  history(_skuId: string, _signal?: AbortSignal): Promise<StockMovement[]> {
-    notImplemented('history');
+
+  async history(skuId: string, signal?: AbortSignal): Promise<StockMovement[]> {
+    const raw = await http.get<StockMovement[] | Envelope<StockMovement[]>>(
+      `/stock/${skuId}/history`,
+      { signal, headers: authHeader() }
+    );
+    return unwrapArray<StockMovement>(raw);
   },
 };
 

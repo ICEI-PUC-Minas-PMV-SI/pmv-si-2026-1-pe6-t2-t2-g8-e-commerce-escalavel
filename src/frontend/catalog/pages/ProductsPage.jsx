@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { catalogApi } from '../../services/api'
 import { useAuth } from '../../contexts/AuthContext'
+import { resolveImageUri } from '../../shared/helpers/imageResolver'
 
 const PRICE_FORMATTER = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' })
 const EMPTY_FILTERS = { name: '', categoryId: '', minPrice: '', maxPrice: '' }
@@ -164,6 +165,7 @@ function ProductCard({ product, isAdmin, onEdit, onDelete }) {
   const [imgFailed, setImgFailed] = useState(false)
   const price = getDisplayPrice(product)
   const productLink = product?.id ? `/products/${product.id}` : '/products'
+  const resolvedImg = resolveImageUri(product?.urlImg)
 
   return (
     <Link to={productLink} className="group flex flex-col border border-gray-100 hover:border-black transition-colors duration-200 relative">
@@ -181,8 +183,8 @@ function ProductCard({ product, isAdmin, onEdit, onDelete }) {
       )}
 
       <div className="w-full aspect-square bg-gray-50 overflow-hidden">
-        {product.urlImg && !imgFailed ? (
-          <img src={product.urlImg} alt={product.name}
+        {resolvedImg && !imgFailed ? (
+          <img src={resolvedImg} alt={product.name}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
             onError={() => setImgFailed(true)} />
         ) : (
