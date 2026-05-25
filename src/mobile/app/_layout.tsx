@@ -17,7 +17,22 @@ export default function RootLayout() {
             contentStyle: { backgroundColor: paperTheme.colors.background },
           }}
         >
-          <Stack.Screen name="index" options={{ title: 'Loja' }} />
+          {/* Shell owns the bottom bar + per-scene headers. */}
+          <Stack.Screen name="index" options={{ headerShown: false }} />
+          <Stack.Screen name="stock" options={{ title: 'Estoque' }} />
+          <Stack.Screen
+            name="stock/create"
+            options={{ title: 'Novo item', presentation: 'modal' }}
+          />
+          <Stack.Screen
+            name="stock/restock"
+            options={{ title: 'Reabastecer', presentation: 'modal' }}
+          />
+          <Stack.Screen
+            name="stock/adjust"
+            options={{ title: 'Ajustar', presentation: 'modal' }}
+          />
+          <Stack.Screen name="stock/history" options={{ title: 'Histórico' }} />
         </Stack>
       </PaperProvider>
     </SafeAreaProvider>

@@ -9,6 +9,7 @@ import CreateStockModal from '../components/CreateStockModal'
 import RestockModal from '../components/RestockModal'
 import AdjustModal from '../components/AdjustModal'
 import HistoryDrawer from '../components/HistoryDrawer'
+import { resolveImageUri } from '../../shared/helpers/imageResolver'
 
 const PRICE_FORMATTER = new Intl.NumberFormat('pt-BR', {
   style: 'currency',
@@ -141,10 +142,10 @@ export default function StockListPage() {
                       <td className="px-4 py-2">
                         <div className="flex items-center gap-3">
                           <div className="h-20 w-20 flex-shrink-0 overflow-hidden rounded-md border border-gray-200 bg-gray-50">
-                            {p?.urlImg ? (
+                            {resolveImageUri(p?.urlImg) ? (
                               <img
-                                src={p.urlImg}
-                                alt={p.name ?? 'produto'}
+                                src={resolveImageUri(p?.urlImg) as string}
+                                alt={p?.name ?? 'produto'}
                                 className="h-full w-full object-cover"
                                 loading="lazy"
                                 onError={(e) => {

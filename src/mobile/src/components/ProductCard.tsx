@@ -1,7 +1,9 @@
 import { Image } from 'expo-image';
+import { useState } from 'react';
 import { View } from 'react-native';
 import { Card, Icon, Text, useTheme } from 'react-native-paper';
 
+import { resolveImageUri } from '@/shared/helpers';
 import type { Product } from '@/src/types/catalog';
 
 import { styles } from './ProductCard.styles';
@@ -27,6 +29,9 @@ type Props = {
 export function ProductCard({ product, onPress }: Props) {
   const theme = useTheme();
   const price = minPrice(product);
+  const imageUri = resolveImageUri(product.urlImg);
+  const [imageFailed, setImageFailed] = useState(false);
+  const showImage = imageUri && !imageFailed;
 
   return (
     <Card
@@ -35,12 +40,13 @@ export function ProductCard({ product, onPress }: Props) {
       onPress={onPress ? () => onPress(product) : undefined}
     >
       <View style={[styles.imageWrap, { backgroundColor: theme.colors.surfaceVariant }]}>
-        {product.urlImg ? (
+        {showImage ? (
           <Image
-            source={{ uri: product.urlImg }}
+            source={{ uri: imageUri }}
             style={styles.image}
             contentFit="cover"
             transition={200}
+            onError={() => setImageFailed(true)}
           />
         ) : (
           <View style={styles.placeholder}>
