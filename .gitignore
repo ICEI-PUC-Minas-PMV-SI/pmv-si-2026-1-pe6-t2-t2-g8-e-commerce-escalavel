@@ -4,3 +4,4 @@ node_modules/
 dist
 src/frontend/public/assets/
 .claude
+.claude/settings.local.json
