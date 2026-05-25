@@ -54,8 +54,11 @@ const styles = StyleSheet.create({
     margin: 0,
   },
   panel: {
-    width: 300,
-    height: '100%',
+    width: 210,
+    // flex:1 fills full screen height; justifyContent overrides Paper's
+    // styles.content (justifyContent:'center') which was centering the items.
+    flex: 1,
+    justifyContent: 'flex-start',
     backgroundColor: '#ffffff',
     paddingHorizontal: spacing.sm,
   },
