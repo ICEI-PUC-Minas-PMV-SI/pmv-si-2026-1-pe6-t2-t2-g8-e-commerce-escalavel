@@ -9,7 +9,7 @@ type RequestOptions = {
 };
 
 // TODO: integrate expo-secure-store for token storage when auth lands.
-export function authHeader(): HeadersInit {
+export async function authHeader(): Promise<HeadersInit> {
   return {};
 }
 
@@ -24,12 +24,28 @@ export class HttpClient {
     return this.request<T>('GET', path, undefined, options);
   }
 
-  post<T>(path: string, body?: unknown, options: RequestOptions = {}): Promise<T> {
+  post<T>(
+    path: string,
+    body?: unknown,
+    options: RequestOptions = {}
+  ): Promise<T> {
     return this.request<T>('POST', path, body, options);
   }
 
-  put<T>(path: string, body?: unknown, options: RequestOptions = {}): Promise<T> {
+  put<T>(
+    path: string,
+    body?: unknown,
+    options: RequestOptions = {}
+  ): Promise<T> {
     return this.request<T>('PUT', path, body, options);
+  }
+
+  patch<T>(
+    path: string,
+    body?: unknown,
+    options: RequestOptions = {}
+  ): Promise<T> {
+    return this.request<T>('PATCH', path, body, options);
   }
 
   del<T>(path: string, options: RequestOptions = {}): Promise<T> {
@@ -43,7 +59,9 @@ export class HttpClient {
     options: RequestOptions
   ): Promise<T> {
     const hasBody = body !== undefined && body !== null;
+
     const headers = new Headers(options.headers);
+
     if (hasBody && !headers.has('Content-Type')) {
       headers.set('Content-Type', 'application/json');
     }
@@ -60,6 +78,7 @@ export class HttpClient {
 
   private async parseResponse<T>(res: Response): Promise<T> {
     const contentType = res.headers.get('content-type') || '';
+
     const isJson = contentType.includes('application/json');
 
     const payload = isJson
@@ -69,18 +88,20 @@ export class HttpClient {
     if (!res.ok) {
       const messageFromPayload =
         payload && typeof payload === 'object'
-          ? (payload as ErrorPayload).message || (payload as ErrorPayload).error
+          ? (payload as ErrorPayload).message ||
+            (payload as ErrorPayload).error
           : null;
 
       const messageFromText =
-        typeof payload === 'string' && payload.trim().length > 0
+        typeof payload === 'string' &&
+        payload.trim().length > 0
           ? payload
           : null;
 
       throw new Error(
         messageFromPayload ||
-        messageFromText ||
-        `Request failed with status ${res.status}`
+          messageFromText ||
+          `Request failed with status ${res.status}`
       );
     }
 
