@@ -6,7 +6,7 @@ function OrderSuccessModal({ order, onClose }) {
 
   return (
     <Modal onClose={onClose}>
-      <h2>🎉 Pedido realizado com sucesso!</h2>
+      <h2>Pedido realizado com sucesso!</h2>
 
       <p><strong>ID:</strong> {order?.id}</p>
       <p><strong>Status:</strong> {order?.status}</p>

@@ -5,6 +5,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { paperTheme } from '@/src/theme';
 import { CartProvider } from '../contexts/CartContext';
 
+
 export default function RootLayout() {
   return (
     <SafeAreaProvider>
