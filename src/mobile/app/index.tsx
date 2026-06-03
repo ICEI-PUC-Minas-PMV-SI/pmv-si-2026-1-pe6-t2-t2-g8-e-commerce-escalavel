@@ -1,30 +1,41 @@
 import { useState } from 'react';
 import { BottomNavigation } from 'react-native-paper';
+import { Redirect, useRouter } from 'expo-router';
 
 import { ServicesDrawer } from '@/src/components/ServicesDrawer';
 import { CatalogScreen } from '@/src/screens/CatalogScreen';
+import { useAuth } from '@/src/contexts/AuthContext';
 
-type RouteKey = 'home' | 'menu';
+type RouteKey = 'home' | 'profile' | 'menu';
 
 const ROUTES: { key: RouteKey; title: string; focusedIcon: string; unfocusedIcon?: string }[] = [
-  { key: 'home', title: 'Início', focusedIcon: 'home', unfocusedIcon: 'home-outline' },
-  { key: 'menu', title: 'Menu', focusedIcon: 'menu' },
+  { key: 'home',    title: 'Início',  focusedIcon: 'home',    unfocusedIcon: 'home-outline' },
+  { key: 'profile', title: 'Perfil',  focusedIcon: 'account', unfocusedIcon: 'account-outline' },
+  { key: 'menu',    title: 'Menu',    focusedIcon: 'menu' },
 ];
 
-// `menu` never owns a scene — tapping it opens the services drawer and the
-// active tab stays on `home`. SceneMap still needs an entry, so it gets a noop.
 const renderScene = BottomNavigation.SceneMap({
-  home: CatalogScreen,
-  menu: () => null,
+  home:    CatalogScreen,
+  profile: () => null,
+  menu:    () => null,
 });
 
 export default function AppShell() {
-  const [index, setIndex] = useState(0);
+  const { isAuthenticated } = useAuth();
+  const router = useRouter();
+  const [index, setIndex]           = useState(0);
   const [drawerOpen, setDrawerOpen] = useState(false);
 
+  if (!isAuthenticated) return <Redirect href="/login" />;
+
   const onIndexChange = (next: number) => {
-    if (ROUTES[next].key === 'menu') {
+    const key = ROUTES[next].key;
+    if (key === 'menu') {
       setDrawerOpen(true);
+      return;
+    }
+    if (key === 'profile') {
+      router.push('/profile');
       return;
     }
     setIndex(next);

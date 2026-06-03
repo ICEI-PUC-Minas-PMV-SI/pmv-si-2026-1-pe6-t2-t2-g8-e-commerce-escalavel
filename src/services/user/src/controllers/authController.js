@@ -1,5 +1,6 @@
 // src/controllers/authController.js
 const authService = require('../services/authService');
+const userRepository = require('../repositories/userRepository');
 const { sanitizeUser, isValidEmail, isValidCPF, isValidPhone, validateAddress } = require('../utils/userUtils');
 
 // Função para padronizar erros
@@ -138,7 +139,22 @@ const login = async (req, res) => {
   }
 };
 
+// Verifica se e-mail já está em uso
+const checkEmail = async (req, res) => {
+  try {
+    const { email } = req.query;
+    if (!email || !isValidEmail(email)) {
+      return res.status(400).json({ status: 'fail', message: 'E-mail inválido' });
+    }
+    const existing = await userRepository.findByEmail(email);
+    return res.json({ status: 'success', data: { available: !existing } });
+  } catch (err) {
+    return res.status(500).json({ status: 'error', message: 'Erro interno' });
+  }
+};
+
 module.exports = {
   register,
   login,
+  checkEmail,
 };
