@@ -1,6 +1,6 @@
 # 📊 Relatório de Contribuições do Projeto
 
-**Última atualização:** 03/06/2026 02:28
+**Última atualização:** 03/06/2026 02:32
 
 ---
 
@@ -9,21 +9,21 @@
 | Aluno                 |   Commits |   Linhas+ |   Linhas- |   Arquivos |   Docs Commits |   Docs Arquivos |
 |-----------------------|-----------|-----------|-----------|------------|----------------|-----------------|
 | Carlos Morais         |         2 |         7 |        15 |          2 |              2 |               2 |
-| Dev-Vinicio           |        25 |     68925 |     52621 |        318 |             18 |              15 |
+| Dev-Vinicio           |        26 |     68929 |     52625 |        318 |             19 |              15 |
 | Hugo Freitas          |        28 |       481 |        90 |         14 |             16 |               6 |
 | João Gabriel Perez    |        28 |      5189 |      1490 |         91 |              7 |               2 |
 | Nicolas               |         6 |      7686 |      1021 |        106 |              2 |               2 |
 | Vitor Linas           |        37 |      1263 |       366 |         17 |             14 |               3 |
 | gabriel               |        13 |      5514 |       752 |         75 |              0 |               0 |
 | gabrielcambraia       |        18 |       953 |        51 |          4 |             10 |               3 |
-| github-actions[bot]   |       129 |       986 |       963 |          3 |            124 |               1 |
+| github-actions[bot]   |       130 |      1067 |      1044 |          3 |            125 |               1 |
 | github-classroom[bot] |         1 |      2152 |         0 |         45 |              1 |              13 |
 | nicolaspborges96      |        65 |     33465 |      5322 |        319 |             24 |               6 |
 
 
 ## 📅 Contribuições Semanais (Todo o Semestre)
 
-**2026-05-27**: Dev-Vinicio: 1, João Gabriel Perez: 4, github-actions[bot]: 5
+**2026-05-27**: Dev-Vinicio: 2, João Gabriel Perez: 4, github-actions[bot]: 6
 
 **2026-05-20**: Nicolas: 1, github-actions[bot]: 2, nicolaspborges96: 3
 
