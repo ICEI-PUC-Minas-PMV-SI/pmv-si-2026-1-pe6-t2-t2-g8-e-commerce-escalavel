@@ -33,6 +33,12 @@ export default function RootLayout() {
               <Stack.Screen name="stock/restock" options={{ title: 'Reabastecer', presentation: 'modal' }} />
               <Stack.Screen name="stock/adjust"  options={{ title: 'Ajustar', presentation: 'modal' }} />
               <Stack.Screen name="stock/history" options={{ title: 'Histórico' }} />
+
+              {/* Catálogo */}
+              <Stack.Screen name="catalog/product/[id]"         options={{ title: 'Produto' }} />
+              <Stack.Screen name="catalog/categories"           options={{ title: 'Categorias' }} />
+              <Stack.Screen name="catalog/products"             options={{ title: 'Produtos' }} />
+              <Stack.Screen name="catalog/admin/product-form"   options={{ title: 'Produto', presentation: 'modal' }} />
             </Stack>
           </CartProvider>
         </AuthProvider>

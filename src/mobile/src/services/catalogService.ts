@@ -1,6 +1,6 @@
 import { API_URL } from '@/src/config/env';
-import type { Category, Product, ProductFilters } from '@/src/types/catalog';
-import { HttpClient } from './httpClient';
+import type { Category, CategoryInput, Product, ProductFilters, ProductInput } from '@/src/types/catalog';
+import { authHeader, HttpClient } from './httpClient';
 
 const http = new HttpClient(API_URL);
 
@@ -41,16 +41,48 @@ export const catalogService = {
     );
     return unwrapArray<Product>(raw);
   },
+
   async getProductById(id: string, signal?: AbortSignal): Promise<Product> {
-    const raw = await http.get<Product | Envelope<Product>>(`/catalog/products/${id}`, {
-      signal,
-    });
+    const raw = await http.get<Product | Envelope<Product>>(`/catalog/products/${id}`, { signal });
     return unwrapObject<Product>(raw);
   },
+
   async getCategories(signal?: AbortSignal): Promise<Category[]> {
-    const raw = await http.get<Category[] | Envelope<Category[]>>('/catalog/categories', {
-      signal,
-    });
+    const raw = await http.get<Category[] | Envelope<Category[]>>('/catalog/categories', { signal });
     return unwrapArray<Category>(raw);
+  },
+
+  async createProduct(data: ProductInput): Promise<Product> {
+    const headers = await authHeader();
+    const raw = await http.post<Product | Envelope<Product>>('/catalog/products', data, { headers });
+    return unwrapObject<Product>(raw);
+  },
+
+  async updateProduct(id: string, data: ProductInput): Promise<Product> {
+    const headers = await authHeader();
+    const raw = await http.put<Product | Envelope<Product>>(`/catalog/products/${id}`, data, { headers });
+    return unwrapObject<Product>(raw);
+  },
+
+  async deleteProduct(id: string): Promise<void> {
+    const headers = await authHeader();
+    await http.del(`/catalog/products/${id}`, { headers });
+  },
+
+  async createCategory(data: CategoryInput): Promise<Category> {
+    const headers = await authHeader();
+    const raw = await http.post<Category | Envelope<Category>>('/catalog/categories', data, { headers });
+    return unwrapObject<Category>(raw);
+  },
+
+  async updateCategory(id: string, data: CategoryInput): Promise<Category> {
+    const headers = await authHeader();
+    const raw = await http.put<Category | Envelope<Category>>(`/catalog/categories/${id}`, data, { headers });
+    return unwrapObject<Category>(raw);
+  },
+
+  async deleteCategory(id: string): Promise<void> {
+    const headers = await authHeader();
+    await http.del(`/catalog/categories/${id}`, { headers });
   },
 };
