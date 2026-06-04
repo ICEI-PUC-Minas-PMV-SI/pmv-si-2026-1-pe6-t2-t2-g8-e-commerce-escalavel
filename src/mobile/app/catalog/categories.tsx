@@ -1,5 +1,5 @@
-import { useRouter } from 'expo-router';
-import { useCallback, useEffect, useState } from 'react';
+import { useFocusEffect, useRouter } from 'expo-router';
+import { useCallback, useState } from 'react';
 import {
   Alert,
   FlatList,
@@ -57,12 +57,14 @@ export default function CategoriesScreen() {
     }
   }, []);
 
-  useEffect(() => {
-    const ctrl = new AbortController();
-    setLoading(true);
-    load(ctrl.signal).finally(() => setLoading(false));
-    return () => ctrl.abort();
-  }, [load]);
+  useFocusEffect(
+    useCallback(() => {
+      const ctrl = new AbortController();
+      setLoading(true);
+      load(ctrl.signal).finally(() => setLoading(false));
+      return () => ctrl.abort();
+    }, [load])
+  );
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);

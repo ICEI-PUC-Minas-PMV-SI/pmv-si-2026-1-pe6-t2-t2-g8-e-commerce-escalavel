@@ -1,6 +1,6 @@
 import { Image } from 'expo-image';
-import { useLocalSearchParams, useRouter } from 'expo-router';
-import { useCallback, useEffect, useState } from 'react';
+import { useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router';
+import { useCallback, useState } from 'react';
 import {
   Alert,
   Pressable,
@@ -60,18 +60,22 @@ export default function ProductDetailScreen() {
     try {
       const data = await catalogService.getProductById(id, signal);
       setProduct(data);
+      setSelectedVariant(null);
+      setSelectedSku(null);
     } catch (err) {
       if ((err as Error).name === 'AbortError') return;
       setError((err as Error).message || 'Erro ao carregar produto.');
     }
   }, [id]);
 
-  useEffect(() => {
-    const ctrl = new AbortController();
-    setLoading(true);
-    load(ctrl.signal).finally(() => setLoading(false));
-    return () => ctrl.abort();
-  }, [load]);
+  useFocusEffect(
+    useCallback(() => {
+      const ctrl = new AbortController();
+      setLoading(true);
+      load(ctrl.signal).finally(() => setLoading(false));
+      return () => ctrl.abort();
+    }, [load])
+  );
 
   const handleVariantSelect = (variant: Variant) => {
     setSelectedVariant(variant);

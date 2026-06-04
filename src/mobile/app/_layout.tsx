@@ -1,4 +1,5 @@
 import { Stack } from 'expo-router';
+import { StatusBar } from 'expo-status-bar';
 import { PaperProvider } from 'react-native-paper';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
@@ -9,6 +10,7 @@ import { AuthProvider } from '@/src/contexts/AuthContext';
 export default function RootLayout() {
   return (
     <SafeAreaProvider>
+      <StatusBar style="light" backgroundColor="#0A0A0A" translucent={false} />
       <PaperProvider theme={paperTheme}>
         <AuthProvider>
           <CartProvider>
@@ -19,6 +21,8 @@ export default function RootLayout() {
                 headerTintColor: paperTheme.colors.onSurface,
                 headerShadowVisible: false,
                 contentStyle: { backgroundColor: paperTheme.colors.background },
+                headerBackTitle: '',
+                headerBackButtonDisplayMode: 'minimal',
               }}
             >
               <Stack.Screen name="index"    options={{ headerShown: false }} />
