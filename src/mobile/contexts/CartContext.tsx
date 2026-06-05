@@ -5,6 +5,7 @@ export interface CartItem {
   productName: string;
   unitPrice: number;
   quantity: number;
+  size: string;
 }
 
 interface CartContextData {
@@ -23,7 +24,34 @@ const CartContext = createContext<CartContextData | undefined>(undefined);
 export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const [items, setItems] = useState<CartItem[]>([]);
+  
+  // REATIVAR QUANDO ESTIVER TUDO PRONTO
+  //const [items, setItems] = useState<CartItem[]>([]);
+
+  // MOCK PARA TESTES DO CARRINHO
+  const [items, setItems] = useState<CartItem[]>([
+  {
+    productId: '1',
+    productName: 'Camiseta Básica Insider',
+    unitPrice: 89.90,
+    quantity: 2,
+    size: 'P',
+  },
+  {
+    productId: '2',
+    productName: 'Calça Slim Masculina',
+    unitPrice: 149.90,
+    quantity: 1,
+    size: 'M',
+  },
+  {
+    productId: '3',
+    productName: 'Jaqueta Casual',
+    unitPrice: 229.90,
+    quantity: 1,
+    size: 'G',
+  },
+]);
 
   function addItem(item: CartItem) {
     setItems((prev) => {

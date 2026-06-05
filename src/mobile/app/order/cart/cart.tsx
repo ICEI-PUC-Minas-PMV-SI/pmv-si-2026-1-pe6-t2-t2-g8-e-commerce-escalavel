@@ -1,19 +1,50 @@
+import { useEffect, useState } from 'react';
 import { View, ScrollView, StyleSheet } from 'react-native';
-import { Button, Card, IconButton, Text } from 'react-native-paper';
+import { Button, Text } from 'react-native-paper';
 import { useRouter } from 'expo-router';
 
 import { useCart } from '@/contexts/CartContext';
+import CartItem from '@/src/components/CartItem';
 
 export default function CartScreen() {
   const router = useRouter();
 
   const {
     items,
-    total,
     removeItem,
     increaseQty,
     decreaseQty,
   } = useCart();
+
+  const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set());
+
+  useEffect(() => {
+    setSelectedItems(
+      new Set(items.map(item => item.productId))
+    );
+  }, [items]);
+
+  function toggleSelect(id: string) {
+    setSelectedItems(prev => {
+      const next = new Set(prev);
+
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+
+      return next;
+    });
+  }
+
+  const selectedTotal = items
+    .filter(item => selectedItems.has(item.productId))
+    .reduce(
+      (sum, item) =>
+        sum + item.unitPrice * item.quantity,
+      0
+    );
 
   if (items.length === 0) {
     return (
@@ -35,61 +66,38 @@ export default function CartScreen() {
 
   return (
     <View style={styles.container}>
+
       <ScrollView contentContainerStyle={styles.list}>
         {items.map(item => (
-          <Card key={item.productId} style={styles.card}>
-            <Card.Content>
-
-              <Text variant="titleMedium">
-                {item.productName}
-              </Text>
-
-              <Text variant="bodyMedium">
-                R$ {item.unitPrice.toFixed(2)}
-              </Text>
-
-              <View style={styles.qtyRow}>
-                <IconButton
-                  icon="minus"
-                  onPress={() => decreaseQty(item.productId)}
-                />
-
-                <Text variant="titleMedium">
-                  {item.quantity}
-                </Text>
-
-                <IconButton
-                  icon="plus"
-                  onPress={() => increaseQty(item.productId)}
-                />
-              </View>
-
-              <Text variant="bodyLarge">
-                Subtotal: R$ {(item.quantity * item.unitPrice).toFixed(2)}
-              </Text>
-
-              <Button
-                mode="text"
-                textColor="red"
-                onPress={() => removeItem(item.productId)}
-              >
-                Remover
-              </Button>
-
-            </Card.Content>
-          </Card>
+          <CartItem
+            key={item.productId}
+            item={item}
+            selected={selectedItems.has(item.productId)}
+            onToggleSelect={toggleSelect}
+            onIncrease={increaseQty}
+            onDecrease={decreaseQty}
+            onRemove={removeItem}
+          />
         ))}
       </ScrollView>
 
       <View style={styles.footer}>
-        <Text variant="titleLarge">
-          Total: R$ {total.toFixed(2)}
+
+        <Text style={styles.totalLabel}>
+          Total
+        </Text>
+
+        <Text style={styles.totalValue}>
+          R$ {selectedTotal.toFixed(2)}
         </Text>
 
         <Button
           mode="contained"
+          disabled={selectedTotal === 0}
           onPress={() => router.push('/order/checkout/checkout')}
-          style={{ marginTop: 12 }}
+            contentStyle={{ paddingVertical: 6, height: 48 }}
+          labelStyle={{ fontSize: 16, fontWeight: '600', marginTop: 6 }}
+          style={[styles.checkoutButton, { borderRadius: 12 }]}
         >
           Finalizar Compra
         </Button>
@@ -97,11 +105,14 @@ export default function CartScreen() {
         <Button
           mode="outlined"
           onPress={() => router.push('/')}
-          style={{ marginTop: 8 }}
+          labelStyle={{ fontSize: 16, fontWeight: '600' }}
+          style={[styles.continueButton, { borderRadius: 12 }]}
         >
           Continuar Comprando
         </Button>
+
       </View>
+
     </View>
   );
 }
@@ -113,24 +124,34 @@ const styles = StyleSheet.create({
 
   list: {
     padding: 16,
-    gap: 12,
-  },
-
-  card: {
-    marginBottom: 12,
-  },
-
-  qtyRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginVertical: 8,
+    paddingBottom: 100,
   },
 
   footer: {
     padding: 16,
     borderTopWidth: 1,
     borderColor: '#E5E7EB',
-    backgroundColor: '#FFF',
+    backgroundColor: '#FFFFFF',
+  },
+
+  totalLabel: {
+    fontSize: 14,
+    color: '#6B7280',
+  },
+
+  totalValue: {
+    fontSize: 24,
+    fontWeight: '700',
+    marginTop: 4,
+    marginBottom: 16,
+  },
+
+  checkoutButton: {
+    marginBottom: 10,
+  },
+
+  continueButton: {
+    marginBottom: 4,
   },
 
   emptyContainer: {

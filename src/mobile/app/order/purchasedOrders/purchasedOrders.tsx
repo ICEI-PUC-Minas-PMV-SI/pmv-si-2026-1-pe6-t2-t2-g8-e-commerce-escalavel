@@ -1,84 +1,142 @@
 import { useEffect, useState } from 'react';
-import { View, Text, FlatList, Pressable } from 'react-native';
+import { ScrollView, View, StyleSheet } from 'react-native';
+import { Text } from 'react-native-paper';
+import { useRouter } from 'expo-router';
 
-import { orderService } from '../../../src/services/orderService';
-import CancelOrderModal from '../../../src/components/modals/CancelOrderModal';
+import OrderCard from '@/src/components/OrderCard';
 
-export default function OrdersPage() {
-  const [orders, setOrders] = useState<any[]>([]);
-  const [selectedOrder, setSelectedOrder] = useState<string | null>(null);
-  const [modalVisible, setModalVisible] = useState(false);
+type Order = {
+  id: string;
+  status: string;
+  productName: string;
+  total: number;
+  productId?: string;
+};
 
-  async function load() {
-    const data = await orderService.getOrdersByUserId('USER_ID_FIXO');
+export default function PurchasedOrders() {
+  const router = useRouter();
 
-    // remove cancelados da lista
-    setOrders(data.filter((o) => o.status !== 'cancelled'));
-  }
+  const [orders, setOrders] = useState<Order[]>([]);
 
   useEffect(() => {
-    load();
+    setOrders([
+      {
+        id: '1',
+        status: 'Entregue',
+        productName: 'Pedido #1023 - 2 itens',
+        total: 259.9,
+        productId: '123',
+      },
+      {
+        id: '2',
+        status: 'Cancelado',
+        productName: 'Pedido #1022 - 1 item',
+        total: 89.9,
+      },
+      {
+        id: '3',
+        status: 'Em processamento',
+        productName: 'Pedido #1021 - 3 itens',
+        total: 399.9,
+      },
+    ]);
   }, []);
 
-  async function confirmCancel() {
-    if (!selectedOrder) return;
-
-    await orderService.cancelOrder(selectedOrder);
-
-    setModalVisible(false);
-    setSelectedOrder(null);
-
-    await load();
-  }
+  const activeOrders = orders.filter(o => o.status !== 'Cancelado');
+  const canceledOrders = orders.filter(o => o.status === 'Cancelado');
 
   return (
-    <View style={{ flex: 1, padding: 16 }}>
-      <Text style={{ fontSize: 20, fontWeight: 'bold' }}>
-        Meus pedidos
-      </Text>
+    <ScrollView contentContainerStyle={styles.container}>
 
-      <FlatList
-        data={orders}
-        keyExtractor={(i) => i.id}
-        renderItem={({ item }) => {
-          const canCancel =
-            item.status === 'pending' || item.status === 'confirmed';
+      <Text style={styles.title}>Meus pedidos</Text>
 
-          return (
-            <View
-              style={{
-                padding: 12,
-                borderWidth: 1,
-                marginTop: 10,
-              }}
-            >
-              <Text>ID: {item.id}</Text>
-              <Text>Status: {item.status}</Text>
-              <Text>Total: R$ {item.totalAmount}</Text>
+      {/* ATIVOS */}
+      {activeOrders.map(order => (
+        <OrderCard
+          key={order.id}
+          order={order}
+          onViewDetails={() =>
+            router.push(`/product/${order.productId}` as any)
+          }
+          onCancel={() =>
+            setOrders(prev =>
+              prev.map(o =>
+                o.id === order.id
+                  ? { ...o, status: 'Cancelado' }
+                  : o
+              )
+            )
+          }
+          onDiscard={() =>
+            setOrders(prev => prev.filter(o => o.id !== order.id))
+          }
+        />
+      ))}
 
-              {canCancel && (
-                <Pressable
-                  onPress={() => {
-                    setSelectedOrder(item.id);
-                    setModalVisible(true);
-                  }}
-                  style={{ marginTop: 10, backgroundColor: 'red', padding: 8 }}
-                >
-                  <Text style={{ color: 'white', textAlign: 'center' }}>
-                    🗑 Cancelar pedido
-                  </Text>
-                </Pressable>
-              )}
-            </View>
-          );
-        }}
-      />
+      {/* CANCELADOS */}
+      {canceledOrders.length > 0 && (
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>
+            Cancelados
+          </Text>
 
-      <CancelOrderModal
-        visible={modalVisible}
-        onCancel={() => setModalVisible(false)}
-        onConfirm={confirmCancel}
-      />
-    </View>
+          <View style={{ opacity: 0.6 }}>
+            {canceledOrders.map(order => (
+              <OrderCard
+                key={order.id}
+                order={order}
+                onViewDetails={() =>
+                  router.push(`/product/${order.productId}` as any)
+                }
+                onCancel={() => {}}
+                onDiscard={() =>
+                  setOrders(prev =>
+                    prev.filter(o => o.id !== order.id)
+                  )
+                }
+              />
+            ))}
+          </View>
+        </View>
+      )}
+
+      {/* EMPTY */}
+      {orders.length === 0 && (
+        <Text style={styles.empty}>
+          Você ainda não possui pedidos.
+        </Text>
+      )}
+
+    </ScrollView>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    padding: 16,
+    paddingBottom: 40,
+  },
+
+  title: {
+    fontSize: 26,
+    fontWeight: '700',
+    marginBottom: 20,
+  },
+
+  section: {
+    marginTop: 20,
+  },
+
+  sectionTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    marginBottom: 10,
+    color: '#6B7280',
+  },
+
+  empty: {
+    textAlign: 'center',
+    marginTop: 30,
+    color: '#9CA3AF',
+  },
+});
