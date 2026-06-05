@@ -1,85 +1,142 @@
-import { View, Text, FlatList, Pressable } from 'react-native';
-import { useCart } from '../../../contexts/CartContext';
+import { View, ScrollView, StyleSheet } from 'react-native';
+import { Button, Card, IconButton, Text } from 'react-native-paper';
+import { useRouter } from 'expo-router';
 
-export default function CartPage() {
+import { useCart } from '@/contexts/CartContext';
+
+export default function CartScreen() {
+  const router = useRouter();
+
   const {
     items,
     total,
     removeItem,
     increaseQty,
     decreaseQty,
-    clearCart,
   } = useCart();
 
+  if (items.length === 0) {
+    return (
+      <View style={styles.emptyContainer}>
+        <Text variant="headlineSmall">
+          Seu carrinho está vazio
+        </Text>
+
+        <Button
+          mode="contained"
+          onPress={() => router.push('/')}
+          style={{ marginTop: 20 }}
+        >
+          Voltar às compras
+        </Button>
+      </View>
+    );
+  }
+
   return (
-    <View style={{ flex: 1, padding: 16 }}>
-      <Text style={{ fontSize: 20, fontWeight: 'bold', marginBottom: 16 }}>
-        Carrinho
-      </Text>
+    <View style={styles.container}>
+      <ScrollView contentContainerStyle={styles.list}>
+        {items.map(item => (
+          <Card key={item.productId} style={styles.card}>
+            <Card.Content>
 
-      {items.length === 0 ? (
-        <Text>Seu carrinho está vazio</Text>
-      ) : (
-        <>
-          <FlatList
-            data={items}
-            keyExtractor={(item) => item.productId}
-            renderItem={({ item }) => (
-              <View
-                style={{
-                  padding: 12,
-                  borderWidth: 1,
-                  borderRadius: 8,
-                  marginBottom: 10,
-                }}
-              >
-                <Text>{item.productName}</Text>
-                <Text>R$ {item.unitPrice}</Text>
-                <Text>Qtd: {item.quantity}</Text>
+              <Text variant="titleMedium">
+                {item.productName}
+              </Text>
 
-                <View style={{ flexDirection: 'row', gap: 10, marginTop: 8 }}>
-                  <Pressable onPress={() => decreaseQty(item.productId)}>
-                    <Text>-</Text>
-                  </Pressable>
+              <Text variant="bodyMedium">
+                R$ {item.unitPrice.toFixed(2)}
+              </Text>
 
-                  <Pressable onPress={() => increaseQty(item.productId)}>
-                    <Text>+</Text>
-                  </Pressable>
+              <View style={styles.qtyRow}>
+                <IconButton
+                  icon="minus"
+                  onPress={() => decreaseQty(item.productId)}
+                />
 
-                  <Pressable onPress={() => removeItem(item.productId)}>
-                    <Text>Remover</Text>
-                  </Pressable>
-                </View>
+                <Text variant="titleMedium">
+                  {item.quantity}
+                </Text>
+
+                <IconButton
+                  icon="plus"
+                  onPress={() => increaseQty(item.productId)}
+                />
               </View>
-            )}
-          />
 
-          <Text style={{ fontSize: 18, fontWeight: 'bold' }}>
-            Total: R$ {total.toFixed(2)}
-          </Text>
+              <Text variant="bodyLarge">
+                Subtotal: R$ {(item.quantity * item.unitPrice).toFixed(2)}
+              </Text>
 
-          <Pressable
-            onPress={clearCart}
-            style={{
-              marginTop: 10,
-              padding: 10,
-              backgroundColor: 'red',
-            }}
-          >
-            <Text style={{ color: 'white' }}>Limpar carrinho</Text>
-          </Pressable>
+              <Button
+                mode="text"
+                textColor="red"
+                onPress={() => removeItem(item.productId)}
+              >
+                Remover
+              </Button>
 
-          <Pressable
-            style={{
-              marginTop: 10,
-              padding: 10,
-              backgroundColor: 'green',
-            }}
-          >
-            <Text style={{ color: 'white' }}>Ir para checkout</Text>
-          </Pressable>
-        </>
-      )}
+            </Card.Content>
+          </Card>
+        ))}
+      </ScrollView>
+
+      <View style={styles.footer}>
+        <Text variant="titleLarge">
+          Total: R$ {total.toFixed(2)}
+        </Text>
+
+        <Button
+          mode="contained"
+          onPress={() => router.push('/order/checkout/checkout')}
+          style={{ marginTop: 12 }}
+        >
+          Finalizar Compra
+        </Button>
+
+        <Button
+          mode="outlined"
+          onPress={() => router.push('/')}
+          style={{ marginTop: 8 }}
+        >
+          Continuar Comprando
+        </Button>
+      </View>
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+
+  list: {
+    padding: 16,
+    gap: 12,
+  },
+
+  card: {
+    marginBottom: 12,
+  },
+
+  qtyRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginVertical: 8,
+  },
+
+  footer: {
+    padding: 16,
+    borderTopWidth: 1,
+    borderColor: '#E5E7EB',
+    backgroundColor: '#FFF',
+  },
+
+  emptyContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 24,
+  },
+});
