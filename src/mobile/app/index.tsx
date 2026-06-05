@@ -4,7 +4,6 @@ import { Redirect, useRouter } from 'expo-router';
 
 import { ServicesDrawer } from '@/src/components/ServicesDrawer';
 import { CatalogScreen } from '@/src/screens/CatalogScreen';
-import { useAuth } from '@/src/contexts/AuthContext';
 
 type RouteKey = 'home' | 'profile' | 'menu';
 
@@ -21,12 +20,9 @@ const renderScene = BottomNavigation.SceneMap({
 });
 
 export default function AppShell() {
-  const { isAuthenticated } = useAuth();
   const router = useRouter();
   const [index, setIndex]           = useState(0);
   const [drawerOpen, setDrawerOpen] = useState(false);
-
-  if (!isAuthenticated) return <Redirect href="/login" />;
 
   const onIndexChange = (next: number) => {
     const key = ROUTES[next].key;
