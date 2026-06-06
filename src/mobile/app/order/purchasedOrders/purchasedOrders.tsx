@@ -1,113 +1,266 @@
 import { useEffect, useState } from 'react';
 import { ScrollView, View, StyleSheet } from 'react-native';
 import { Text } from 'react-native-paper';
-import { useRouter } from 'expo-router';
 
 import OrderCard from '@/src/components/OrderCard';
+
+import CancelOrderModal from '@/src/components/modals/CancelOrderModal';
+import DeliveredOrderModal from '@/src/components/modals/DeliveredOrderModal';
+import OrderDetailsModal from '@/src/components/modals/OrderDetailsModal';
+
+type OrderItem = {
+  id: string;
+  productName: string;
+  size: string;
+  quantity: number;
+  unitPrice: number;
+};
 
 type Order = {
   id: string;
   status: string;
-  productName: string;
   total: number;
-  productId?: string;
+  items: OrderItem[];
 };
 
 export default function PurchasedOrders() {
-  const router = useRouter();
-
   const [orders, setOrders] = useState<Order[]>([]);
+
+  const [showCancelModal, setShowCancelModal] =
+    useState(false);
+
+  const [showDeliveredModal, setShowDeliveredModal] =
+    useState(false);
+
+  const [showDetailsModal, setShowDetailsModal] =
+    useState(false);
+
+  const [selectedOrder, setSelectedOrder] =
+    useState<Order | null>(null);
+
+  const [orderToCancel, setOrderToCancel] =
+    useState<string | null>(null);
 
   useEffect(() => {
     setOrders([
       {
-        id: '1',
+        id: '1023',
         status: 'Entregue',
-        productName: 'Pedido #1023 - 2 itens',
-        total: 259.9,
-        productId: '123',
+        total: 329.7,
+        items: [
+          {
+            id: '1',
+            productName: 'Camiseta Básica Insider',
+            size: 'M',
+            quantity: 2,
+            unitPrice: 89.9,
+          },
+          {
+            id: '2',
+            productName: 'Calça Slim Masculina',
+            size: 'G',
+            quantity: 1,
+            unitPrice: 149.9,
+          },
+        ],
       },
+
       {
-        id: '2',
+        id: '1022',
         status: 'Cancelado',
-        productName: 'Pedido #1022 - 1 item',
         total: 89.9,
+        items: [
+          {
+            id: '3',
+            productName: 'Camiseta Oversized',
+            size: 'P',
+            quantity: 1,
+            unitPrice: 89.9,
+          },
+        ],
       },
+
       {
-        id: '3',
+        id: '1021',
         status: 'Em processamento',
-        productName: 'Pedido #1021 - 3 itens',
         total: 399.9,
+        items: [
+          {
+            id: '4',
+            productName: 'Jaqueta Casual',
+            size: 'G',
+            quantity: 1,
+            unitPrice: 229.9,
+          },
+          {
+            id: '5',
+            productName: 'Calça Cargo',
+            size: 'M',
+            quantity: 1,
+            unitPrice: 170,
+          },
+        ],
+      },
+
+      {
+        id: '1020',
+        status: 'Enviado',
+        total: 149.9,
+        items: [
+          {
+            id: '6',
+            productName: 'Calça Slim',
+            size: 'M',
+            quantity: 1,
+            unitPrice: 149.9,
+          },
+        ],
       },
     ]);
   }, []);
 
-  const activeOrders = orders.filter(o => o.status !== 'Cancelado');
-  const canceledOrders = orders.filter(o => o.status === 'Cancelado');
+  const activeOrders = orders.filter(
+    order => order.status !== 'Cancelado'
+  );
+
+  const canceledOrders = orders.filter(
+    order => order.status === 'Cancelado'
+  );
+
+  function handleCancelOrder(order: Order) {
+    if (order.status === 'Entregue') {
+      setShowDeliveredModal(true);
+      return;
+    }
+
+    setOrderToCancel(order.id);
+    setShowCancelModal(true);
+  }
+
+  function handleConfirmCancel() {
+    if (!orderToCancel) return;
+
+    setOrders(prev =>
+      prev.map(order =>
+        order.id === orderToCancel
+          ? { ...order, status: 'Cancelado' }
+          : order
+      )
+    );
+
+    setOrderToCancel(null);
+    setShowCancelModal(false);
+  }
+
+  function handleDiscardOrder(orderId: string) {
+    setOrders(prev =>
+      prev.filter(order => order.id !== orderId)
+    );
+  }
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
+    <>
+      <ScrollView contentContainerStyle={styles.container}>
 
-      <Text style={styles.title}>Meus pedidos</Text>
-
-      {/* ATIVOS */}
-      {activeOrders.map(order => (
-        <OrderCard
-          key={order.id}
-          order={order}
-          onViewDetails={() =>
-            router.push(`/product/${order.productId}` as any)
-          }
-          onCancel={() =>
-            setOrders(prev =>
-              prev.map(o =>
-                o.id === order.id
-                  ? { ...o, status: 'Cancelado' }
-                  : o
-              )
-            )
-          }
-          onDiscard={() =>
-            setOrders(prev => prev.filter(o => o.id !== order.id))
-          }
-        />
-      ))}
-
-      {/* CANCELADOS */}
-      {canceledOrders.length > 0 && (
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>
-            Cancelados
-          </Text>
-
-          <View style={{ opacity: 0.6 }}>
-            {canceledOrders.map(order => (
-              <OrderCard
-                key={order.id}
-                order={order}
-                onViewDetails={() =>
-                  router.push(`/product/${order.productId}` as any)
-                }
-                onCancel={() => {}}
-                onDiscard={() =>
-                  setOrders(prev =>
-                    prev.filter(o => o.id !== order.id)
-                  )
-                }
-              />
-            ))}
-          </View>
-        </View>
-      )}
-
-      {/* EMPTY */}
-      {orders.length === 0 && (
-        <Text style={styles.empty}>
-          Você ainda não possui pedidos.
+        <Text style={styles.title}>
+          Meus pedidos
         </Text>
-      )}
 
-    </ScrollView>
+        {/* PEDIDOS ATIVOS */}
+        {activeOrders.map(order => (
+          <OrderCard
+            key={order.id}
+            order={{
+              id: order.id,
+              status: order.status,
+              productName:
+                order.items.length === 1
+                  ? order.items[0].productName
+                  : `Pedido - ${order.items.length} itens`,
+              total: order.total,
+            }}
+            onViewDetails={() => {
+              setSelectedOrder(order);
+              setShowDetailsModal(true);
+            }}
+            onCancel={() =>
+              handleCancelOrder(order)
+            }
+            onDiscard={() =>
+              handleDiscardOrder(order.id)
+            }
+          />
+        ))}
+
+        {/* PEDIDOS CANCELADOS */}
+        {canceledOrders.length > 0 && (
+          <View style={styles.section}>
+
+            <Text style={styles.sectionTitle}>
+              Pedidos cancelados
+            </Text>
+
+            <View style={styles.canceledContainer}>
+              {canceledOrders.map(order => (
+                <OrderCard
+                  key={order.id}
+                  order={{
+                    id: order.id,
+                    status: order.status,
+                    productName:
+                      order.items.length === 1
+                        ? order.items[0].productName
+                        : `Pedido - ${order.items.length} itens`,
+                    total: order.total,
+                  }}
+                  onViewDetails={() => {
+                    setSelectedOrder(order);
+                    setShowDetailsModal(true);
+                  }}
+                  onCancel={() => {}}
+                  onDiscard={() =>
+                    handleDiscardOrder(order.id)
+                  }
+                />
+              ))}
+            </View>
+
+          </View>
+        )}
+
+        {orders.length === 0 && (
+          <Text style={styles.empty}>
+            Você ainda não possui pedidos.
+          </Text>
+        )}
+
+      </ScrollView>
+
+      <CancelOrderModal
+        visible={showCancelModal}
+        onCancel={() => {
+          setShowCancelModal(false);
+          setOrderToCancel(null);
+        }}
+        onConfirm={handleConfirmCancel}
+      />
+
+      <DeliveredOrderModal
+        visible={showDeliveredModal}
+        onClose={() =>
+          setShowDeliveredModal(false)
+        }
+      />
+
+      <OrderDetailsModal
+        visible={showDetailsModal}
+        order={selectedOrder}
+        onClose={() => {
+          setShowDetailsModal(false);
+          setSelectedOrder(null);
+        }}
+      />
+    </>
   );
 }
 
@@ -124,19 +277,24 @@ const styles = StyleSheet.create({
   },
 
   section: {
-    marginTop: 20,
+    marginTop: 24,
   },
 
   sectionTitle: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: '600',
-    marginBottom: 10,
+    marginBottom: 12,
     color: '#6B7280',
+  },
+
+  canceledContainer: {
+    opacity: 0.65,
   },
 
   empty: {
     textAlign: 'center',
-    marginTop: 30,
+    marginTop: 40,
     color: '#9CA3AF',
+    fontSize: 16,
   },
 });
