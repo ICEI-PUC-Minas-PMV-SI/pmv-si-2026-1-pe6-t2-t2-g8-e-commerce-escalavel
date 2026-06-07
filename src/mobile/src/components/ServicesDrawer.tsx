@@ -1,6 +1,6 @@
 import { useRouter, type Href } from 'expo-router'
-import { StyleSheet, View, Pressable, ScrollView } from 'react-native'
-import { Modal, Portal, Text } from 'react-native-paper'
+import { Modal, Pressable, ScrollView, StyleSheet, View } from 'react-native'
+import { Text } from 'react-native-paper'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useAuth } from '@/src/contexts/AuthContext'
 
@@ -16,8 +16,6 @@ type MenuItem = {
   label: string
   href?: Href
   onPress?: () => void
-  danger?: boolean
-  adminOnly?: boolean
 }
 
 export function ServicesDrawer({ visible, onDismiss }: Props) {
@@ -26,9 +24,9 @@ export function ServicesDrawer({ visible, onDismiss }: Props) {
   const { user, logout } = useAuth()
 
   const go = (href: Href) => { onDismiss(); router.push(href) }
-  const handleLogout = () => { onDismiss(); logout(); router.replace('/login') }
+  const handleLogout = () => { onDismiss(); logout() }
 
-  const initials = user?.name.split(' ').slice(0,2).map(w => w[0]).join('').toUpperCase() ?? '?'
+  const initials = user?.name.split(' ').slice(0, 2).map(w => w[0]).join('').toUpperCase() ?? '?'
   const isAdmin  = user?.role === 'admin'
 
   const ACCOUNT_ITEMS: MenuItem[] = [
@@ -42,94 +40,60 @@ export function ServicesDrawer({ visible, onDismiss }: Props) {
   ]
 
   const ADMIN_ITEMS: MenuItem[] = [
-    { icon: '👥', label: 'Usuários',  href: '/admin/users' },
-    { icon: '📦', label: 'Estoque',   href: '/stock' },
+    { icon: '👥', label: 'Usuários', href: '/admin/users' },
+    { icon: '📦', label: 'Estoque',  href: '/stock' },
   ]
 
   return (
-    <Portal>
-      <Modal
-        visible={visible}
-        onDismiss={onDismiss}
-        style={s.overlay}
-        contentContainerStyle={[s.panel, { paddingTop: insets.top + 16 }]}
-      >
-        <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={s.scroll}>
+    <Modal
+      visible={visible}
+      transparent
+      animationType="slide"
+      onRequestClose={onDismiss}
+      statusBarTranslucent
+    >
+      <View style={s.root}>
+        {/* Painel lateral */}
+        <View style={[s.panel, { paddingTop: insets.top + 16 }]}>
+          <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={s.scroll}>
 
-          {/* ── Cabeçalho ── */}
-          <View style={s.header}>
-            <Text style={s.headerLabel}>INSIDER</Text>
-            <Pressable onPress={onDismiss} style={s.closeBtn}>
-              <Text style={s.closeTxt}>✕</Text>
-            </Pressable>
-          </View>
-
-          {/* ── User Card ── */}
-          {user && (
-            <View style={s.userCard}>
-              <View style={[s.userAvatar, { backgroundColor: isAdmin ? '#1a0f00' : '#0f0f1a' }]}>
-                <Text style={[s.userAvatarTxt, { color: isAdmin ? ACCENT : '#90b8e0' }]}>{initials}</Text>
-              </View>
-              <View style={s.userInfo}>
-                <Text style={s.userName} numberOfLines={1}>{user.name}</Text>
-                <Text style={s.userEmail} numberOfLines={1}>{user.email}</Text>
-                <View style={[s.userRolePill, isAdmin && s.userRolePillAdmin]}>
-                  <View style={[s.roleDot, { backgroundColor: user.active !== false ? GREEN : '#9CA3AF' }]} />
-                  <Text style={[s.userRoleTxt, isAdmin && s.userRoleTxtAdmin]}>
-                    {isAdmin ? '⚑  Administrador' : 'Cliente'}
-                  </Text>
-                </View>
-              </View>
+            {/* ── Cabeçalho ── */}
+            <View style={s.header}>
+              <Text style={s.headerLabel}>INSIDER</Text>
+              <Pressable onPress={onDismiss} style={s.closeBtn}>
+                <Text style={s.closeTxt}>✕</Text>
+              </Pressable>
             </View>
-          )}
 
-          {/* ── Seção Conta ── */}
-          <View style={s.section}>
-            <Text style={s.sectionLabel}>Minha Conta</Text>
-            {ACCOUNT_ITEMS.map(item => (
-              <Pressable
-                key={item.label}
-                style={({ pressed }) => [s.item, pressed && s.itemPressed]}
-                onPress={() => item.href && go(item.href)}
-              >
-                <View style={s.itemIcon}>
-                  <Text style={s.itemIconTxt}>{item.icon}</Text>
+            {/* ── User Card ── */}
+            {user && (
+              <View style={s.userCard}>
+                <View style={[s.userAvatar, { backgroundColor: isAdmin ? '#1a0f00' : '#0f0f1a' }]}>
+                  <Text style={[s.userAvatarTxt, { color: isAdmin ? ACCENT : '#90b8e0' }]}>{initials}</Text>
                 </View>
-                <Text style={s.itemLabel}>{item.label}</Text>
-                <Text style={s.itemArrow}>›</Text>
-              </Pressable>
-            ))}
-          </View>
-
-          {/* ── Seção Catálogo ── */}
-          <View style={s.section}>
-            <Text style={s.sectionLabel}>Catálogo</Text>
-            {CATALOG_ITEMS.map(item => (
-              <Pressable
-                key={item.label}
-                style={({ pressed }) => [s.item, pressed && s.itemPressed]}
-                onPress={() => item.href && go(item.href)}
-              >
-                <View style={s.itemIcon}>
-                  <Text style={s.itemIconTxt}>{item.icon}</Text>
+                <View style={s.userInfo}>
+                  <Text style={s.userName} numberOfLines={1}>{user.name}</Text>
+                  <Text style={s.userEmail} numberOfLines={1}>{user.email}</Text>
+                  <View style={[s.userRolePill, isAdmin && s.userRolePillAdmin]}>
+                    <View style={[s.roleDot, { backgroundColor: user.active !== false ? GREEN : '#9CA3AF' }]} />
+                    <Text style={[s.userRoleTxt, isAdmin && s.userRoleTxtAdmin]}>
+                      {isAdmin ? '⚑  Administrador' : 'Cliente'}
+                    </Text>
+                  </View>
                 </View>
-                <Text style={s.itemLabel}>{item.label}</Text>
-                <Text style={s.itemArrow}>›</Text>
-              </Pressable>
-            ))}
-          </View>
+              </View>
+            )}
 
-          {/* ── Seção Admin ── */}
-          {isAdmin && (
+            {/* ── Seção Conta ── */}
             <View style={s.section}>
-              <Text style={s.sectionLabel}>Administração</Text>
-              {ADMIN_ITEMS.map(item => (
+              <Text style={s.sectionLabel}>Minha Conta</Text>
+              {ACCOUNT_ITEMS.map(item => (
                 <Pressable
                   key={item.label}
                   style={({ pressed }) => [s.item, pressed && s.itemPressed]}
                   onPress={() => item.href && go(item.href)}
                 >
-                  <View style={[s.itemIcon, s.itemIconAdmin]}>
+                  <View style={s.itemIcon}>
                     <Text style={s.itemIconTxt}>{item.icon}</Text>
                   </View>
                   <Text style={s.itemLabel}>{item.label}</Text>
@@ -137,52 +101,94 @@ export function ServicesDrawer({ visible, onDismiss }: Props) {
                 </Pressable>
               ))}
             </View>
-          )}
 
-          {/* ── Sair ── */}
-          <View style={s.section}>
-            <Pressable
-              style={({ pressed }) => [s.item, s.itemLogout, pressed && s.itemLogoutPressed]}
-              onPress={handleLogout}
-            >
-              <View style={[s.itemIcon, s.itemIconLogout]}>
-                <Text style={s.itemIconTxt}>🚪</Text>
+            {/* ── Seção Catálogo ── */}
+            <View style={s.section}>
+              <Text style={s.sectionLabel}>Catálogo</Text>
+              {CATALOG_ITEMS.map(item => (
+                <Pressable
+                  key={item.label}
+                  style={({ pressed }) => [s.item, pressed && s.itemPressed]}
+                  onPress={() => item.href && go(item.href)}
+                >
+                  <View style={s.itemIcon}>
+                    <Text style={s.itemIconTxt}>{item.icon}</Text>
+                  </View>
+                  <Text style={s.itemLabel}>{item.label}</Text>
+                  <Text style={s.itemArrow}>›</Text>
+                </Pressable>
+              ))}
+            </View>
+
+            {/* ── Seção Admin ── */}
+            {isAdmin && (
+              <View style={s.section}>
+                <Text style={s.sectionLabel}>Administração</Text>
+                {ADMIN_ITEMS.map(item => (
+                  <Pressable
+                    key={item.label}
+                    style={({ pressed }) => [s.item, pressed && s.itemPressed]}
+                    onPress={() => item.href && go(item.href)}
+                  >
+                    <View style={[s.itemIcon, s.itemIconAdmin]}>
+                      <Text style={s.itemIconTxt}>{item.icon}</Text>
+                    </View>
+                    <Text style={s.itemLabel}>{item.label}</Text>
+                    <Text style={s.itemArrow}>›</Text>
+                  </Pressable>
+                ))}
               </View>
-              <Text style={[s.itemLabel, s.itemLabelLogout]}>Sair da conta</Text>
-            </Pressable>
-          </View>
+            )}
 
-          {/* ── Versão ── */}
-          <Text style={s.version}>INSIDER · v1.0.0</Text>
+            {/* ── Sair ── */}
+            <View style={s.section}>
+              <Pressable
+                style={({ pressed }) => [s.item, s.itemLogout, pressed && s.itemLogoutPressed]}
+                onPress={handleLogout}
+              >
+                <View style={[s.itemIcon, s.itemIconLogout]}>
+                  <Text style={s.itemIconTxt}>🚪</Text>
+                </View>
+                <Text style={[s.itemLabel, s.itemLabelLogout]}>Sair da conta</Text>
+              </Pressable>
+            </View>
 
-        </ScrollView>
-      </Modal>
-    </Portal>
+            <Text style={s.version}>INSIDER · v1.0.0</Text>
+
+          </ScrollView>
+        </View>
+
+        {/* Backdrop — toca para fechar */}
+        <Pressable style={s.backdrop} onPress={onDismiss} />
+      </View>
+    </Modal>
   )
 }
 
 const s = StyleSheet.create({
-  overlay: { justifyContent: 'flex-start', alignItems: 'flex-start', margin: 0 },
-  panel:   { width: 260, flex: 1, backgroundColor: '#FFFFFF', paddingHorizontal: 0 },
-  scroll:  { flexGrow: 1, paddingBottom: 32 },
+  /* Layout */
+  root:    { flex: 1, flexDirection: 'row' },
+  backdrop:{ flex: 1, backgroundColor: 'rgba(0,0,0,0.45)' },
+  panel:   { width: 270, backgroundColor: '#FFFFFF' },
+  scroll:  { flexGrow: 1, paddingBottom: 40 },
 
   /* Header */
-  header:     { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingBottom: 20, borderBottomWidth: 1, borderBottomColor: '#F3F4F6' },
-  headerLabel:{ fontSize: 11, letterSpacing: 4, fontWeight: '800', color: DARK },
-  closeBtn:   { width: 32, height: 32, borderRadius: 8, backgroundColor: '#F3F4F6', alignItems: 'center', justifyContent: 'center' },
-  closeTxt:   { color: '#6B7280', fontSize: 13, fontWeight: '700' },
+  header:      { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingBottom: 20, borderBottomWidth: 1, borderBottomColor: '#F3F4F6' },
+  headerLabel: { fontSize: 11, letterSpacing: 4, fontWeight: '800', color: DARK },
+  closeBtn:    { width: 32, height: 32, borderRadius: 8, backgroundColor: '#F3F4F6', alignItems: 'center', justifyContent: 'center' },
+  closeTxt:    { color: '#6B7280', fontSize: 13, fontWeight: '700' },
 
   /* User Card */
-  userCard:       { flexDirection: 'row', alignItems: 'center', gap: 12, margin: 16, padding: 14, backgroundColor: '#F8F9FA', borderRadius: 12, borderWidth: 1, borderColor: '#F3F4F6' },
-  userAvatar:     { width: 44, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center', flexShrink: 0 },
-  userAvatarTxt:  { fontSize: 16, fontWeight: '900' },
-  userInfo:       { flex: 1, minWidth: 0 },
-  userName:       { fontSize: 14, fontWeight: '700', color: DARK },
-  userEmail:      { fontSize: 11, color: '#9CA3AF', marginTop: 1, marginBottom: 5 },
-  userRolePill:   { flexDirection: 'row', alignItems: 'center', gap: 5, alignSelf: 'flex-start', backgroundColor: 'rgba(0,0,0,0.05)', borderRadius: 20, paddingHorizontal: 8, paddingVertical: 3 },
+  userCard:        { flexDirection: 'row', alignItems: 'center', gap: 12, margin: 16, padding: 14, backgroundColor: '#F8F9FA', borderRadius: 12, borderWidth: 1, borderColor: '#F3F4F6' },
+  userAvatar:      { width: 44, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center', flexShrink: 0 },
+  userAvatarTxt:   { fontSize: 16, fontWeight: '900' },
+  userInfo:        { flex: 1, minWidth: 0 },
+  userName:        { fontSize: 14, fontWeight: '700', color: DARK },
+  userEmail:       { fontSize: 11, color: '#9CA3AF', marginTop: 1, marginBottom: 5 },
+  userRolePill:    { flexDirection: 'row', alignItems: 'center', gap: 5, alignSelf: 'flex-start', backgroundColor: 'rgba(0,0,0,0.05)', borderRadius: 20, paddingHorizontal: 8, paddingVertical: 3 },
   userRolePillAdmin: { backgroundColor: 'rgba(201,169,110,0.12)' },
-  roleDot:        { width: 6, height: 6, borderRadius: 3 },
-  userRoleTxt:    { fontSize: 10, fontWeight: '700', color: '#6B7280' },
+  roleDot:         { width: 6, height: 6, borderRadius: 3 },
+  userRoleTxt:     { fontSize: 10, fontWeight: '700', color: '#6B7280' },
   userRoleTxtAdmin:{ color: ACCENT },
 
   /* Sections */
