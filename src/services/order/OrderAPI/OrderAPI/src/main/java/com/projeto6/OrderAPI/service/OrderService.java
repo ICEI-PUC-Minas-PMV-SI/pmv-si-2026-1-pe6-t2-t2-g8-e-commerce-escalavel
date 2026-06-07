@@ -1,21 +1,26 @@
 package com.projeto6.OrderAPI.service;
 
 import com.projeto6.OrderAPI.client.CatalogClient;
+import com.projeto6.OrderAPI.client.PaymentClient;
 import com.projeto6.OrderAPI.client.StockClient;
 import com.projeto6.OrderAPI.dto.ItemRequest;
 import com.projeto6.OrderAPI.dto.ItemResponse;
 import com.projeto6.OrderAPI.dto.OrderRequest;
 import com.projeto6.OrderAPI.dto.OrderResponse;
+import com.projeto6.OrderAPI.dto.PaymentResponse;
 import com.projeto6.OrderAPI.dto.SkuResponse;
 import com.projeto6.OrderAPI.exception.InsufficientStockException;
+import com.projeto6.OrderAPI.exception.PaymentDeclinedException;
 import com.projeto6.OrderAPI.model.Item;
 import com.projeto6.OrderAPI.model.Order;
+import com.projeto6.OrderAPI.model.OrderStatus;
 import com.projeto6.OrderAPI.repository.OrderRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -23,10 +28,6 @@ import java.util.stream.Collectors;
 
 @Service
 public class OrderService {
-
-    private static final String STATUS_CREATED = "CREATED";
-    private static final String STATUS_CANCELLED = "CANCELLED";
-    private static final String STATUS_PAID = "PAID";
 
     @Autowired
     private OrderRepository repository;
@@ -37,12 +38,15 @@ public class OrderService {
     @Autowired
     private StockClient stockClient;
 
+    @Autowired
+    private PaymentClient paymentClient;
+
     @Transactional
     public OrderResponse createOrder(OrderRequest request) {
         Order order = new Order();
         order.setCustomerId(request.getCustomerId());
         order.setItems(toItemList(request.getItems()));
-        order.setStatus(STATUS_CREATED);
+        order.setStatus(OrderStatus.CREATED);
 
         Order saved = repository.save(order);
         reserveStockOrCompensate(saved);
@@ -77,7 +81,7 @@ public class OrderService {
         String previousStatus = order.getStatus();
         order.setStatus(status);
 
-        if (STATUS_PAID.equalsIgnoreCase(status) && !STATUS_PAID.equalsIgnoreCase(previousStatus)) {
+        if (OrderStatus.PAID.equalsIgnoreCase(status) && !OrderStatus.PAID.equalsIgnoreCase(previousStatus)) {
             for (Item item : order.getItems()) {
                 stockClient.confirm(item.getSkuId(), order.getId(), item.getQuantity());
             }
@@ -91,11 +95,11 @@ public class OrderService {
         Order order = repository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Pedido não encontrado"));
 
-        if (STATUS_CANCELLED.equalsIgnoreCase(order.getStatus())) {
+        if (OrderStatus.CANCELLED.equalsIgnoreCase(order.getStatus())) {
             return toResponse(order);
         }
 
-        if (STATUS_PAID.equalsIgnoreCase(order.getStatus())) {
+        if (OrderStatus.PAID.equalsIgnoreCase(order.getStatus())) {
             throw new RuntimeException("Pedido já pago não pode ser cancelado por este endpoint");
         }
 
@@ -103,9 +107,53 @@ public class OrderService {
             stockClient.release(item.getSkuId(), order.getId(), item.getQuantity());
         }
 
-        order.setStatus(STATUS_CANCELLED);
+        order.setStatus(OrderStatus.CANCELLED);
         Order updated = repository.save(order);
         return toResponse(updated);
+    }
+
+    /**
+     * Orquestra o pagamento de um pedido já criado (estoque reservado na criação):
+     * calcula o total, chama a PaymentAPI e, conforme o resultado, confirma o estoque
+     * (APPROVED → PAID) ou libera o estoque (DECLINED → PAYMENT_FAILED). Idempotente
+     * para pedidos já pagos.
+     */
+    @Transactional
+    public OrderResponse payOrder(UUID id, String paymentMethod) {
+        Order order = repository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Pedido não encontrado"));
+
+        if (OrderStatus.PAID.equalsIgnoreCase(order.getStatus())) {
+            return toResponse(order);
+        }
+        if (OrderStatus.CANCELLED.equalsIgnoreCase(order.getStatus())) {
+            throw new RuntimeException("Pedido cancelado não pode ser pago");
+        }
+
+        BigDecimal value = order.getItems().stream()
+                .map(item -> item.getUnitPrice().multiply(BigDecimal.valueOf(item.getQuantity())))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        try {
+            PaymentResponse payment = paymentClient.process(order.getId(), value);
+            for (Item item : order.getItems()) {
+                stockClient.confirm(item.getSkuId(), order.getId(), item.getQuantity());
+            }
+            order.setTransactionId(payment != null ? payment.getTransactionId() : null);
+            order.setStatus(OrderStatus.PAID);
+        } catch (PaymentDeclinedException ex) {
+            for (Item item : order.getItems()) {
+                try {
+                    stockClient.release(item.getSkuId(), order.getId(), item.getQuantity());
+                } catch (RuntimeException ignore) {
+                    // best-effort compensation
+                }
+            }
+            order.setStatus(OrderStatus.PAYMENT_FAILED);
+        }
+
+        Order saved = repository.save(order);
+        return toResponse(saved);
     }
 
     private void reserveStockOrCompensate(Order order) {
@@ -160,6 +208,7 @@ public class OrderService {
         response.setCustomerId(order.getCustomerId());
         response.setItems(toItemResponseList(order.getItems()));
         response.setStatus(order.getStatus());
+        response.setTransactionId(order.getTransactionId());
 
         return response;
     }

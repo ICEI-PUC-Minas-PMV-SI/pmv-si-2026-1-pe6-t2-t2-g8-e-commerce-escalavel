@@ -2,6 +2,8 @@ package com.projeto6.OrderAPI.controller;
 
 import com.projeto6.OrderAPI.dto.OrderRequest;
 import com.projeto6.OrderAPI.dto.OrderResponse;
+import com.projeto6.OrderAPI.dto.PayRequest;
+import com.projeto6.OrderAPI.model.OrderStatus;
 import com.projeto6.OrderAPI.service.OrderService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -9,6 +11,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.Parameter;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -70,6 +73,24 @@ public class OrderController {
             @RequestParam String status) {
 
         return ResponseEntity.ok(orderService.updateStatus(id, status));
+    }
+
+    // Pagar pedido
+    @Operation(summary = "Processar o pagamento de um pedido")
+    @PostMapping("/{id}/pay")
+    public ResponseEntity<OrderResponse> payOrder(
+            @Parameter(description = "ID do pedido", example = "550e8400-e29b-41d4-a716-446655440000")
+            @PathVariable UUID id,
+
+            @RequestBody(required = false) PayRequest request) {
+
+        String method = request != null ? request.getPaymentMethod() : null;
+        OrderResponse response = orderService.payOrder(id, method);
+
+        if (OrderStatus.PAYMENT_FAILED.equalsIgnoreCase(response.getStatus())) {
+            return ResponseEntity.status(HttpStatus.PAYMENT_REQUIRED).body(response);
+        }
+        return ResponseEntity.ok(response);
     }
 
     // Cancelar pedido
