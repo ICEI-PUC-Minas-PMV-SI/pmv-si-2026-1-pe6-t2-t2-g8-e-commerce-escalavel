@@ -46,6 +46,9 @@ export default function RootLayout() {
               <Stack.Screen name="catalog/categories"           options={{ title: 'Categorias' }} />
               <Stack.Screen name="catalog/products"             options={{ title: 'Produtos' }} />
               <Stack.Screen name="catalog/admin/product-form"   options={{ title: 'Produto', presentation: 'modal' }} />
+
+               {/* Notificações */}
+              <Stack.Screen name="notification" options={{ title: 'Notificações' }} />
             </Stack>
           </CartProvider>
         </AuthProvider>
