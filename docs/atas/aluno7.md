@@ -17,10 +17,10 @@
 | 20/04 - 26/04 | Computação Ubíqua e Pervasiva e IoT - Unidade 2 | ✅ | Desenvolvimento Notification Front-End testes | Desenvolvimento Notification Front-End testes |
 | 27/04 - 03/05 | Desenvolvimento de Aplicações Móveis - Unidade 1 | ✅ | Desenvolvimento Notification Front-End testes finais | Desenvolvimento Notification Front-End testes finais |
 | 04/05 - 10/05 | Desenvolvimento de Aplicações Móveis - Unidade 2 | ✅ | Melhorias Notification Front-End | Melhorias Notification Front-End |
-| 11/05 - 17/05 | Desenvolvimento de Aplicações Móveis - Unidade 2 | ⬜ |  |  |
-| 18/05 - 24/05 | Fundamentos de Projeto e Análise de Algoritmos - Unidade 1 | ⬜ |  |  |
-| 25/05 - 31/05 | Fundamentos de Projeto e Análise de Algoritmos - Unidade 2 | ⬜ |  |  |
-| 01/06 - 07/06 |  | ⬜ |  |  |
+| 11/05 - 17/05 | Desenvolvimento de Aplicações Móveis - Unidade 2 | ✅ | Estudar Microfundamento para elaborar o NotificationService Mobile | Estudo dos microfundamentos |
+| 18/05 - 24/05 | Fundamentos de Projeto e Análise de Algoritmos - Unidade 1 | ✅ | Desenvolvimento do NotificationService mobile | Desenvolvimento do NotificationService mobile |
+| 25/05 - 31/05 | Fundamentos de Projeto e Análise de Algoritmos - Unidade 2 | ✅ | Desenvolvimento do NotificationService mobile | Desenvolvimento do NotificationService mobile |
+| 01/06 - 07/06 |  | ✅ | Testes do NotificationService mobile | Testes do desenvolvimento do NotificationService mobile |
 | 08/06 - 14/06 |  | ⬜ |  |  |
 
 **Legenda:** ✅ Estudou | ⬜ Não estudou
