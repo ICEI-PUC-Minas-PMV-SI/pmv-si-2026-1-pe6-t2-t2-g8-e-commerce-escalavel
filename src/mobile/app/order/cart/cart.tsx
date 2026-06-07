@@ -1,85 +1,170 @@
-import { View, Text, FlatList, Pressable } from 'react-native';
-import { useCart } from '../../../contexts/CartContext';
+import { useEffect, useState } from 'react';
+import { View, ScrollView, StyleSheet } from 'react-native';
+import { Button, Text } from 'react-native-paper';
+import { useRouter } from 'expo-router';
 
-export default function CartPage() {
+import { useCart } from '@/contexts/CartContext';
+import CartItem from '@/src/components/CartItem';
+
+export default function CartScreen() {
+  const router = useRouter();
+
   const {
     items,
-    total,
     removeItem,
     increaseQty,
     decreaseQty,
-    clearCart,
   } = useCart();
 
+  const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set());
+
+  // gera chave única do item
+  const getItemKey = (item: any) =>
+    `${item.productId}-${item.size}-${item.color}`;
+
+  useEffect(() => {
+    setSelectedItems(
+      new Set(items.map(item => getItemKey(item)))
+    );
+  }, [items]);
+
+  function toggleSelect(id: string) {
+    setSelectedItems(prev => {
+      const next = new Set(prev);
+
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+
+      return next;
+    });
+  }
+
+  const selectedTotal = items
+    .filter(item => selectedItems.has(getItemKey(item)))
+    .reduce(
+      (sum, item) => sum + item.unitPrice * item.quantity,
+      0
+    );
+
+  if (items.length === 0) {
+    return (
+      <View style={styles.emptyContainer}>
+        <Text variant="headlineSmall">
+          Seu carrinho está vazio
+        </Text>
+
+        <Button
+          mode="contained"
+          onPress={() => router.push('/')}
+          style={{ marginTop: 20 }}
+        >
+          Voltar às compras
+        </Button>
+      </View>
+    );
+  }
+
   return (
-    <View style={{ flex: 1, padding: 16 }}>
-      <Text style={{ fontSize: 20, fontWeight: 'bold', marginBottom: 16 }}>
-        Carrinho
-      </Text>
+    <View style={styles.container}>
 
-      {items.length === 0 ? (
-        <Text>Seu carrinho está vazio</Text>
-      ) : (
-        <>
-          <FlatList
-            data={items}
-            keyExtractor={(item) => item.productId}
-            renderItem={({ item }) => (
-              <View
-                style={{
-                  padding: 12,
-                  borderWidth: 1,
-                  borderRadius: 8,
-                  marginBottom: 10,
-                }}
-              >
-                <Text>{item.productName}</Text>
-                <Text>R$ {item.unitPrice}</Text>
-                <Text>Qtd: {item.quantity}</Text>
+      <ScrollView contentContainerStyle={styles.list}>
+        {items.map(item => {
+          const key = getItemKey(item);
 
-                <View style={{ flexDirection: 'row', gap: 10, marginTop: 8 }}>
-                  <Pressable onPress={() => decreaseQty(item.productId)}>
-                    <Text>-</Text>
-                  </Pressable>
+          return (
+            <CartItem
+              key={key}
+              item={item}
+              selected={selectedItems.has(key)}
+              onToggleSelect={toggleSelect}
+              onIncrease={increaseQty}
+              onDecrease={decreaseQty}
+              onRemove={removeItem}
+            />
+          );
+        })}
+      </ScrollView>
 
-                  <Pressable onPress={() => increaseQty(item.productId)}>
-                    <Text>+</Text>
-                  </Pressable>
+      <View style={styles.footer}>
 
-                  <Pressable onPress={() => removeItem(item.productId)}>
-                    <Text>Remover</Text>
-                  </Pressable>
-                </View>
-              </View>
-            )}
-          />
+        <Text style={styles.totalLabel}>
+          Total
+        </Text>
 
-          <Text style={{ fontSize: 18, fontWeight: 'bold' }}>
-            Total: R$ {total.toFixed(2)}
-          </Text>
+        <Text style={styles.totalValue}>
+          R$ {selectedTotal.toFixed(2)}
+        </Text>
 
-          <Pressable
-            onPress={clearCart}
-            style={{
-              marginTop: 10,
-              padding: 10,
-              backgroundColor: 'red',
-            }}
-          >
-            <Text style={{ color: 'white' }}>Limpar carrinho</Text>
-          </Pressable>
+        <Button
+          mode="contained"
+          disabled={selectedTotal === 0}
+          onPress={() => router.push('/order/checkout/checkout')}
+          contentStyle={{ paddingVertical: 6, height: 48 }}
+          labelStyle={{ fontSize: 16, fontWeight: '600', marginTop: 6 }}
+          style={[styles.checkoutButton, { borderRadius: 12 }]}
+        >
+          Finalizar Compra
+        </Button>
 
-          <Pressable
-            style={{
-              marginTop: 10,
-              padding: 10,
-              backgroundColor: 'green',
-            }}
-          >
-            <Text style={{ color: 'white' }}>Ir para checkout</Text>
-          </Pressable>
-        </>
-      )}
+        <Button
+          mode="outlined"
+          onPress={() => router.push('/')}
+          labelStyle={{ fontSize: 16, fontWeight: '600' }}
+          style={[styles.continueButton, { borderRadius: 12 }]}
+        >
+          Continuar Comprando
+        </Button>
+
+      </View>
+
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+
+  list: {
+    padding: 16,
+    paddingBottom: 100,
+  },
+
+  footer: {
+    padding: 16,
+    borderTopWidth: 1,
+    borderColor: '#E5E7EB',
+    backgroundColor: '#FFFFFF',
+  },
+
+  totalLabel: {
+    fontSize: 14,
+    color: '#6B7280',
+  },
+
+  totalValue: {
+    fontSize: 24,
+    fontWeight: '700',
+    marginTop: 4,
+    marginBottom: 16,
+  },
+
+  checkoutButton: {
+    marginBottom: 10,
+  },
+
+  continueButton: {
+    marginBottom: 4,
+  },
+
+  emptyContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 24,
+  },
+});
