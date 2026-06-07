@@ -24,9 +24,10 @@ function minPrice(product: Product): number | null {
 type Props = {
   product: Product;
   onPress?: (product: Product) => void;
+  onLongPress?: (product: Product) => void;
 };
 
-export function ProductCard({ product, onPress }: Props) {
+export function ProductCard({ product, onPress, onLongPress }: Props) {
   const theme = useTheme();
   const price = minPrice(product);
   const imageUri = resolveImageUri(product.urlImg);
@@ -38,6 +39,7 @@ export function ProductCard({ product, onPress }: Props) {
       mode="outlined"
       style={styles.card}
       onPress={onPress ? () => onPress(product) : undefined}
+      onLongPress={onLongPress ? () => onLongPress(product) : undefined}
     >
       <View style={[styles.imageWrap, { backgroundColor: theme.colors.surfaceVariant }]}>
         {showImage ? (

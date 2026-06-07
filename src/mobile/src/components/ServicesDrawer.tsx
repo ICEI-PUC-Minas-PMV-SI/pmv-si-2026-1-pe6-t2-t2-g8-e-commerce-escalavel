@@ -40,6 +40,10 @@ export function ServicesDrawer({ visible, onDismiss }: Props) {
     { icon: '📋', label: 'Meus Pedidos', href: '/order/purchasedOrders/purchasedOrders'},
   ]
 
+  const CATALOG_ITEMS: MenuItem[] = [
+    { icon: '🏷️', label: 'Categorias', href: '/catalog/categories' },
+  ]
+
   const ADMIN_ITEMS: MenuItem[] = [
     { icon: '👥', label: 'Usuários', href: '/admin/users' },
     { icon: '📦', label: 'Estoque', href: '/stock' },
@@ -86,6 +90,24 @@ export function ServicesDrawer({ visible, onDismiss }: Props) {
           <View style={s.section}>
             <Text style={s.sectionLabel}>Minha Conta</Text>
             {ACCOUNT_ITEMS.map(item => (
+              <Pressable
+                key={item.label}
+                style={({ pressed }) => [s.item, pressed && s.itemPressed]}
+                onPress={() => item.href && go(item.href)}
+              >
+                <View style={s.itemIcon}>
+                  <Text style={s.itemIconTxt}>{item.icon}</Text>
+                </View>
+                <Text style={s.itemLabel}>{item.label}</Text>
+                <Text style={s.itemArrow}>›</Text>
+              </Pressable>
+            ))}
+          </View>
+
+          {/* ── Seção Catálogo ── */}
+          <View style={s.section}>
+            <Text style={s.sectionLabel}>Catálogo</Text>
+            {CATALOG_ITEMS.map(item => (
               <Pressable
                 key={item.label}
                 style={({ pressed }) => [s.item, pressed && s.itemPressed]}

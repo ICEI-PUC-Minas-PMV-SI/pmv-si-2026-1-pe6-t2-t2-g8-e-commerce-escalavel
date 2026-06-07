@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { BottomNavigation } from 'react-native-paper';
-import { Redirect, useRouter } from 'expo-router';
+import { useRouter } from 'expo-router';
 
 import { ServicesDrawer } from '@/src/components/ServicesDrawer';
 import { CatalogScreen } from '@/src/screens/CatalogScreen';
@@ -49,6 +49,9 @@ export default function AppShell() {
         navigationState={{ index, routes: ROUTES }}
         onIndexChange={onIndexChange}
         renderScene={renderScene}
+        barStyle={{ backgroundColor: '#0A0A0A' }}
+        inactiveColor="rgba(255,255,255,0.55)"
+        activeColor="#FFFFFF"
       />
       <ServicesDrawer visible={drawerOpen} onDismiss={() => setDrawerOpen(false)} />
     </>

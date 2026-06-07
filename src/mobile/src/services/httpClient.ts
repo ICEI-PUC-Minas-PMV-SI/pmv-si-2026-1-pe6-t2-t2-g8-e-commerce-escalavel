@@ -8,9 +8,11 @@ type RequestOptions = {
   headers?: HeadersInit;
 };
 
-// TODO: integrate expo-secure-store for token storage when auth lands.
+import { tokenStore } from './tokenStore';
+
 export async function authHeader(): Promise<HeadersInit> {
-  return {};
+  const token = tokenStore.get();
+  return token ? { Authorization: `Bearer ${token}` } : {};
 }
 
 export class HttpClient {
