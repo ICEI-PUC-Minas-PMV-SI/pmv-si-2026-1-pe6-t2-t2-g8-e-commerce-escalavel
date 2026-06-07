@@ -19,8 +19,8 @@
 | 04/05 - 10/05 | Desenvolvimento de Aplicações Móveis - Unidade 2 | ✅ | Desenvolvimento do frontend order e testes | Desenvolvimento do frontend order e testes |
 | 11/05 - 17/05 | Desenvolvimento de Aplicações Móveis - Unidade 2 | ✅ | Correção da documentação frontend | Correção da documentação frontend |
 | 18/05 - 24/05 | Fundamentos de Projeto e Análise de Algoritmos - Unidade 1 | ✅ | Estudo dos microfundamentos | Estudo dos microfundamentos |
-| 25/05 - 31/05 | Fundamentos de Projeto e Análise de Algoritmos - Unidade 2 | ⬜ | Implementação do order mobile |  |
-| 01/06 - 07/06 |  | ⬜ |  |  |
+| 25/05 - 31/05 | Fundamentos de Projeto e Análise de Algoritmos - Unidade 2 | ✅ | Implementação do order mobile | Implementação do order mobile |
+| 01/06 - 07/06 |  | ✅ | Documentação e Testes | Documentação e Testes |
 | 08/06 - 14/06 |  | ⬜ |  |  |
 
 **Legenda:** ✅ Estudou | ⬜ Não estudou
