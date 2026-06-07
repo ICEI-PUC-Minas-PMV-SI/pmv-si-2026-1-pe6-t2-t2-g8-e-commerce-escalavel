@@ -5,10 +5,11 @@ import { useRouter } from 'expo-router';
 
 import { useCart } from '@/contexts/CartContext';
 import { useAuth } from '@/src/contexts/AuthContext';
+import { orderService } from '@/src/services/orderService';
 
 export default function CheckoutScreen() {
   const router = useRouter();
-  const { items, total } = useCart();
+  const { items, total, clearCart } = useCart();
   const { user } = useAuth();
 
   const [loading, setLoading] = useState(false);
@@ -47,11 +48,32 @@ export default function CheckoutScreen() {
     setError(null);
 
     try {
-      await new Promise(resolve => setTimeout(resolve, 1200));
 
-      router.push('/order/purchasedOrders/purchasedOrders');
-    } catch (e) {
-      setError('Erro ao finalizar pedido.');
+      const orderPayload = {
+        customerId: user.id,
+        items: items.map(item => ({
+          skuId: item.productId, // vamos ajustar depois
+          quantity: item.quantity,
+        })),
+      };
+
+      const createdOrder =
+        await orderService.createOrder(orderPayload);
+
+      console.log('Pedido criado:', createdOrder);
+
+      clearCart();
+
+      router.push(
+        '/order/purchasedOrders/purchasedOrders'
+      );
+
+    } catch (error) {
+      console.error(error);
+
+      setError(
+        'Erro ao finalizar pedido.'
+      );
     } finally {
       setLoading(false);
     }
@@ -299,17 +321,17 @@ const styles = StyleSheet.create({
   },
 
   summaryItem: {
-  fontSize: 15,
-  color: 'black',
-  marginBottom: 2,
-},
+    fontSize: 15,
+    color: 'black',
+    marginBottom: 2,
+  },
 
   totalItem: {
-  fontSize: 18,
-  fontWeight: '700',
-  color: 'black',
-  marginBottom: 2,
-},
+    fontSize: 18,
+    fontWeight: '700',
+    color: 'black',
+    marginBottom: 2,
+  },
 
   totalRow: {
     flexDirection: 'row',

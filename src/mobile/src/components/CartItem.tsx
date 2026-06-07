@@ -17,14 +17,15 @@ interface Props {
     unitPrice: number;
     quantity: number;
     size: string;
+    color: string;
   };
 
   selected: boolean;
 
   onToggleSelect: (id: string) => void;
-  onIncrease: (id: string) => void;
-  onDecrease: (id: string) => void;
-  onRemove: (id: string) => void;
+onIncrease: (productId: string, size: string, color: string) => void;
+onDecrease: (productId: string, size: string, color: string) => void;
+  onRemove: (productId: string, size: string, color: string) => void;
 }
 
 export default function CartItem({
@@ -66,12 +67,14 @@ export default function CartItem({
               size={22}
 
               // ATIVAR NA INTEGRAÇÃO
-              // onPress={() => router.push(`/product/${item.productId}`)}
-
+              onPress={() => {
+  console.log('NAVIGATE TO PRODUCT:', item.productId);
+  router.push(`/products/${item.productId}`);
+}}
               // TEMPORÁRIO
-              onPress={() =>
-                console.log('Abrir produto', item.productId)
-              }
+             // onPress={() =>
+             //   console.log('Abrir produto', item.productId)
+             // }
             />
 
           </View>
@@ -91,6 +94,10 @@ export default function CartItem({
                 Tamanho: {item.size}
               </Text>
 
+              <Text style={styles.color}>
+                Cor: {item.color}
+              </Text>
+
               <Text style={styles.subtotal}>
                 Subtotal: R$ {subtotal.toFixed(2)}
               </Text>
@@ -103,7 +110,7 @@ export default function CartItem({
                   mode="contained-tonal"
                   size={18}
                   style={styles.qtyButton}
-                  onPress={() => onDecrease(item.productId)}
+                  onPress={() => onDecrease(item.productId, item.size, item.color)}
                 />
 
                 <Text style={styles.quantity}>
@@ -115,7 +122,7 @@ export default function CartItem({
                   mode="contained-tonal"
                   size={18}
                   style={styles.qtyButton}
-                  onPress={() => onIncrease(item.productId)}
+                  onPress={() => onIncrease(item.productId, item.size, item.color)}
                 />
 
               </View>
@@ -139,7 +146,7 @@ export default function CartItem({
         productName={item.productName}
         onCancel={() => setShowRemoveModal(false)}
         onConfirm={() => {
-          onRemove(item.productId);
+          onRemove(item.productId, item.size, item.color)
           setShowRemoveModal(false);
         }}
       />
@@ -221,4 +228,11 @@ const styles = StyleSheet.create({
     color: '#111827',
     marginBottom: 8,
   },
+
+  color: {
+  fontSize: 16,
+  color: 'black',
+  marginBottom: 4,
+},
+
 });

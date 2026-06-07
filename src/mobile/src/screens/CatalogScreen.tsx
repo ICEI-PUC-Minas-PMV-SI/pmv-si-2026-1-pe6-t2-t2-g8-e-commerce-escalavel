@@ -10,6 +10,7 @@ import { ProductCard } from '@/src/components/ProductCard';
 import { catalogService } from '@/src/services/catalogService';
 import { useAuth } from '@/src/contexts/AuthContext';
 import type { Product } from '@/src/types/catalog';
+import { router } from 'expo-router'
 
 const ACCENT = '#C9A96E';
 const DARK   = '#0A0A0A';
@@ -139,7 +140,12 @@ export function CatalogScreen() {
         <FlatList
           data={filtered}
           keyExtractor={item => item.id}
-          renderItem={({ item }) => <ProductCard product={item} />}
+          renderItem={({ item }) => (
+            <ProductCard 
+              product={item} 
+              onPress={(product) => router.push(`/products/${product.id}`)}
+            />
+          )}
           numColumns={2}
           contentContainerStyle={s.list}
           columnWrapperStyle={s.row}

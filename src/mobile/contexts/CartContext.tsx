@@ -1,11 +1,13 @@
 import React, { createContext, useContext, useMemo, useState } from 'react';
 
 export interface CartItem {
+  skuId: string;
   productId: string;
   productName: string;
   unitPrice: number;
   quantity: number;
   size: string;
+  color: string;
 }
 
 interface CartContextData {
@@ -13,9 +15,9 @@ interface CartContextData {
   total: number;
 
   addItem: (item: CartItem) => void;
-  removeItem: (productId: string) => void;
-  increaseQty: (productId: string) => void;
-  decreaseQty: (productId: string) => void;
+  removeItem: (productId: string, size: string, color: string) => void;
+  increaseQty: (productId: string, size: string, color: string) => void;
+  decreaseQty: (productId: string, size: string, color: string) => void;
   clearCart: () => void;
 }
 
@@ -24,42 +26,16 @@ const CartContext = createContext<CartContextData | undefined>(undefined);
 export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  
-  // REATIVAR QUANDO ESTIVER TUDO PRONTO
-  //const [items, setItems] = useState<CartItem[]>([]);
 
-  // MOCK PARA TESTES DO CARRINHO
-  const [items, setItems] = useState<CartItem[]>([
-  {
-    productId: '1',
-    productName: 'Camiseta Básica Insider',
-    unitPrice: 89.90,
-    quantity: 2,
-    size: 'P',
-  },
-  {
-    productId: '2',
-    productName: 'Calça Slim Masculina',
-    unitPrice: 149.90,
-    quantity: 1,
-    size: 'M',
-  },
-  {
-    productId: '3',
-    productName: 'Jaqueta Casual',
-    unitPrice: 229.90,
-    quantity: 1,
-    size: 'G',
-  },
-]);
+  const [items, setItems] = useState<CartItem[]>([]);
 
   function addItem(item: CartItem) {
-    setItems((prev) => {
-      const existing = prev.find(i => i.productId === item.productId);
+    setItems(prev => {
+      const existing = prev.find(i => i.skuId === item.skuId);
 
       if (existing) {
         return prev.map(i =>
-          i.productId === item.productId
+          i.skuId === item.skuId
             ? { ...i, quantity: i.quantity + item.quantity }
             : i
         );
@@ -69,25 +45,38 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
     });
   }
 
-  function removeItem(productId: string) {
-    setItems(prev => prev.filter(i => i.productId !== productId));
+  function removeItem(productId: string, size?: string, color?: string) {
+    setItems(prev =>
+      prev.filter(
+        i =>
+          !(
+            i.productId === productId &&
+            i.size === size &&
+            i.color === color
+          )
+      )
+    );
   }
 
-  function increaseQty(productId: string) {
+  function increaseQty(productId: string, size: string, color: string) {
     setItems(prev =>
       prev.map(i =>
-        i.productId === productId
+        i.productId === productId &&
+          i.size === size &&
+          i.color === color
           ? { ...i, quantity: i.quantity + 1 }
           : i
       )
     );
   }
 
-  function decreaseQty(productId: string) {
+  function decreaseQty(productId: string, size: string, color: string) {
     setItems(prev =>
       prev
         .map(i =>
-          i.productId === productId
+          i.productId === productId &&
+            i.size === size &&
+            i.color === color
             ? { ...i, quantity: i.quantity - 1 }
             : i
         )
