@@ -37,6 +37,9 @@ export default function RootLayout() {
               <Stack.Screen name="stock/restock" options={{ title: 'Reabastecer', presentation: 'modal' }} />
               <Stack.Screen name="stock/adjust"  options={{ title: 'Ajustar', presentation: 'modal' }} />
               <Stack.Screen name="stock/history" options={{ title: 'Histórico' }} />
+              <Stack.Screen name="order/cart/cart" options={{ title: 'Carrinho' }}/>
+              <Stack.Screen name="order/checkout/checkout" options={{ title: 'Checkout' }}/>
+              <Stack.Screen name="order/purchasedOrders/purchasedOrders" options={{ title: 'Meus Pedidos' }}/>
 
               {/* Catálogo */}
               <Stack.Screen name="catalog/product/[id]"         options={{ title: 'Produto' }} />

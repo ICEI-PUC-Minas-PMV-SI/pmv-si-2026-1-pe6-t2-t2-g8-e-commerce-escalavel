@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import { useFocusEffect } from 'expo-router';
 import {
   Alert,
   FlatList,
@@ -17,6 +18,7 @@ import { ProductCard } from '@/src/components/ProductCard';
 import { catalogService } from '@/src/services/catalogService';
 import { useAuth } from '@/src/contexts/AuthContext';
 import type { Category, Product } from '@/src/types/catalog';
+import { router } from 'expo-router'
 
 const ACCENT = '#C9A96E';
 const DARK   = '#0A0A0A';
@@ -85,12 +87,14 @@ export function CatalogScreen() {
     }
   }, [activeCatId]);
 
-  useEffect(() => {
-    const ctrl = new AbortController();
-    setLoading(true);
-    load(ctrl.signal).finally(() => setLoading(false));
-    return () => ctrl.abort();
-  }, [load]);
+  useFocusEffect(
+    useCallback(() => {
+      const ctrl = new AbortController();
+      setLoading(true);
+      load(ctrl.signal).finally(() => setLoading(false));
+      return () => ctrl.abort();
+    }, [load])
+  );
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
@@ -133,7 +137,8 @@ export function CatalogScreen() {
   };
 
   return (
-    <SafeAreaView style={s.root} edges={['bottom']}>
+    <View style={s.statusBarBg}>
+    <SafeAreaView style={s.root} edges={['top', 'bottom']}>
 
       {/* ── Header ── */}
       <View style={s.header}>
@@ -265,10 +270,12 @@ export function CatalogScreen() {
       )}
 
     </SafeAreaView>
+    </View>
   );
 }
 
 const s = StyleSheet.create({
+  statusBarBg: { flex: 1, backgroundColor: '#0A0A0A' },
   root: { flex: 1, backgroundColor: '#F3F4F6' },
 
   /* Header */
@@ -290,8 +297,8 @@ const s = StyleSheet.create({
   chip:         { backgroundColor: '#F3F4F6' },
 
   /* List */
-  list:      { padding: 10, paddingBottom: 96 },
-  row:       { gap: 0 },
+  list:      { paddingHorizontal: 12, paddingTop: 8, paddingBottom: 96 },
+  row:       { gap: 0, paddingHorizontal: 2 },
   resultTxt: { fontSize: 12, color: '#9CA3AF', marginHorizontal: 6, marginBottom: 8, fontWeight: '500' },
 
   /* Error */
