@@ -1,3 +1,5 @@
+import * as Clipboard from 'expo-clipboard';
+import * as Haptics from 'expo-haptics';
 import { useFocusEffect, useRouter } from 'expo-router';
 import { useCallback, useMemo, useState } from 'react';
 import { FlatList, StyleSheet, View } from 'react-native';
@@ -9,6 +11,7 @@ import {
   Divider,
   FAB,
   Searchbar,
+  Snackbar,
   Text,
 } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -28,6 +31,13 @@ export default function StockListScreen() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState('');
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = useCallback(async (skuId: string) => {
+    await Clipboard.setStringAsync(skuId);
+    void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    setCopied(true);
+  }, []);
 
   const load = useCallback(async (signal?: AbortSignal) => {
     setError(null);
@@ -83,7 +93,13 @@ export default function StockListScreen() {
                 {subtitle}
               </Text>
             ) : null}
-            <Text variant="bodySmall" style={styles.sku} numberOfLines={1}>
+            <Text
+              variant="bodySmall"
+              style={styles.sku}
+              numberOfLines={1}
+              onPress={() => handleCopy(item.skuId)}
+              accessibilityLabel="Copiar SKU"
+            >
               {item.skuId}
             </Text>
 
@@ -119,7 +135,7 @@ export default function StockListScreen() {
         </Card>
       );
     },
-    [router]
+    [router, handleCopy]
   );
 
   return (
@@ -168,6 +184,14 @@ export default function StockListScreen() {
         style={styles.fab}
         onPress={() => router.push('/stock/create')}
       />
+
+      <Snackbar
+        visible={copied}
+        onDismiss={() => setCopied(false)}
+        duration={1500}
+      >
+        SKU copiado.
+      </Snackbar>
     </SafeAreaView>
   );
 }
