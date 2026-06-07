@@ -210,6 +210,7 @@ services:
     environment:
       - DOTNET_ConnectionStrings__Default=Host=postgres;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}
       - RABBITMQ_URL=amqp://guest:guest@rabbitmq:5672
+      - RabbitMQ__Host=rabbitmq
     depends_on:
       rabbitmq:
         condition: service_healthy

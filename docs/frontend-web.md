@@ -1377,10 +1377,114 @@ Invoke-WebRequest -Uri http://localhost:5000/api/demo/stock   -Method POST
 
 ---
 
+## Testes — Módulo de Pagamento (Checkout)
+
+Testes funcionais manuais cobrindo o fluxo de pagamento integrado ao checkout web. Pré-condição global: usuário autenticado, ao menos 1 item no carrinho.
+
+### Inventário de itens de interface
+
+| ID | Componente / Tela | Arquivo |
+|----|---|---|
+| P1 | Seletor de método de pagamento | `CheckoutPage.jsx` |
+| P2 | Botão "Confirmar e pagar" | `CheckoutPage.jsx` |
+| P3 | Modal de sucesso (`OrderSuccessModal`) | `modals/OrderSuccessModal.jsx` |
+| P4 | Modal de recusa (`PaymentDeclinedModal`) | `modals/PaymentDeclinedModal.jsx` |
+| P5 | Código PIX copiável | `modals/OrderSuccessModal.jsx` |
+| P6 | `transactionId` no card de pedido | `OrderCard.jsx` |
+| P7 | `transactionId` no detalhe do pedido | `modals/OrderDetailsModal.jsx` |
+
+---
+
+### Casos de teste
+
+#### Checkout — P1: Pagamento aprovado (valor redondo)
+
+##### TC-P1-01 · Fluxo feliz — cartão de crédito aprovado
+
+- **Pré-condições:**
+  - Carrinho com produto cujo total **não** termina em `.99`.
+- **Passos:**
+  1. Acessar `/checkout`.
+  2. Selecionar **Cartão de crédito**.
+  3. Clicar em **Confirmar e pagar**.
+- **Resultado esperado:**
+  - `OrderSuccessModal` abre com status `PAID` e `transactionId` exibido.
+  - Carrinho é esvaziado.
+
+---
+
+#### Checkout — P2: Pagamento recusado e retry
+
+##### TC-P2-01 · Pagamento recusado — modal de recusa exibido
+
+- **Pré-condições:**
+  - Carrinho com produto cujo total termina exatamente em `.99` (ex: R$ 9,99).
+- **Passos:**
+  1. Acessar `/checkout`, selecionar método, clicar **Confirmar e pagar**.
+- **Resultado esperado:**
+  - `PaymentDeclinedModal` abre com mensagem de recusa.
+  - Status do pedido = `PAYMENT_FAILED`.
+  - Botão **Tentar novamente** visível.
+
+##### TC-P2-02 · Retry após recusa — aprovação
+
+- **Pré-condições:**
+  - `PaymentDeclinedModal` aberto (TC-P2-01 executado).
+  - Simular valor aprovado (alterar item do carrinho ou usar outro pedido).
+- **Passos:**
+  1. Clicar em **Tentar novamente** no modal de recusa.
+- **Resultado esperado:**
+  - `PaymentDeclinedModal` fecha, `OrderSuccessModal` abre com `PAID` + `transactionId`.
+
+---
+
+#### Checkout — P3: PIX copiável
+
+##### TC-P3-01 · Código PIX exibido e copiado
+
+- **Pré-condições:**
+  - Carrinho com valor redondo (aprovação simulada).
+- **Passos:**
+  1. Selecionar **PIX** no seletor de método.
+  2. Confirmar pagamento.
+  3. No `OrderSuccessModal`, clicar em **Copiar código PIX**.
+- **Resultado esperado:**
+  - Botão muda para **Copiado!** por ~2 s.
+  - Código PIX na área de transferência.
+
+---
+
+#### Pedidos — P4: transactionId visível
+
+##### TC-P4-01 · transactionId no card de pedido
+
+- **Pré-condições:**
+  - Pedido `PAID` existente na listagem `/orders`.
+- **Passos:**
+  1. Acessar `/orders`.
+- **Resultado esperado:**
+  - Card exibe linha `Transação: TRX-XXXXXX`.
+
+##### TC-P4-02 · transactionId no modal de detalhes
+
+- **Pré-condições:**
+  - Pedido `PAID` existente.
+- **Passos:**
+  1. Acessar `/orders`, clicar em **Página do produto** no card.
+- **Resultado esperado:**
+  - Modal exibe `Transação: TRX-XXXXXX`.
+
+---
+
 ## Referências
 
 - `src/services/notification/Program.cs`
 - `src/frontend/notification/NotificationPage.tsx`
 - `src/frontend/notification/NotificationBell.jsx`
 - `src/frontend/notification/NotificationRoutes.jsx`
+- `src/frontend/Order/pages/CheckoutPage.jsx`
+- `src/frontend/Order/components/modals/OrderSuccessModal.jsx`
+- `src/frontend/Order/components/modals/PaymentDeclinedModal.jsx`
+- `src/frontend/Order/components/OrderCard.jsx`
+- `src/frontend/Order/components/modals/OrderDetailsModal.jsx`
 - `src/frontend/App.tsx`

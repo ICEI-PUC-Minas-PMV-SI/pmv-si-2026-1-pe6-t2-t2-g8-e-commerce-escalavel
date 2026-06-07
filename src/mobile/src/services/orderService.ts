@@ -29,6 +29,7 @@ export interface Order {
   id: string;
   customerId: string;
   status: string;
+  transactionId?: string;
   items: OrderItemResponse[];
 }
 
@@ -103,6 +104,26 @@ class OrderService {
         headers: await authHeader(),
       }
     );
+  }
+
+  async payOrder(
+    orderId: string,
+    paymentMethod?: string,
+    signal?: AbortSignal
+  ): Promise<{ order: Order; declined: boolean }> {
+    const headers = new Headers(await authHeader() as HeadersInit);
+    headers.set('Content-Type', 'application/json');
+    const res = await fetch(
+      `${process.env.EXPO_PUBLIC_API_URL}/orders/${orderId}/pay`,
+      {
+        method: 'POST',
+        signal,
+        headers,
+        body: paymentMethod ? JSON.stringify({ paymentMethod }) : undefined,
+      }
+    );
+    const order: Order = await res.json();
+    return { order, declined: res.status === 402 };
   }
 
   async updateOrderStatus(

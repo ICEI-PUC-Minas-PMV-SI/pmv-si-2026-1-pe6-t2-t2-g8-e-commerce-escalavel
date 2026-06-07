@@ -8,11 +8,11 @@ import DeliveredOrderModal from '@/src/components/modals/DeliveredOrderModal';
 import OrderDetailsModal from '@/src/components/modals/OrderDetailsModal';
 
 import { useAuth } from '@/src/contexts/AuthContext';
+import { orderService } from '@/src/services/orderService';
 
 type OrderItem = {
-  id: string;
-  productName: string;
-  size: string;
+  skuId: string;
+  productId: string;
   quantity: number;
   unitPrice: number;
 };
@@ -21,6 +21,7 @@ type Order = {
   id: string;
   status: string;
   total: number;
+  transactionId?: string;
   items: OrderItem[];
 };
 
@@ -42,17 +43,15 @@ export default function PurchasedOrders() {
 
     async function loadOrders() {
       try {
-        const res = await fetch(
-          `http://10.0.2.2:7000/api/orders/customer/${user.id}`
-        );
-
-        if (!res.ok) {
-          throw new Error('Erro ao buscar pedidos');
-        }
-
-        const data = await res.json();
-        setOrders(data);
-
+        const data = await orderService.getOrdersByUserId(user.id);
+        const normalized = data.map(o => ({
+          ...o,
+          total: o.items.reduce(
+            (sum, it) => sum + Number(it.unitPrice || 0) * it.quantity,
+            0
+          ),
+        }));
+        setOrders(normalized);
       } catch (err) {
         console.log('Erro ao carregar pedidos:', err);
         setOrders([]);
@@ -116,7 +115,7 @@ export default function PurchasedOrders() {
               status: order.status,
               productName:
                 order.items.length === 1
-                  ? order.items[0].productName
+                  ? `Pedido - item ${order.items[0].productId}`
                   : `Pedido - ${order.items.length} itens`,
               total: order.total,
             }}

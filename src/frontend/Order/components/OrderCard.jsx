@@ -58,6 +58,12 @@ function OrderCard({ order, onViewDetails, onCancel, onDiscard }) {
               </span>
             </p>
 
+            {order.transactionId && (
+              <p className="text-xs text-gray-400">
+                Transação: {order.transactionId}
+              </p>
+            )}
+
           </div>
         </div>
 

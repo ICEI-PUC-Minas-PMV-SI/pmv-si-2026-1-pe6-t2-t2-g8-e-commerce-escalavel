@@ -4,6 +4,7 @@ import { useCart } from "../../contexts/CartContext";
 import { useAuth } from "../../contexts/AuthContext";
 import { orderApi } from "../../services/api";
 import OrderSuccessModal from "../components/modals/OrderSuccessModal";
+import PaymentDeclinedModal from "../components/modals/PaymentDeclinedModal";
 
 function CheckoutPage() {
   const navigate = useNavigate();
@@ -23,7 +24,8 @@ function CheckoutPage() {
     paymentMethod: "credit_card"
   });
 
-  const [createdOrder, setCreatedOrder] = useState(null);
+  const [paidOrder, setPaidOrder] = useState(null);
+  const [declinedOrder, setDeclinedOrder] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -56,12 +58,35 @@ function CheckoutPage() {
         })),
       };
 
-      const response = await orderApi.createOrder(orderData);
-      setCreatedOrder(response);
-      clearCart();
-    } catch (error) {
-      console.error("Erro ao criar pedido:", error);
+      const order = await orderApi.createOrder(orderData);
+      await processPayment(order.id);
+    } catch (err) {
+      console.error("Erro ao criar pedido:", err);
       setError("Erro ao finalizar pedido. Tente novamente.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const processPayment = async (orderId) => {
+    const res = await orderApi.payOrder(orderId, form.paymentMethod);
+    if (res.status === "PAYMENT_FAILED") {
+      setDeclinedOrder(res);
+    } else {
+      setPaidOrder(res);
+      clearCart();
+    }
+  };
+
+  const handleRetry = async () => {
+    if (!declinedOrder) return;
+    setLoading(true);
+    setError(null);
+    try {
+      await processPayment(declinedOrder.id);
+      setDeclinedOrder(null);
+    } catch (err) {
+      setError("Erro ao tentar novamente.");
     } finally {
       setLoading(false);
     }
@@ -186,9 +211,9 @@ function CheckoutPage() {
           </div>
 
           <div
-            onClick={() => setForm({ ...form, paymentMethod: "debt_card" })}
+            onClick={() => setForm({ ...form, paymentMethod: "debit_card" })}
             className={`border rounded-md p-3 text-center cursor-pointer transition transition transform hover:scale-[1.02] ${
-              form.paymentMethod === "debt_card"
+              form.paymentMethod === "debit_card"
                 ? "border-black bg-black text-white"
                 : "border-gray-400"
             }`}
@@ -246,7 +271,7 @@ function CheckoutPage() {
           onClick={handleSubmit}
           disabled={loading || cartItems.length === 0}
         >
-          {loading ? 'Processando pedido...' : 'Confirmar pedido'}
+          {loading ? 'Processando...' : 'Confirmar e pagar'}
         </button>
 
         <button
@@ -258,11 +283,22 @@ function CheckoutPage() {
 
       </div>
 
-      {/* MODAL */}
-      {createdOrder && (
+      {/* MODAL SUCESSO */}
+      {paidOrder && (
         <OrderSuccessModal
-          order={createdOrder}
-          onClose={() => setCreatedOrder(null)}
+          order={paidOrder}
+          paymentMethod={form.paymentMethod}
+          onClose={() => setPaidOrder(null)}
+        />
+      )}
+
+      {/* MODAL RECUSA */}
+      {declinedOrder && (
+        <PaymentDeclinedModal
+          order={declinedOrder}
+          onRetry={handleRetry}
+          onClose={() => { setDeclinedOrder(null); navigate("/orders"); }}
+          loading={loading}
         />
       )}
 

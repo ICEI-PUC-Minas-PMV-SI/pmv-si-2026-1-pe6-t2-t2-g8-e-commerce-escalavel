@@ -20,6 +20,9 @@ function OrderDetailsModal({ order, onClose }) {
 
       <p>Status: {order.status}</p>
       <p>Total: R$ {order.total}</p>
+      {order.transactionId && (
+        <p>Transação: {order.transactionId}</p>
+      )}
 
       <h3>Itens:</h3>
       {order.items?.map((item, index) => (

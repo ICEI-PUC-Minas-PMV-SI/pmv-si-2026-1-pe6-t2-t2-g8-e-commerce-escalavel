@@ -3,6 +3,7 @@ package com.projeto6.OrderAPI.service;
 import com.projeto6.OrderAPI.client.CatalogClient;
 import com.projeto6.OrderAPI.client.PaymentClient;
 import com.projeto6.OrderAPI.client.StockClient;
+import com.projeto6.OrderAPI.messaging.OrderEventPublisher;
 import com.projeto6.OrderAPI.dto.ItemRequest;
 import com.projeto6.OrderAPI.dto.ItemResponse;
 import com.projeto6.OrderAPI.dto.OrderRequest;
@@ -40,6 +41,9 @@ public class OrderService {
 
     @Autowired
     private PaymentClient paymentClient;
+
+    @Autowired
+    private OrderEventPublisher orderEventPublisher;
 
     @Transactional
     public OrderResponse createOrder(OrderRequest request) {
@@ -141,6 +145,7 @@ public class OrderService {
             }
             order.setTransactionId(payment != null ? payment.getTransactionId() : null);
             order.setStatus(OrderStatus.PAID);
+            orderEventPublisher.publishPaymentConfirmed(order.getId());
         } catch (PaymentDeclinedException ex) {
             for (Item item : order.getItems()) {
                 try {

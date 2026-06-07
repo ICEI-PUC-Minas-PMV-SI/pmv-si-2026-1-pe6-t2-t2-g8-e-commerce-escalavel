@@ -960,25 +960,45 @@ Objetivos principais:
 - Consultar detalhes de um pedido.
 - Atualizar status de um pedido.
 - Cancelar pedidos.
+- Orquestrar o pagamento de um pedido via PaymentAPI (sincrono) e publicar evento de confirmacao via RabbitMQ (assincrono).
 
 ### Modelagem da Aplicacao
 Entidades principais (schema `orders`):
-- `orders`: pedido (id, customer_id, status).
-- `order_items`: itens do pedido (product_id, quantity), colecao embutida no pedido.
+- `orders`: pedido (id, customer_id, status, transaction_id).
+- `order_items`: itens do pedido (sku_id, product_id, unit_price, quantity), colecao embutida no pedido.
 
-Status possiveis: `CREATED`, `APPROVED`, `CANCELLED`.
+Status possiveis: `CREATED`, `PAID`, `PAYMENT_FAILED`, `CANCELLED`.
 
-> **Nota de implementacao:** O campo `status` e armazenado como `String` (sem enum). O endpoint `PATCH /orders/{id}/status` aceita qualquer valor de texto — nao ha validacao de valores permitidos. Apenas `CREATED` (na criacao) e `CANCELLED` (no cancelamento) sao atribuidos pelo codigo; `APPROVED` pode ser enviado via PATCH mas nao e utilizado internamente.
+> **Nota de implementacao:** O campo `status` e armazenado como `String`. Valores atribuidos pelo codigo: `CREATED` (criacao), `PAID` (pagamento aprovado), `PAYMENT_FAILED` (pagamento recusado), `CANCELLED` (cancelamento). O campo `transactionId` e preenchido com o ID retornado pela PaymentAPI apos aprovacao.
 
 Regras de negocio centrais:
-- Pedido criado sempre com status `CREATED`.
-- Cancelamento altera status para `CANCELLED`.
+- Pedido criado sempre com status `CREATED`; estoque reservado via StockAPI na criacao.
+- `POST /orders/{id}/pay` orquestra: calcula total dos itens → chama PaymentAPI → APROVADO: confirma estoque + status `PAID` + publica `PaymentConfirmedEvent` no RabbitMQ → RECUSADO: libera estoque + status `PAYMENT_FAILED`.
+- Pagamento e idempotente: pedido ja `PAID` retorna 200 sem reprocessar.
+- Cancelamento libera estoque reservado e altera status para `CANCELLED`; pedido `PAID` nao pode ser cancelado por este endpoint.
 - Pedido inexistente lanca excecao (`RuntimeException`), retornando `500 Internal Server Error` (sem `@ExceptionHandler` customizado).
+
+### Fluxo de orquestracao de pagamento
+
+```
+Frontend
+  │
+  ├─► POST /orders                          → cria pedido (status CREATED) + reserva estoque
+  │
+  └─► POST /orders/{id}/pay
+        │
+        ├─► PaymentAPI POST /payments/process
+        │       ├─ 201 APPROVED → OrderService confirma estoque (StockAPI) + status PAID
+        │       │                  + publica PaymentConfirmedEvent (RabbitMQ → NotificationService)
+        │       └─ 402 DECLINED → OrderService libera estoque (StockAPI) + status PAYMENT_FAILED
+        │
+        └─► 200 OK (PAID) | 402 Payment Required (PAYMENT_FAILED)
+```
 
 ### Tecnologias Utilizadas
 - Java 17 + Spring Boot 4.0.3
 - Spring Data JPA + Hibernate
-- Spring AMQP (RabbitMQ) — dependencia configurada em `application.properties`, porem nao utilizada no codigo atual (nenhum `RabbitTemplate` ou `@RabbitListener` implementado)
+- Spring AMQP (RabbitMQ) — `RabbitTemplate` utilizado para publicar `PaymentConfirmedEvent` no exchange fanout `PaymentConfirmedEvent`, consumido pelo NotificationService (MassTransit)
 - PostgreSQL
 - Docker / Docker Compose
 - Nginx Gateway
@@ -1020,10 +1040,12 @@ Objetivo: criar um novo pedido.
 - URL gateway: `/api/orders/`
 - Autenticacao: nao requer (estado atual)
 - Body (`OrderRequest`):
-  - `customerId` (long, obrigatorio)
+  - `customerId` (UUID, obrigatorio)
   - `items` (array, obrigatorio):
-    - `productId` (long)
+    - `skuId` (UUID) — SKU do catalogo
     - `quantity` (int)
+
+> Na criacao, OrderAPI consulta o CatalogAPI para resolver cada `skuId` (preco unitario e productId) e reserva o estoque correspondente no StockAPI.
 
 Respostas:
 - `200 OK`
@@ -1031,10 +1053,10 @@ Respostas:
 Exemplo de body:
 ```json
 {
-  "customerId": 1,
+  "customerId": "7f3b1c2d-1111-2222-3333-444455556666",
   "items": [
-    { "productId": 100, "quantity": 2 },
-    { "productId": 200, "quantity": 1 }
+    { "skuId": "4ee89568-951f-4442-93bd-c703350af1f3", "quantity": 2 },
+    { "skuId": "633ab734-be70-49e3-a7dc-03e0481080a7", "quantity": 1 }
   ]
 }
 ```
@@ -1042,13 +1064,14 @@ Exemplo de body:
 Exemplo de resposta:
 ```json
 {
-  "id": 1,
-  "customerId": 1,
+  "id": "550e8400-e29b-41d4-a716-446655440000",
+  "customerId": "7f3b1c2d-1111-2222-3333-444455556666",
   "items": [
-    { "productId": 100, "quantity": 2 },
-    { "productId": 200, "quantity": 1 }
+    { "skuId": "4ee89568-951f-4442-93bd-c703350af1f3", "productId": "...", "unitPrice": 79.90, "quantity": 2 },
+    { "skuId": "633ab734-be70-49e3-a7dc-03e0481080a7", "productId": "...", "unitPrice": 79.90, "quantity": 1 }
   ],
-  "status": "CREATED"
+  "status": "CREATED",
+  "transactionId": null
 }
 ```
 
@@ -1072,7 +1095,7 @@ Objetivo: buscar pedido por ID.
 - URL direta: `/orders/{id}`
 - URL gateway: `/api/orders/{id}`
 - Parametros de rota:
-  - `id` (long)
+  - `id` (UUID)
 
 Respostas:
 - `200 OK` — `OrderResponse`
@@ -1086,7 +1109,7 @@ Objetivo: listar pedidos de um usuario.
 - URL direta: `/orders/user/{userId}`
 - URL gateway: `/api/orders/user/{userId}`
 - Parametros de rota:
-  - `userId` (long)
+  - `userId` (UUID)
 
 Respostas:
 - `200 OK` — array de `OrderResponse`
@@ -1096,12 +1119,12 @@ Respostas:
 #### PATCH /orders/{id}/status
 Objetivo: atualizar status de um pedido.
 
-- URL direta: `/orders/{id}/status?status=APPROVED`
-- URL gateway: `/api/orders/{id}/status?status=APPROVED`
+- URL direta: `/orders/{id}/status?status=PAID`
+- URL gateway: `/api/orders/{id}/status?status=PAID`
 - Parametros de rota:
-  - `id` (long)
+  - `id` (UUID)
 - Query params:
-  - `status` (string, obrigatorio) — novo status (ex: `APPROVED`)
+  - `status` (string, obrigatorio) — novo status (ex: `PAID`, `CANCELLED`)
 
 Respostas:
 - `200 OK` — `OrderResponse` com status atualizado
@@ -1115,12 +1138,65 @@ Objetivo: cancelar um pedido.
 - URL direta: `/orders/{id}/cancel`
 - URL gateway: `/api/orders/{id}/cancel`
 - Parametros de rota:
-  - `id` (long)
+  - `id` (UUID)
 - Body: nao possui
 
 Respostas:
 - `200 OK` — `OrderResponse` com status `CANCELLED`
+- `500 Internal Server Error` — pedido nao encontrado ou ja pago
+
+---
+
+#### POST /orders/{id}/pay
+Objetivo: orquestrar o pagamento de um pedido ja criado (estoque previamente reservado na criacao).
+
+- URL direta: `/orders/{id}/pay`
+- URL gateway: `/api/orders/{id}/pay`
+- Autenticacao: nao requer (estado atual)
+- Parametros de rota:
+  - `id` (UUID) — ID do pedido
+- Body (opcional):
+  - `paymentMethod` (string) — metodo de pagamento selecionado pelo usuario (ex: `credit_card`, `debit_card`, `pix`). Informativo; nao altera a logica de aprovacao/recusa.
+
+Respostas:
+- `200 OK` — pagamento aprovado (`OrderResponse` com status `PAID` e `transactionId` preenchido)
+- `402 Payment Required` — pagamento recusado pela PaymentAPI (`OrderResponse` com status `PAYMENT_FAILED`)
 - `500 Internal Server Error` — pedido nao encontrado
+
+Exemplo de body (opcional):
+```json
+{
+  "paymentMethod": "credit_card"
+}
+```
+
+Exemplo de resposta `200 OK` (aprovado):
+```json
+{
+  "id": "550e8400-e29b-41d4-a716-446655440000",
+  "customerId": "7f3b1c2d-...",
+  "status": "PAID",
+  "transactionId": "TRX-837462",
+  "items": [
+    { "skuId": "...", "productId": "...", "unitPrice": 89.90, "quantity": 2 }
+  ]
+}
+```
+
+Exemplo de resposta `402 Payment Required` (recusado):
+```json
+{
+  "id": "550e8400-e29b-41d4-a716-446655440000",
+  "customerId": "7f3b1c2d-...",
+  "status": "PAYMENT_FAILED",
+  "transactionId": null,
+  "items": [...]
+}
+```
+
+> **Nota de simulacao:** A PaymentAPI recusa pagamentos cujo valor total termine em `.99` (ex: `R$ 199,99`). Para forcar recusa em testes, o carrinho deve somar exatamente esse valor.
+
+> **Evento assincrono:** Apos aprovacao, OrderAPI publica `PaymentConfirmedEvent` no exchange RabbitMQ `PaymentConfirmedEvent` (fanout, duravel), consumido pelo NotificationService via MassTransit. Falha na publicacao do evento nao desfaz o pagamento ja aprovado (fire-and-forget com log de erro).
 
 ---
 
@@ -1153,20 +1229,28 @@ docker compose logs orderapi
 
 ### Testes
 Fluxo recomendado de validacao funcional:
-1. `POST /orders` — criar pedido
+1. `POST /orders` — criar pedido (estoque e reservado automaticamente)
 2. `GET /orders` — listar todos
 3. `GET /orders/{id}` — buscar por ID
 4. `GET /orders/user/{userId}` — buscar por usuario
-5. `PATCH /orders/{id}/status?status=APPROVED` — atualizar status
-6. `POST /orders/{id}/cancel` — cancelar pedido
+5. `POST /orders/{id}/pay` — pagar pedido (valor redondo → PAID; valor `.99` → PAYMENT_FAILED)
+6. `POST /orders/{id}/cancel` — cancelar pedido (apenas status `CREATED`)
+7. `PATCH /orders/{id}/status?status=<valor>` — atualizar status manualmente (admin)
 
-Cenarios de erro importantes:
+Cenarios importantes:
+- Pagamento aprovado: `status = PAID`, `transactionId` preenchido, notificacao criada no NotificationService.
+- Pagamento recusado: `status = PAYMENT_FAILED`, estoque liberado, resposta `402`.
+- Retry de pagamento: chamar `POST /orders/{id}/pay` novamente no mesmo pedido `PAYMENT_FAILED`.
+- Pedido ja `PAID` — nova chamada ao `/pay` retorna `200` idempotente sem reprocessar.
 - Buscar pedido inexistente (`500`).
-- Cancelar pedido inexistente (`500`).
+- Cancelar pedido ja pago (`500`).
 
 ### Referencias
 - `services/order/OrderAPI/OrderAPI/src/main/java/com/projeto6/OrderAPI/controller/OrderController.java`
 - `services/order/OrderAPI/OrderAPI/src/main/java/com/projeto6/OrderAPI/service/OrderService.java`
+- `services/order/OrderAPI/OrderAPI/src/main/java/com/projeto6/OrderAPI/client/PaymentClient.java`
+- `services/order/OrderAPI/OrderAPI/src/main/java/com/projeto6/OrderAPI/config/RabbitConfig.java`
+- `services/order/OrderAPI/OrderAPI/src/main/java/com/projeto6/OrderAPI/messaging/OrderEventPublisher.java`
 - `services/order/OrderAPI/OrderAPI/src/main/java/com/projeto6/OrderAPI/dto`
 - `services/order/OrderAPI/OrderAPI/src/main/java/com/projeto6/OrderAPI/model`
 - `services/order/OrderAPI/OrderAPI/src/main/resources/application.properties`

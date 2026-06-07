@@ -24,6 +24,7 @@ type Order = {
   id: string;
   status: string;
   total: number;
+  transactionId?: string;
   items: OrderItem[];
 };
 
@@ -56,6 +57,12 @@ export default function OrderDetailsModal({
           <Text style={styles.status}>
             Status: {order.status}
           </Text>
+
+          {order.transactionId && (
+            <Text style={styles.status}>
+              Transação: {order.transactionId}
+            </Text>
+          )}
 
           <Divider style={styles.divider} />
 

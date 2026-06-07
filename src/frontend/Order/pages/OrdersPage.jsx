@@ -27,6 +27,7 @@ function OrdersPage() {
         const normalized = data.map(order => ({
           id: order.id,
           status: order.status,
+          transactionId: order.transactionId,
           productName: order.items?.length === 1
             ? `Pedido - item ${order.items[0].productId}`
             : `Pedido - ${order.items?.length || 0} itens`,
