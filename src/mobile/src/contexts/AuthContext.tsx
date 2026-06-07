@@ -1,15 +1,6 @@
 import { createContext, useContext, useState, ReactNode } from 'react'
-import { User } from '@/src/services/userService'
-
-// AUTH DESABILITADA PARA TESTES — substitua pelo AuthProvider real quando o serviço de usuário estiver ok
-const MOCK_USER: User = {
-  id: 'mock-user-id',
-  name: 'Admin Teste',
-  email: 'admin@teste.com',
-  role: 'admin',
-  active: true,
-  created_at: new Date().toISOString(),
-}
+import { userService, User } from '@/src/services/userService'
+import { tokenStore } from '@/src/services/tokenStore'
 
 interface AuthState {
   user: User | null
@@ -24,12 +15,42 @@ interface AuthState {
 const AuthContext = createContext<AuthState | null>(null)
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUserState] = useState<User | null>(MOCK_USER)
+  const [user, setUserState] = useState<User | null>(null)
   const [loading, setLoading] = useState(false)
 
-  const login = async (_email: string, _password: string) => { /* mock */ }
-  const register = async (_name: string, _email: string, _password: string) => { /* mock */ }
-  const logout = () => setUserState(null)
+  const login = async (email: string, password: string) => {
+    setLoading(true)
+    try {
+      const res = await userService.login({ email, password })
+      tokenStore.set(res.token)
+      setUserState(res.user)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const register = async (
+    name: string,
+    email: string,
+    password: string,
+    cpf?: string,
+    phone?: string,
+  ) => {
+    setLoading(true)
+    try {
+      const res = await userService.register({ name, email, password, cpf, phone })
+      tokenStore.set(res.token)
+      setUserState(res.user)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const logout = () => {
+    tokenStore.clear()
+    setUserState(null)
+  }
+
   const setUser = (u: User) => setUserState(u)
 
   return (
