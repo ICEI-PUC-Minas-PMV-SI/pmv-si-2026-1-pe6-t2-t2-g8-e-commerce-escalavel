@@ -33,7 +33,7 @@ export function ServicesDrawer({ visible, onDismiss }: Props) {
     { icon: '👤', label: 'Meu Perfil', href: '/profile' },
     { icon: '✏️', label: 'Editar Perfil', href: '/profile/edit' },
     { icon: '🔒', label: 'Alterar Senha', href: '/profile/password' },
-
+    { icon: '🔔', label: 'Notificações', href: '/notification' }, 
     { icon: '🛒', label: 'Carrinho', href: '/order/cart/cart' },
     { icon: '📋', label: 'Meus Pedidos', href: '/order/purchasedOrders/purchasedOrders'},
   ]
