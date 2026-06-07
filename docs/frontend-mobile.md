@@ -387,6 +387,9 @@ cd src/mobile && npx expo start
 - `src/mobile/src/components/ServicesDrawer.tsx`
 - `src/mobile/app/_layout.tsx`
 - `src/services/notification/Program.cs`
+
+--- 
+
 # Front-end Móvel — Módulo de Notificações
 
 O módulo de notificações do front-end móvel é responsável por exibir em tempo real as notificações geradas pelos demais serviços do e-commerce (pedidos, pagamentos e estoque) diretamente no aplicativo mobile. A interface consome a mesma API REST do `NotificationService` utilizada pelo front-end web, adaptada para o contexto mobile com React Native.
@@ -580,6 +583,8 @@ Testes funcionais manuais executados em ambiente local, cobrindo as interações
   - Cards não lidos exibem ponto azul e opacidade plena.
   - Cards lidos exibem opacidade reduzida (60%).
   - Borda esquerda colorida por tipo (verde/amarelo/azul/vermelho).
+  - **Evidência:**
+  ![TC-I7](img/notificationMobile.png)
 
 ---
 
