@@ -5,7 +5,8 @@ import { spacing } from '@/src/theme';
 export const styles = StyleSheet.create({
   card: {
     flex: 1,
-    margin: spacing.xs,
+    marginHorizontal: spacing.sm,
+    marginVertical: spacing.xs,
   },
   imageWrap: {
     width: '100%',

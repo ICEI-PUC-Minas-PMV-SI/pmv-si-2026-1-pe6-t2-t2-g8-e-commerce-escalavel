@@ -1,6 +1,6 @@
 import { useRouter, type Href } from 'expo-router'
-import { StyleSheet, View, Pressable, ScrollView } from 'react-native'
-import { Modal, Portal, Text } from 'react-native-paper'
+import { Modal, Pressable, ScrollView, StyleSheet, View } from 'react-native'
+import { Text } from 'react-native-paper'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useAuth } from '@/src/contexts/AuthContext'
 
@@ -16,8 +16,6 @@ type MenuItem = {
   label: string
   href?: Href
   onPress?: () => void
-  danger?: boolean
-  adminOnly?: boolean
 }
 
 export function ServicesDrawer({ visible, onDismiss }: Props) {
@@ -26,10 +24,10 @@ export function ServicesDrawer({ visible, onDismiss }: Props) {
   const { user, logout } = useAuth()
 
   const go = (href: Href) => { onDismiss(); router.push(href) }
-  const handleLogout = () => { onDismiss(); logout(); router.replace('/login') }
+  const handleLogout = () => { onDismiss(); logout() }
 
   const initials = user?.name.split(' ').slice(0, 2).map(w => w[0]).join('').toUpperCase() ?? '?'
-  const isAdmin = user?.role === 'admin'
+  const isAdmin  = user?.role === 'admin'
 
   const ACCOUNT_ITEMS: MenuItem[] = [
     { icon: '👤', label: 'Meu Perfil', href: '/profile' },
@@ -46,93 +44,59 @@ export function ServicesDrawer({ visible, onDismiss }: Props) {
 
   const ADMIN_ITEMS: MenuItem[] = [
     { icon: '👥', label: 'Usuários', href: '/admin/users' },
-    { icon: '📦', label: 'Estoque', href: '/stock' },
+    { icon: '📦', label: 'Estoque',  href: '/stock' },
   ]
 
   return (
-    <Portal>
-      <Modal
-        visible={visible}
-        onDismiss={onDismiss}
-        style={s.overlay}
-        contentContainerStyle={[s.panel, { paddingTop: insets.top + 16 }]}
-      >
-        <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={s.scroll}>
+    <Modal
+      visible={visible}
+      transparent
+      animationType="slide"
+      onRequestClose={onDismiss}
+      statusBarTranslucent
+    >
+      <View style={s.root}>
+        {/* Painel lateral */}
+        <View style={[s.panel, { paddingTop: insets.top + 16 }]}>
+          <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={s.scroll}>
 
-          {/* ── Cabeçalho ── */}
-          <View style={s.header}>
-            <Text style={s.headerLabel}>INSIDER</Text>
-            <Pressable onPress={onDismiss} style={s.closeBtn}>
-              <Text style={s.closeTxt}>✕</Text>
-            </Pressable>
-          </View>
-
-          {/* ── User Card ── */}
-          {user && (
-            <View style={s.userCard}>
-              <View style={[s.userAvatar, { backgroundColor: isAdmin ? '#1a0f00' : '#0f0f1a' }]}>
-                <Text style={[s.userAvatarTxt, { color: isAdmin ? ACCENT : '#90b8e0' }]}>{initials}</Text>
-              </View>
-              <View style={s.userInfo}>
-                <Text style={s.userName} numberOfLines={1}>{user.name}</Text>
-                <Text style={s.userEmail} numberOfLines={1}>{user.email}</Text>
-                <View style={[s.userRolePill, isAdmin && s.userRolePillAdmin]}>
-                  <View style={[s.roleDot, { backgroundColor: user.active !== false ? GREEN : '#9CA3AF' }]} />
-                  <Text style={[s.userRoleTxt, isAdmin && s.userRoleTxtAdmin]}>
-                    {isAdmin ? '⚑  Administrador' : 'Cliente'}
-                  </Text>
-                </View>
-              </View>
+            {/* ── Cabeçalho ── */}
+            <View style={s.header}>
+              <Text style={s.headerLabel}>INSIDER</Text>
+              <Pressable onPress={onDismiss} style={s.closeBtn}>
+                <Text style={s.closeTxt}>✕</Text>
+              </Pressable>
             </View>
-          )}
 
-          {/* ── Seção Conta ── */}
-          <View style={s.section}>
-            <Text style={s.sectionLabel}>Minha Conta</Text>
-            {ACCOUNT_ITEMS.map(item => (
-              <Pressable
-                key={item.label}
-                style={({ pressed }) => [s.item, pressed && s.itemPressed]}
-                onPress={() => item.href && go(item.href)}
-              >
-                <View style={s.itemIcon}>
-                  <Text style={s.itemIconTxt}>{item.icon}</Text>
+            {/* ── User Card ── */}
+            {user && (
+              <View style={s.userCard}>
+                <View style={[s.userAvatar, { backgroundColor: isAdmin ? '#1a0f00' : '#0f0f1a' }]}>
+                  <Text style={[s.userAvatarTxt, { color: isAdmin ? ACCENT : '#90b8e0' }]}>{initials}</Text>
                 </View>
-                <Text style={s.itemLabel}>{item.label}</Text>
-                <Text style={s.itemArrow}>›</Text>
-              </Pressable>
-            ))}
-          </View>
-
-          {/* ── Seção Catálogo ── */}
-          <View style={s.section}>
-            <Text style={s.sectionLabel}>Catálogo</Text>
-            {CATALOG_ITEMS.map(item => (
-              <Pressable
-                key={item.label}
-                style={({ pressed }) => [s.item, pressed && s.itemPressed]}
-                onPress={() => item.href && go(item.href)}
-              >
-                <View style={s.itemIcon}>
-                  <Text style={s.itemIconTxt}>{item.icon}</Text>
+                <View style={s.userInfo}>
+                  <Text style={s.userName} numberOfLines={1}>{user.name}</Text>
+                  <Text style={s.userEmail} numberOfLines={1}>{user.email}</Text>
+                  <View style={[s.userRolePill, isAdmin && s.userRolePillAdmin]}>
+                    <View style={[s.roleDot, { backgroundColor: user.active !== false ? GREEN : '#9CA3AF' }]} />
+                    <Text style={[s.userRoleTxt, isAdmin && s.userRoleTxtAdmin]}>
+                      {isAdmin ? '⚑  Administrador' : 'Cliente'}
+                    </Text>
+                  </View>
                 </View>
-                <Text style={s.itemLabel}>{item.label}</Text>
-                <Text style={s.itemArrow}>›</Text>
-              </Pressable>
-            ))}
-          </View>
+              </View>
+            )}
 
-          {/* ── Seção Admin ── */}
-          {isAdmin && (
+            {/* ── Seção Conta ── */}
             <View style={s.section}>
-              <Text style={s.sectionLabel}>Administração</Text>
-              {ADMIN_ITEMS.map(item => (
+              <Text style={s.sectionLabel}>Minha Conta</Text>
+              {ACCOUNT_ITEMS.map(item => (
                 <Pressable
                   key={item.label}
                   style={({ pressed }) => [s.item, pressed && s.itemPressed]}
                   onPress={() => item.href && go(item.href)}
                 >
-                  <View style={[s.itemIcon, s.itemIconAdmin]}>
+                  <View style={s.itemIcon}>
                     <Text style={s.itemIconTxt}>{item.icon}</Text>
                   </View>
                   <Text style={s.itemLabel}>{item.label}</Text>
@@ -140,27 +104,67 @@ export function ServicesDrawer({ visible, onDismiss }: Props) {
                 </Pressable>
               ))}
             </View>
-          )}
 
-          {/* ── Sair ── */}
-          <View style={s.section}>
-            <Pressable
-              style={({ pressed }) => [s.item, s.itemLogout, pressed && s.itemLogoutPressed]}
-              onPress={handleLogout}
-            >
-              <View style={[s.itemIcon, s.itemIconLogout]}>
-                <Text style={s.itemIconTxt}>🚪</Text>
+            {/* ── Seção Catálogo ── */}
+            <View style={s.section}>
+              <Text style={s.sectionLabel}>Catálogo</Text>
+              {CATALOG_ITEMS.map(item => (
+                <Pressable
+                  key={item.label}
+                  style={({ pressed }) => [s.item, pressed && s.itemPressed]}
+                  onPress={() => item.href && go(item.href)}
+                >
+                  <View style={s.itemIcon}>
+                    <Text style={s.itemIconTxt}>{item.icon}</Text>
+                  </View>
+                  <Text style={s.itemLabel}>{item.label}</Text>
+                  <Text style={s.itemArrow}>›</Text>
+                </Pressable>
+              ))}
+            </View>
+
+            {/* ── Seção Admin ── */}
+            {isAdmin && (
+              <View style={s.section}>
+                <Text style={s.sectionLabel}>Administração</Text>
+                {ADMIN_ITEMS.map(item => (
+                  <Pressable
+                    key={item.label}
+                    style={({ pressed }) => [s.item, pressed && s.itemPressed]}
+                    onPress={() => item.href && go(item.href)}
+                  >
+                    <View style={[s.itemIcon, s.itemIconAdmin]}>
+                      <Text style={s.itemIconTxt}>{item.icon}</Text>
+                    </View>
+                    <Text style={s.itemLabel}>{item.label}</Text>
+                    <Text style={s.itemArrow}>›</Text>
+                  </Pressable>
+                ))}
               </View>
-              <Text style={[s.itemLabel, s.itemLabelLogout]}>Sair da conta</Text>
-            </Pressable>
-          </View>
+            )}
 
-          {/* ── Versão ── */}
-          <Text style={s.version}>INSIDER · v1.0.0</Text>
+            {/* ── Sair ── */}
+            <View style={s.section}>
+              <Pressable
+                style={({ pressed }) => [s.item, s.itemLogout, pressed && s.itemLogoutPressed]}
+                onPress={handleLogout}
+              >
+                <View style={[s.itemIcon, s.itemIconLogout]}>
+                  <Text style={s.itemIconTxt}>🚪</Text>
+                </View>
+                <Text style={[s.itemLabel, s.itemLabelLogout]}>Sair da conta</Text>
+              </Pressable>
+            </View>
 
-        </ScrollView>
-      </Modal>
-    </Portal>
+            <Text style={s.version}>INSIDER · v1.0.0</Text>
+
+          </ScrollView>
+        </View>
+
+        {/* Backdrop — toca para fechar */}
+        <Pressable style={s.backdrop} onPress={onDismiss} />
+      </View>
+    </Modal>
   )
 }
 
