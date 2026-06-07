@@ -21,6 +21,6 @@
 | 18/05 - 24/05 | Fundamentos de Projeto e Análise de Algoritmos - Unidade 1 | ✅ | Desenvolvimento do NotificationService mobile | Desenvolvimento do NotificationService mobile |
 | 25/05 - 31/05 | Fundamentos de Projeto e Análise de Algoritmos - Unidade 2 | ✅ | Desenvolvimento do NotificationService mobile | Desenvolvimento do NotificationService mobile |
 | 01/06 - 07/06 |  | ✅ | Testes do NotificationService mobile | Testes do desenvolvimento do NotificationService mobile |
-| 08/06 - 14/06 |  | ⬜ |  |  |
+| 08/06 - 14/06 |  | ✅ | Documentação do NotificationService mobile | Documentação do desenvolvimento do NotificationService mobile |
 
 **Legenda:** ✅ Estudou | ⬜ Não estudou
