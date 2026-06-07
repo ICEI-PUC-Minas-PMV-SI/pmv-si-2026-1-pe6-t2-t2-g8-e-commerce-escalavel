@@ -121,5 +121,17 @@ export const orderApi = {
     })
 
     return response.json()
+  },
+
+  // Dispara o pagamento de um pedido já criado (estoque reservado).
+  // Backend orquestra: chama PaymentAPI e confirma/libera estoque.
+  payOrder: async (orderId, paymentMethod) => {
+    const response = await fetch(`${BASE_URL}/orders/${orderId}/pay`, {
+      method: 'POST',
+      headers: getHeaders(),
+      body: JSON.stringify({ paymentMethod })
+    })
+
+    return response.json()
   }
 }
