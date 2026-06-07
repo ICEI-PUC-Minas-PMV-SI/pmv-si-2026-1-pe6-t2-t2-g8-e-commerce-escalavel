@@ -15,9 +15,9 @@ interface CartContextData {
   total: number;
 
   addItem: (item: CartItem) => void;
-  removeItem: (productId: string, size: string, color: string) => void;
-  increaseQty: (productId: string, size: string, color: string) => void;
-  decreaseQty: (productId: string, size: string, color: string) => void;
+  removeItem: (skuId: string) => void;
+  increaseQty: (skuId: string) => void;
+  decreaseQty: (skuId: string) => void;
   clearCart: () => void;
 }
 
@@ -45,43 +45,30 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
     });
   }
 
-  function removeItem(productId: string, size?: string, color?: string) {
-    setItems(prev =>
-      prev.filter(
-        i =>
-          !(
-            i.productId === productId &&
-            i.size === size &&
-            i.color === color
-          )
-      )
-    );
-  }
-
-  function increaseQty(productId: string, size: string, color: string) {
+  function increaseQty(skuId: string) {
     setItems(prev =>
       prev.map(i =>
-        i.productId === productId &&
-          i.size === size &&
-          i.color === color
+        i.skuId === skuId
           ? { ...i, quantity: i.quantity + 1 }
           : i
       )
     );
   }
 
-  function decreaseQty(productId: string, size: string, color: string) {
+  function decreaseQty(skuId: string) {
     setItems(prev =>
       prev
         .map(i =>
-          i.productId === productId &&
-            i.size === size &&
-            i.color === color
+          i.skuId === skuId
             ? { ...i, quantity: i.quantity - 1 }
             : i
         )
         .filter(i => i.quantity > 0)
     );
+  }
+
+  function removeItem(skuId: string) {
+    setItems(prev => prev.filter(i => i.skuId !== skuId));
   }
 
   function clearCart() {

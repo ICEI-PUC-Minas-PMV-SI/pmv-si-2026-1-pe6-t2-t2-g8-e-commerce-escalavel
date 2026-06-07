@@ -18,9 +18,13 @@ export default function CartScreen() {
 
   const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set());
 
+  // gera chave única do item
+  const getItemKey = (item: any) =>
+    `${item.productId}-${item.size}-${item.color}`;
+
   useEffect(() => {
     setSelectedItems(
-      new Set(items.map(item => item.productId))
+      new Set(items.map(item => getItemKey(item)))
     );
   }, [items]);
 
@@ -39,10 +43,9 @@ export default function CartScreen() {
   }
 
   const selectedTotal = items
-    .filter(item => selectedItems.has(item.productId))
+    .filter(item => selectedItems.has(getItemKey(item)))
     .reduce(
-      (sum, item) =>
-        sum + item.unitPrice * item.quantity,
+      (sum, item) => sum + item.unitPrice * item.quantity,
       0
     );
 
@@ -68,17 +71,21 @@ export default function CartScreen() {
     <View style={styles.container}>
 
       <ScrollView contentContainerStyle={styles.list}>
-        {items.map(item => (
-          <CartItem
-            key={item.productId}
-            item={item}
-            selected={selectedItems.has(item.productId)}
-            onToggleSelect={toggleSelect}
-            onIncrease={increaseQty}
-            onDecrease={decreaseQty}
-            onRemove={removeItem}
-          />
-        ))}
+        {items.map(item => {
+          const key = getItemKey(item);
+
+          return (
+            <CartItem
+              key={key}
+              item={item}
+              selected={selectedItems.has(key)}
+              onToggleSelect={toggleSelect}
+              onIncrease={increaseQty}
+              onDecrease={decreaseQty}
+              onRemove={removeItem}
+            />
+          );
+        })}
       </ScrollView>
 
       <View style={styles.footer}>
@@ -95,7 +102,7 @@ export default function CartScreen() {
           mode="contained"
           disabled={selectedTotal === 0}
           onPress={() => router.push('/order/checkout/checkout')}
-            contentStyle={{ paddingVertical: 6, height: 48 }}
+          contentStyle={{ paddingVertical: 6, height: 48 }}
           labelStyle={{ fontSize: 16, fontWeight: '600', marginTop: 6 }}
           style={[styles.checkoutButton, { borderRadius: 12 }]}
         >

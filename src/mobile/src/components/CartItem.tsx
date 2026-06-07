@@ -1,238 +1,157 @@
-import React, { useState } from 'react';
-import { View, StyleSheet } from 'react-native';
-import {
-  Card,
-  Text,
-  IconButton,
-  Checkbox,
-} from 'react-native-paper';
+import { useEffect, useState } from 'react';
+import { View, ScrollView, StyleSheet } from 'react-native';
+import { Button, Text } from 'react-native-paper';
 import { useRouter } from 'expo-router';
 
-import RemoveCartItemModal from '@/src/components/modals/RemoveCartItemModal';
+import { useCart } from '@/contexts/CartContext';
+import CartItem from '@/src/components/CartItem';
 
-interface Props {
-  item: {
-    productId: string;
-    productName: string;
-    unitPrice: number;
-    quantity: number;
-    size: string;
-    color: string;
-  };
-
-  selected: boolean;
-
-  onToggleSelect: (id: string) => void;
-onIncrease: (productId: string, size: string, color: string) => void;
-onDecrease: (productId: string, size: string, color: string) => void;
-  onRemove: (productId: string, size: string, color: string) => void;
-}
-
-export default function CartItem({
-  item,
-  selected,
-  onToggleSelect,
-  onIncrease,
-  onDecrease,
-  onRemove,
-}: Props) {
+export default function CartScreen() {
   const router = useRouter();
 
-  const [showRemoveModal, setShowRemoveModal] = useState(false);
+  const {
+    items,
+    removeItem,
+    increaseQty,
+    decreaseQty,
+  } = useCart();
 
-  const subtotal = item.unitPrice * item.quantity;
+  const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set());
+
+  // ✅ seleciona tudo APENAS quando entra na tela ou quando carrinho zera
+  useEffect(() => {
+    if (items.length === 0) {
+      setSelectedItems(new Set());
+      return;
+    }
+
+    setSelectedItems(new Set(items.map(item => item.productId)));
+  }, [items.length]);
+
+  function toggleSelect(id: string) {
+    setSelectedItems(prev => {
+      const next = new Set(prev);
+
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+
+      return next;
+    });
+  }
+
+  const selectedTotal = items
+    .filter(item => selectedItems.has(item.productId))
+    .reduce((sum, item) => sum + item.unitPrice * item.quantity, 0);
+
+  if (items.length === 0) {
+    return (
+      <View style={styles.emptyContainer}>
+        <Text variant="headlineSmall">
+          Seu carrinho está vazio
+        </Text>
+
+        <Button
+          mode="contained"
+          onPress={() => router.push('/')}
+          style={{ marginTop: 20 }}
+        >
+          Voltar às compras
+        </Button>
+      </View>
+    );
+  }
 
   return (
-    <>
-      <Card style={styles.card}>
-        <Card.Content>
+    <View style={styles.container}>
 
-          {/* Cabeçalho */}
-          <View style={styles.header}>
+      <ScrollView contentContainerStyle={styles.list}>
+        {items.map(item => (
+          <CartItem
+            key={`${item.productId}-${item.size}-${item.color}`}
+            item={item}
+            selected={selectedItems.has(item.productId)}
+            onToggleSelect={toggleSelect}
+            onIncrease={increaseQty}
+            onDecrease={decreaseQty}
+            onRemove={removeItem}
+          />
+        ))}
+      </ScrollView>
 
-            <Checkbox
-              status={selected ? 'checked' : 'unchecked'}
-              onPress={() => onToggleSelect(item.productId)}
-            />
+      <View style={styles.footer}>
+        <Text style={styles.totalLabel}>Total</Text>
 
-            <Text
-              numberOfLines={2}
-              style={styles.productName}
-            >
-              {item.productName}
-            </Text>
+        <Text style={styles.totalValue}>
+          R$ {selectedTotal.toFixed(2)}
+        </Text>
 
-            <IconButton
-              icon="arrow-right"
-              size={22}
+        <Button
+          mode="contained"
+          disabled={selectedTotal === 0}
+          onPress={() => router.push('/order/checkout/checkout')}
+          contentStyle={{ paddingVertical: 6, height: 48 }}
+          labelStyle={{ fontSize: 16, fontWeight: '600', marginTop: 6 }}
+          style={[styles.checkoutButton, { borderRadius: 12 }]}
+        >
+          Finalizar Compra
+        </Button>
 
-              // ATIVAR NA INTEGRAÇÃO
-              onPress={() => {
-  console.log('NAVIGATE TO PRODUCT:', item.productId);
-  router.push(`/products/${item.productId}`);
-}}
-              // TEMPORÁRIO
-             // onPress={() =>
-             //   console.log('Abrir produto', item.productId)
-             // }
-            />
+        <Button
+          mode="outlined"
+          onPress={() => router.push('/')}
+          labelStyle={{ fontSize: 16, fontWeight: '600' }}
+          style={[styles.continueButton, { borderRadius: 12 }]}
+        >
+          Continuar Comprando
+        </Button>
+      </View>
 
-          </View>
-
-          {/* Corpo */}
-          <View style={styles.body}>
-
-            {/* Imagem */}
-            <View style={styles.image}>
-              <Text style={styles.imageEmoji}>👕</Text>
-            </View>
-
-            {/* Informações */}
-            <View style={styles.info}>
-
-              <Text style={styles.size}>
-                Tamanho: {item.size}
-              </Text>
-
-              <Text style={styles.color}>
-                Cor: {item.color}
-              </Text>
-
-              <Text style={styles.subtotal}>
-                Subtotal: R$ {subtotal.toFixed(2)}
-              </Text>
-
-              {/* Quantidade */}
-              <View style={styles.qtyContainer}>
-
-                <IconButton
-                  icon="minus"
-                  mode="contained-tonal"
-                  size={18}
-                  style={styles.qtyButton}
-                  onPress={() => onDecrease(item.productId, item.size, item.color)}
-                />
-
-                <Text style={styles.quantity}>
-                  {item.quantity}
-                </Text>
-
-                <IconButton
-                  icon="plus"
-                  mode="contained-tonal"
-                  size={18}
-                  style={styles.qtyButton}
-                  onPress={() => onIncrease(item.productId, item.size, item.color)}
-                />
-
-              </View>
-
-            </View>
-
-            {/* Remover */}
-            <IconButton
-              icon="trash-can-outline"
-              iconColor="#EF4444"
-              onPress={() => setShowRemoveModal(true)}
-            />
-
-          </View>
-
-        </Card.Content>
-      </Card>
-
-      <RemoveCartItemModal
-        visible={showRemoveModal}
-        productName={item.productName}
-        onCancel={() => setShowRemoveModal(false)}
-        onConfirm={() => {
-          onRemove(item.productId, item.size, item.color)
-          setShowRemoveModal(false);
-        }}
-      />
-    </>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  card: {
-    marginBottom: 12,
-    borderRadius: 12,
+  container: { flex: 1 },
+
+  list: {
+    padding: 16,
+    paddingBottom: 100,
   },
 
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 2,
+  footer: {
+    padding: 16,
+    borderTopWidth: 1,
+    borderColor: '#E5E7EB',
+    backgroundColor: '#FFFFFF',
   },
 
-  productName: {
-    flex: 1,
-    fontSize: 18,
+  totalLabel: {
+    fontSize: 14,
+    color: '#6B7280',
+  },
+
+  totalValue: {
+    fontSize: 24,
     fontWeight: '700',
-    lineHeight: 22,
-    marginTop: 0,
-    marginRight: 4,
+    marginTop: 4,
+    marginBottom: 16,
   },
 
-  body: {
-    flexDirection: 'row',
-    alignItems: 'center',
+  checkoutButton: {
+    marginBottom: 10,
   },
 
-  image: {
-    width: 85,
-    height: 85,
-    borderRadius: 12,
-    backgroundColor: '#F3F4F6',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-
-  imageEmoji: {
-    fontSize: 32,
-  },
-
-  info: {
-    flex: 1,
-    marginLeft: 12,
-  },
-
-  size: {
-    fontSize: 16,
-    color: 'black',
+  continueButton: {
     marginBottom: 4,
   },
 
-  qtyContainer: {
-    flexDirection: 'row',
+  emptyContainer: {
+    flex: 1,
+    justifyContent: 'center',
     alignItems: 'center',
-    marginVertical: 4,
+    padding: 24,
   },
-
-  qtyButton: {
-    margin: 0,
-  },
-
-  quantity: {
-    fontSize: 18,
-    fontWeight: '600',
-    marginHorizontal: 12,
-    minWidth: 20,
-    textAlign: 'center',
-  },
-
-  subtotal: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#111827',
-    marginBottom: 8,
-  },
-
-  color: {
-  fontSize: 16,
-  color: 'black',
-  marginBottom: 4,
-},
-
 });

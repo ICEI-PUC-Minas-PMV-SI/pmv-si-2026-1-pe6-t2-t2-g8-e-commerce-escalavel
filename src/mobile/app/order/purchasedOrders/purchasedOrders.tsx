@@ -3,10 +3,11 @@ import { ScrollView, View, StyleSheet } from 'react-native';
 import { Text } from 'react-native-paper';
 
 import OrderCard from '@/src/components/OrderCard';
-
 import CancelOrderModal from '@/src/components/modals/CancelOrderModal';
 import DeliveredOrderModal from '@/src/components/modals/DeliveredOrderModal';
 import OrderDetailsModal from '@/src/components/modals/OrderDetailsModal';
+
+import { useAuth } from '@/src/contexts/AuthContext';
 
 type OrderItem = {
   id: string;
@@ -24,100 +25,42 @@ type Order = {
 };
 
 export default function PurchasedOrders() {
+  const { user } = useAuth();
+
   const [orders, setOrders] = useState<Order[]>([]);
 
-  const [showCancelModal, setShowCancelModal] =
-    useState(false);
+  const [showCancelModal, setShowCancelModal] = useState(false);
+  const [showDeliveredModal, setShowDeliveredModal] = useState(false);
+  const [showDetailsModal, setShowDetailsModal] = useState(false);
 
-  const [showDeliveredModal, setShowDeliveredModal] =
-    useState(false);
+  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+  const [orderToCancel, setOrderToCancel] = useState<string | null>(null);
 
-  const [showDetailsModal, setShowDetailsModal] =
-    useState(false);
-
-  const [selectedOrder, setSelectedOrder] =
-    useState<Order | null>(null);
-
-  const [orderToCancel, setOrderToCancel] =
-    useState<string | null>(null);
 
   useEffect(() => {
-    setOrders([
-      {
-        id: '1023',
-        status: 'Entregue',
-        total: 329.7,
-        items: [
-          {
-            id: '1',
-            productName: 'Camiseta Básica Insider',
-            size: 'M',
-            quantity: 2,
-            unitPrice: 89.9,
-          },
-          {
-            id: '2',
-            productName: 'Calça Slim Masculina',
-            size: 'G',
-            quantity: 1,
-            unitPrice: 149.9,
-          },
-        ],
-      },
+    if (!user?.id) return;
 
-      {
-        id: '1022',
-        status: 'Cancelado',
-        total: 89.9,
-        items: [
-          {
-            id: '3',
-            productName: 'Camiseta Oversized',
-            size: 'P',
-            quantity: 1,
-            unitPrice: 89.9,
-          },
-        ],
-      },
+    async function loadOrders() {
+      try {
+        const res = await fetch(
+          `http://10.0.2.2:7000/api/orders/customer/${user.id}`
+        );
 
-      {
-        id: '1021',
-        status: 'Em processamento',
-        total: 399.9,
-        items: [
-          {
-            id: '4',
-            productName: 'Jaqueta Casual',
-            size: 'G',
-            quantity: 1,
-            unitPrice: 229.9,
-          },
-          {
-            id: '5',
-            productName: 'Calça Cargo',
-            size: 'M',
-            quantity: 1,
-            unitPrice: 170,
-          },
-        ],
-      },
+        if (!res.ok) {
+          throw new Error('Erro ao buscar pedidos');
+        }
 
-      {
-        id: '1020',
-        status: 'Enviado',
-        total: 149.9,
-        items: [
-          {
-            id: '6',
-            productName: 'Calça Slim',
-            size: 'M',
-            quantity: 1,
-            unitPrice: 149.9,
-          },
-        ],
-      },
-    ]);
-  }, []);
+        const data = await res.json();
+        setOrders(data);
+
+      } catch (err) {
+        console.log('Erro ao carregar pedidos:', err);
+        setOrders([]);
+      }
+    }
+
+    loadOrders();
+  }, [user]);
 
   const activeOrders = orders.filter(
     order => order.status !== 'Cancelado'
@@ -162,9 +105,7 @@ export default function PurchasedOrders() {
     <>
       <ScrollView contentContainerStyle={styles.container}>
 
-        <Text style={styles.title}>
-          Meus pedidos
-        </Text>
+        <Text style={styles.title}>Meus pedidos</Text>
 
         {/* PEDIDOS ATIVOS */}
         {activeOrders.map(order => (
@@ -183,19 +124,14 @@ export default function PurchasedOrders() {
               setSelectedOrder(order);
               setShowDetailsModal(true);
             }}
-            onCancel={() =>
-              handleCancelOrder(order)
-            }
-            onDiscard={() =>
-              handleDiscardOrder(order.id)
-            }
+            onCancel={() => handleCancelOrder(order)}
+            onDiscard={() => handleDiscardOrder(order.id)}
           />
         ))}
 
         {/* PEDIDOS CANCELADOS */}
         {canceledOrders.length > 0 && (
           <View style={styles.section}>
-
             <Text style={styles.sectionTitle}>
               Pedidos cancelados
             </Text>
@@ -218,13 +154,10 @@ export default function PurchasedOrders() {
                     setShowDetailsModal(true);
                   }}
                   onCancel={() => {}}
-                  onDiscard={() =>
-                    handleDiscardOrder(order.id)
-                  }
+                  onDiscard={() => handleDiscardOrder(order.id)}
                 />
               ))}
             </View>
-
           </View>
         )}
 
@@ -236,6 +169,7 @@ export default function PurchasedOrders() {
 
       </ScrollView>
 
+      {/* MODAIS */}
       <CancelOrderModal
         visible={showCancelModal}
         onCancel={() => {
@@ -247,9 +181,7 @@ export default function PurchasedOrders() {
 
       <DeliveredOrderModal
         visible={showDeliveredModal}
-        onClose={() =>
-          setShowDeliveredModal(false)
-        }
+        onClose={() => setShowDeliveredModal(false)}
       />
 
       <OrderDetailsModal
