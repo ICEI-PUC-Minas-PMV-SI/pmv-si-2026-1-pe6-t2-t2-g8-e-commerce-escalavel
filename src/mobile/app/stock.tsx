@@ -77,17 +77,24 @@ export default function StockListScreen() {
     ({ item }: { item: StockItemDetailed }) => {
       const p = item.product;
       const subtitle = [p?.code, p?.size].filter(Boolean).join(' · ');
+      const color = p?.color ?? '';
       const params = {
         skuId: item.skuId,
         name: p?.name ?? '',
         available: String(item.quantityAvailable),
+        color,
       };
       return (
         <Card style={styles.card} mode="outlined">
           <Card.Content style={styles.cardBody}>
-            <Text variant="titleMedium" numberOfLines={1}>
-              {p?.name ?? 'Produto não encontrado'}
-            </Text>
+            <View style={styles.titleRow}>
+              <Text variant="titleMedium" numberOfLines={1} style={styles.titleText}>
+                {p?.name ?? 'Produto não encontrado'}
+              </Text>
+              {!!color && (
+                <View style={[styles.colorDot, { backgroundColor: color }]} />
+              )}
+            </View>
             {subtitle ? (
               <Text variant="bodySmall" style={styles.muted}>
                 {subtitle}
@@ -221,6 +228,9 @@ const styles = StyleSheet.create({
   },
   card: { borderRadius: 8 },
   cardBody: { gap: spacing.xxs },
+  titleRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
+  titleText: { flex: 1 },
+  colorDot: { width: 18, height: 18, borderRadius: 9, borderWidth: 1, borderColor: '#E5E7EB', flexShrink: 0 },
   muted: { opacity: 0.6 },
   sku: {
     fontFamily: 'monospace',

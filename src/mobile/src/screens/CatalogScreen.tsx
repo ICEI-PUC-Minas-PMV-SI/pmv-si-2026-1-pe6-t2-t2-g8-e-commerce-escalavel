@@ -18,7 +18,6 @@ import { ProductCard } from '@/src/components/ProductCard';
 import { catalogService } from '@/src/services/catalogService';
 import { useAuth } from '@/src/contexts/AuthContext';
 import type { Category, Product } from '@/src/types/catalog';
-import { router } from 'expo-router'
 
 const ACCENT = '#C9A96E';
 const DARK   = '#0A0A0A';

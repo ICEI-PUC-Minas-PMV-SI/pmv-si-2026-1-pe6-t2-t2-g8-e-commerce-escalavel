@@ -1,5 +1,5 @@
 import { API_URL } from '@/src/config/env';
-import type { Category, CategoryInput, Product, ProductFilters, ProductInput } from '@/src/types/catalog';
+import type { Category, CategoryInput, Product, ProductFilters, ProductInput, Sku, Variant } from '@/src/types/catalog';
 import { authHeader, HttpClient } from './httpClient';
 
 const http = new HttpClient(API_URL);
@@ -84,5 +84,33 @@ export const catalogService = {
   async deleteCategory(id: string): Promise<void> {
     const headers = await authHeader();
     await http.del(`/catalog/categories/${id}`, { headers });
+  },
+
+  async createVariant(productId: string, data: { color: string; urlImg?: string }): Promise<Variant> {
+    const headers = await authHeader();
+    const raw = await http.post<Variant>(`/catalog/products/${productId}/variants`, data, { headers });
+    return raw;
+  },
+
+  async deleteVariant(variantId: string): Promise<void> {
+    const headers = await authHeader();
+    await http.del(`/catalog/variants/${variantId}`, { headers });
+  },
+
+  async createSku(variantId: string, data: { size: string; code: string; price: number }): Promise<Sku> {
+    const headers = await authHeader();
+    const raw = await http.post<Sku>(`/catalog/variants/${variantId}/skus`, data, { headers });
+    return raw;
+  },
+
+  async updateSku(skuId: string, data: { price: number }): Promise<Sku> {
+    const headers = await authHeader();
+    const raw = await http.patch<Sku | Envelope<Sku>>(`/catalog/skus/${skuId}`, data, { headers });
+    return unwrapObject<Sku>(raw);
+  },
+
+  async deleteSku(skuId: string): Promise<void> {
+    const headers = await authHeader();
+    await http.del(`/catalog/skus/${skuId}`, { headers });
   },
 };
