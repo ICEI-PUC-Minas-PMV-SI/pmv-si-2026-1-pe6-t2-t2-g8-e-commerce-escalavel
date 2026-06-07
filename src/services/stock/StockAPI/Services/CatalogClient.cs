@@ -41,7 +41,8 @@ public class CatalogClient : ICatalogClient
                 product?.Description,
                 urlImg,
                 sku.Code,
-                sku.Size
+                sku.Size,
+                variant?.Color
             );
         }
         catch (Exception ex)

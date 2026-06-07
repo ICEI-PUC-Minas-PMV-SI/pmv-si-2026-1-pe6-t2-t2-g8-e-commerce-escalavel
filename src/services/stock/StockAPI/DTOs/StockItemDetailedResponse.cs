@@ -5,7 +5,8 @@ public record CatalogProductInfo(
     string? Description,
     string? UrlImg,
     string? Code,
-    string? Size
+    string? Size,
+    string? Color
 );
 
 public record StockItemDetailedResponse(

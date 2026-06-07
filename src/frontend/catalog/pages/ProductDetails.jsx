@@ -9,6 +9,39 @@ const PRICE_FORMATTER = new Intl.NumberFormat("pt-BR", {
     currency: "BRL",
 })
 
+const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:7000/api'
+
+// Retorna:
+//   number  → quantidade disponível (encontrado no estoque)
+//   null    → SKU não tem estoque cadastrado (404)
+//   undefined → erro de API (401, rede, etc.) → não bloquear
+async function fetchSkuStock(skuId) {
+    try {
+        const token = localStorage.getItem('token')
+        const headers = token ? { Authorization: `Bearer ${token}` } : {}
+        const res = await fetch(`${BASE_URL}/stock/${skuId}`, { headers })
+        if (res.status === 404) return null
+        if (!res.ok) return undefined
+        const body = await res.json()
+        const item = body?.data ?? body
+        return typeof item?.quantityAvailable === 'number' ? item.quantityAvailable : undefined
+    } catch {
+        return undefined
+    }
+}
+
+// Retorna se a cor do CSS é válida no browser atual
+function isCssColor(value) {
+    if (!value) return false
+    try {
+        const el = document.createElement('span')
+        el.style.color = value
+        return el.style.color !== ''
+    } catch {
+        return false
+    }
+}
+
 export default function ProductDetails() {
     const { id } = useParams()
     const navigate = useNavigate()
@@ -16,6 +49,10 @@ export default function ProductDetails() {
 
     const [product, setProduct] = useState(null)
     const [loading, setLoading] = useState(true)
+
+    // mapa de estoque: { [skuId]: quantityAvailable | null }
+    // null = não foi possível verificar, assume disponível
+    const [stockMap, setStockMap] = useState({})
 
     // seleção do usuário
     const [selectedVariant, setSelectedVariant] = useState(null)
@@ -28,6 +65,14 @@ export default function ProductDetails() {
             try {
                 const data = await catalogApi.getProductById(id)
                 setProduct(data)
+
+                const allSkus = (data.variants ?? []).flatMap(v => v.skus ?? [])
+                if (allSkus.length > 0) {
+                    const results = await Promise.all(allSkus.map(s => fetchSkuStock(s.id)))
+                    const map = {}
+                    allSkus.forEach((sku, i) => { map[sku.id] = results[i] })
+                    setStockMap(map)
+                }
             } finally {
                 setLoading(false)
             }
@@ -35,6 +80,22 @@ export default function ProductDetails() {
 
         loadProduct()
     }, [id])
+
+    // undefined = erro de API → não bloquear
+    // null      = sem cadastro de estoque (404) → bloquear
+    // number    = quantidade → bloquear se 0
+    const isSkuAvailable = (skuId) => {
+        const qty = stockMap[skuId]
+        if (qty === undefined) return true   // API inacessível → não bloquear
+        if (qty === null) return false        // sem estoque cadastrado → bloquear
+        return qty > 0
+    }
+
+    const isVariantAvailable = (variant) => {
+        const skus = variant.skus ?? []
+        if (skus.length === 0) return false
+        return skus.some(s => isSkuAvailable(s.id))
+    }
 
     if (loading) {
         return <div className="p-10 animate-pulse h-80 bg-gray-100" />
@@ -47,15 +108,19 @@ export default function ProductDetails() {
     // pega preço do SKU selecionado
     const price = selectedSku?.price ?? null
 
-    // selecionar variante (cor)
+    // selecionar variante (cor) — ignora se indisponível
     const handleSelectVariant = (variant) => {
+        if (!isVariantAvailable(variant)) return
         setSelectedVariant(variant)
         setSelectedSku(null)
     }
 
     // adicionar ao carrinho
     const handleAddToCart = () => {
-        const item = {
+        if (!selectedSku || !isSkuAvailable(selectedSku.id)) return
+        const available = stockMap[selectedSku.id]
+        if (typeof available === 'number' && quantity > available) return
+        addItem({
             productId: product.id,
             name: product.name,
             variant: selectedVariant?.color,
@@ -63,12 +128,15 @@ export default function ProductDetails() {
             skuId: selectedSku?.id,
             price: selectedSku?.price,
             quantity,
-        }
-
-        // Adicionar ao cart context
-        addItem(item)
+        })
         setAddedToCart(true)
     }
+
+    const selectedSkuUnavailable = selectedSku && !isSkuAvailable(selectedSku.id)
+
+    const maxQuantity = selectedSku
+        ? (typeof stockMap[selectedSku.id] === 'number' ? stockMap[selectedSku.id] : Infinity)
+        : Infinity
 
     return (
         <div className="max-w-6xl mx-auto p-10 grid grid-cols-1 md:grid-cols-2 gap-10">
@@ -97,42 +165,66 @@ export default function ProductDetails() {
 
                 {/* VARIANTES (COR) */}
                 <div>
-                    <h3 className="font-semibold mb-2">Cores</h3>
+                    <h3 className="font-semibold mb-2">
+                        Cor{selectedVariant ? <span className="font-normal text-gray-500 ml-2 text-sm">{selectedVariant.color}</span> : ''}
+                    </h3>
 
-                    <div className="flex gap-2 flex-wrap">
-                        {product.variants?.map(v => (
-                            <button
-                                key={v.id}
-                                onClick={() => handleSelectVariant(v)}
-                                className={`px-4 py-2 border text-sm ${selectedVariant?.id === v.id
-                                        ? "bg-black text-white"
-                                        : "bg-white"
-                                    }`}
-                            >
-                                {v.color}
-                            </button>
-                        ))}
+                    <div className="flex gap-3 flex-wrap items-center">
+                        {product.variants?.map(v => {
+                            const isSelected = selectedVariant?.id === v.id
+                            const validCss = isCssColor(v.color)
+                            const available = isVariantAvailable(v)
+                            return (
+                                <button
+                                    key={v.id}
+                                    onClick={() => handleSelectVariant(v)}
+                                    title={available ? v.color : `${v.color} — esgotado`}
+                                    disabled={!available}
+                                    className={`relative flex items-center justify-center rounded-full border-2 transition-all focus:outline-none
+                                        ${validCss ? 'w-9 h-9' : 'px-3 py-1 h-9 text-xs font-medium'}
+                                        ${isSelected ? 'border-black scale-110 shadow-md' : 'border-gray-300'}
+                                        ${available ? 'hover:border-gray-600' : 'opacity-40 cursor-not-allowed'}
+                                    `}
+                                    style={validCss ? { backgroundColor: v.color } : { backgroundColor: '#f3f4f6' }}
+                                >
+                                    {!validCss && (
+                                        <span className="text-gray-700 whitespace-nowrap">{v.color}</span>
+                                    )}
+                                    {!available && (
+                                        <span className="absolute inset-0 rounded-full flex items-center justify-center overflow-hidden">
+                                            <span className="block w-[140%] h-px bg-gray-600 rotate-45 opacity-70" />
+                                        </span>
+                                    )}
+                                </button>
+                            )
+                        })}
                     </div>
                 </div>
 
                 {/* TAMANHOS (SKU) */}
                 {selectedVariant && (
                     <div>
-                        <h3 className="font-semibold mb-2">Tamanhos</h3>
+                        <h3 className="font-semibold mb-2">Tamanho</h3>
 
                         <div className="flex gap-2 flex-wrap">
-                            {selectedVariant.skus?.map(sku => (
-                                <button
-                                    key={sku.id}
-                                    onClick={() => setSelectedSku(sku)}
-                                    className={`px-4 py-2 border text-sm ${selectedSku?.id === sku.id
-                                            ? "bg-black text-white"
-                                            : "bg-white"
-                                        }`}
-                                >
-                                    {sku.size}
-                                </button>
-                            ))}
+                            {selectedVariant.skus?.map(sku => {
+                                const available = isSkuAvailable(sku.id)
+                                const isSelected = selectedSku?.id === sku.id
+                                return (
+                                    <button
+                                        key={sku.id}
+                                        onClick={() => available && setSelectedSku(sku)}
+                                        disabled={!available}
+                                        title={available ? sku.size : `${sku.size} — esgotado`}
+                                        className={`relative px-4 py-2 border text-sm transition-all
+                                            ${isSelected ? "bg-black text-white border-black" : "bg-white border-gray-300"}
+                                            ${available ? "hover:border-black" : "opacity-40 cursor-not-allowed line-through"}
+                                        `}
+                                    >
+                                        {sku.size}
+                                    </button>
+                                )
+                            })}
                         </div>
                     </div>
                 )}
@@ -171,13 +263,20 @@ export default function ProductDetails() {
 
                 {/* BOTÕES */}
                 {!addedToCart ? (
-                    <button
-                        disabled={!selectedSku}
-                        onClick={handleAddToCart}
-                        className="mt-4 bg-black text-white py-3 disabled:opacity-50"
-                    >
-                        Adicionar ao carrinho
-                    </button>
+                    <>
+                        <button
+                            disabled={!selectedSku || !!selectedSkuUnavailable}
+                            onClick={handleAddToCart}
+                            className="mt-4 bg-black text-white py-3 disabled:opacity-50"
+                        >
+                            {selectedSkuUnavailable ? 'Esgotado' : 'Adicionar ao carrinho'}
+                        </button>
+                        {selectedSkuUnavailable && (
+                            <p className="text-red-500 text-sm">
+                                Este tamanho está esgotado. Escolha outro tamanho ou cor.
+                            </p>
+                        )}
+                    </>
                 ) : (
                     <div className="flex gap-3 mt-4">
                         <button

@@ -80,6 +80,52 @@ export const catalogApi = {
     })
     if (!response.ok) throw new Error('Erro ao deletar categoria')
   },
+
+  createVariant: async (productId, data) => {
+    const response = await fetch(`${BASE_URL}/catalog/products/${productId}/variants`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('token')}` },
+      body: JSON.stringify(data),
+    })
+    if (!response.ok) throw new Error('Erro ao criar variante')
+    return response.json()
+  },
+
+  deleteVariant: async (variantId) => {
+    const response = await fetch(`${BASE_URL}/catalog/variants/${variantId}`, {
+      method: 'DELETE',
+      headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
+    })
+    if (!response.ok) throw new Error('Erro ao deletar variante')
+  },
+
+  createSku: async (variantId, data) => {
+    const response = await fetch(`${BASE_URL}/catalog/variants/${variantId}/skus`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('token')}` },
+      body: JSON.stringify(data),
+    })
+    if (!response.ok) throw new Error('Erro ao criar SKU')
+    return response.json()
+  },
+
+  updateSku: async (skuId, data) => {
+    const response = await fetch(`${BASE_URL}/catalog/skus/${skuId}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('token')}` },
+      body: JSON.stringify(data),
+    })
+    if (!response.ok) throw new Error('Erro ao atualizar SKU')
+    return response.json()
+  },
+
+  deleteSku: async (skuId) => {
+    const response = await fetch(`${BASE_URL}/catalog/skus/${skuId}`, {
+      method: 'DELETE',
+      headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
+    })
+    if (!response.ok) throw new Error('Erro ao deletar SKU')
+  },
 }
 const getHeaders = () => ({
   'Content-Type': 'application/json',
