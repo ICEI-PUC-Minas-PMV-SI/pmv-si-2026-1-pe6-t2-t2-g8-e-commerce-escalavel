@@ -169,7 +169,8 @@ export function ServicesDrawer({ visible, onDismiss }: Props) {
 }
 
 const s = StyleSheet.create({
-  overlay: { justifyContent: 'flex-start', alignItems: 'flex-start', margin: 0 },
+  root: { flex: 1, flexDirection: 'row' },
+  backdrop: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)' },
   panel: { width: 260, flex: 1, backgroundColor: '#FFFFFF', paddingHorizontal: 0 },
   scroll: { flexGrow: 1, paddingBottom: 32 },
 
