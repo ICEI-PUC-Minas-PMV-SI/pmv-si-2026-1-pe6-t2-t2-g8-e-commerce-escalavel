@@ -23,7 +23,6 @@ function OrderSuccessModal({ order, paymentMethod, onClose }) {
 
         <div className="flex flex-col gap-1 text-sm text-gray-700">
           <p><strong>ID do pedido:</strong> {order?.id}</p>
-          <p><strong>Status:</strong> {order?.status}</p>
           {order?.transactionId && (
             <p><strong>Transação:</strong> {order.transactionId}</p>
           )}
