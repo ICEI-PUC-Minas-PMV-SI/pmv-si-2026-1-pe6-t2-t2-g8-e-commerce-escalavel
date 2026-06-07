@@ -16,6 +16,9 @@ public class Order {
 
     private String status;
 
+    // Identificador da transação retornado pela PaymentAPI quando aprovado
+    private String transactionId;
+
     // Lista de itens do pedido
     @ElementCollection
     @CollectionTable(name = "order_items_collection", joinColumns = @JoinColumn(name = "order_id"))
@@ -44,6 +47,14 @@ public class Order {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public String getTransactionId() {
+        return transactionId;
+    }
+
+    public void setTransactionId(String transactionId) {
+        this.transactionId = transactionId;
     }
 
     public List<Item> getItems() {

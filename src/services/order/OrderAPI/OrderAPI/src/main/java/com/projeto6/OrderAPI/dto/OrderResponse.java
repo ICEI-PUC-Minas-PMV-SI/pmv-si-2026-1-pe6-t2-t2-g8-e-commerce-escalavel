@@ -27,9 +27,15 @@ public class OrderResponse {
 
     @Schema(
         description = "Status atual do pedido",
-        example = "CRIADO"
+        example = "CREATED"
     )
     private String status;
+
+    @Schema(
+        description = "ID da transação de pagamento (preenchido quando aprovado)",
+        example = "TRX-837462"
+    )
+    private String transactionId;
 
     // Getters e Setters
     public UUID getId() {
@@ -62,5 +68,13 @@ public class OrderResponse {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public String getTransactionId() {
+        return transactionId;
+    }
+
+    public void setTransactionId(String transactionId) {
+        this.transactionId = transactionId;
     }
 }
