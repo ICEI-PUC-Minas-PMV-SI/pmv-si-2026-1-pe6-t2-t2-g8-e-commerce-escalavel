@@ -1,84 +1,232 @@
 import { useEffect, useState } from 'react';
-import { View, Text, FlatList, Pressable } from 'react-native';
+import { ScrollView, View, StyleSheet } from 'react-native';
+import { Text } from 'react-native-paper';
 
-import { orderService } from '../../../src/services/orderService';
-import CancelOrderModal from '../../../src/components/modals/CancelOrderModal';
+import OrderCard from '@/src/components/OrderCard';
+import CancelOrderModal from '@/src/components/modals/CancelOrderModal';
+import DeliveredOrderModal from '@/src/components/modals/DeliveredOrderModal';
+import OrderDetailsModal from '@/src/components/modals/OrderDetailsModal';
 
-export default function OrdersPage() {
-  const [orders, setOrders] = useState<any[]>([]);
-  const [selectedOrder, setSelectedOrder] = useState<string | null>(null);
-  const [modalVisible, setModalVisible] = useState(false);
+import { useAuth } from '@/src/contexts/AuthContext';
 
-  async function load() {
-    const data = await orderService.getOrdersByUserId('USER_ID_FIXO');
+type OrderItem = {
+  id: string;
+  productName: string;
+  size: string;
+  quantity: number;
+  unitPrice: number;
+};
 
-    // remove cancelados da lista
-    setOrders(data.filter((o) => o.status !== 'cancelled'));
-  }
+type Order = {
+  id: string;
+  status: string;
+  total: number;
+  items: OrderItem[];
+};
+
+export default function PurchasedOrders() {
+  const { user } = useAuth();
+
+  const [orders, setOrders] = useState<Order[]>([]);
+
+  const [showCancelModal, setShowCancelModal] = useState(false);
+  const [showDeliveredModal, setShowDeliveredModal] = useState(false);
+  const [showDetailsModal, setShowDetailsModal] = useState(false);
+
+  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+  const [orderToCancel, setOrderToCancel] = useState<string | null>(null);
+
 
   useEffect(() => {
-    load();
-  }, []);
+    if (!user?.id) return;
 
-  async function confirmCancel() {
-    if (!selectedOrder) return;
+    async function loadOrders() {
+      try {
+        const res = await fetch(
+          `http://10.0.2.2:7000/api/orders/customer/${user.id}`
+        );
 
-    await orderService.cancelOrder(selectedOrder);
+        if (!res.ok) {
+          throw new Error('Erro ao buscar pedidos');
+        }
 
-    setModalVisible(false);
-    setSelectedOrder(null);
+        const data = await res.json();
+        setOrders(data);
 
-    await load();
+      } catch (err) {
+        console.log('Erro ao carregar pedidos:', err);
+        setOrders([]);
+      }
+    }
+
+    loadOrders();
+  }, [user]);
+
+  const activeOrders = orders.filter(
+    order => order.status !== 'Cancelado'
+  );
+
+  const canceledOrders = orders.filter(
+    order => order.status === 'Cancelado'
+  );
+
+  function handleCancelOrder(order: Order) {
+    if (order.status === 'Entregue') {
+      setShowDeliveredModal(true);
+      return;
+    }
+
+    setOrderToCancel(order.id);
+    setShowCancelModal(true);
+  }
+
+  function handleConfirmCancel() {
+    if (!orderToCancel) return;
+
+    setOrders(prev =>
+      prev.map(order =>
+        order.id === orderToCancel
+          ? { ...order, status: 'Cancelado' }
+          : order
+      )
+    );
+
+    setOrderToCancel(null);
+    setShowCancelModal(false);
+  }
+
+  function handleDiscardOrder(orderId: string) {
+    setOrders(prev =>
+      prev.filter(order => order.id !== orderId)
+    );
   }
 
   return (
-    <View style={{ flex: 1, padding: 16 }}>
-      <Text style={{ fontSize: 20, fontWeight: 'bold' }}>
-        Meus pedidos
-      </Text>
+    <>
+      <ScrollView contentContainerStyle={styles.container}>
 
-      <FlatList
-        data={orders}
-        keyExtractor={(i) => i.id}
-        renderItem={({ item }) => {
-          const canCancel =
-            item.status === 'pending' || item.status === 'confirmed';
+        <Text style={styles.title}>Meus pedidos</Text>
 
-          return (
-            <View
-              style={{
-                padding: 12,
-                borderWidth: 1,
-                marginTop: 10,
-              }}
-            >
-              <Text>ID: {item.id}</Text>
-              <Text>Status: {item.status}</Text>
-              <Text>Total: R$ {item.totalAmount}</Text>
+        {/* PEDIDOS ATIVOS */}
+        {activeOrders.map(order => (
+          <OrderCard
+            key={order.id}
+            order={{
+              id: order.id,
+              status: order.status,
+              productName:
+                order.items.length === 1
+                  ? order.items[0].productName
+                  : `Pedido - ${order.items.length} itens`,
+              total: order.total,
+            }}
+            onViewDetails={() => {
+              setSelectedOrder(order);
+              setShowDetailsModal(true);
+            }}
+            onCancel={() => handleCancelOrder(order)}
+            onDiscard={() => handleDiscardOrder(order.id)}
+          />
+        ))}
 
-              {canCancel && (
-                <Pressable
-                  onPress={() => {
-                    setSelectedOrder(item.id);
-                    setModalVisible(true);
+        {/* PEDIDOS CANCELADOS */}
+        {canceledOrders.length > 0 && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>
+              Pedidos cancelados
+            </Text>
+
+            <View style={styles.canceledContainer}>
+              {canceledOrders.map(order => (
+                <OrderCard
+                  key={order.id}
+                  order={{
+                    id: order.id,
+                    status: order.status,
+                    productName:
+                      order.items.length === 1
+                        ? order.items[0].productName
+                        : `Pedido - ${order.items.length} itens`,
+                    total: order.total,
                   }}
-                  style={{ marginTop: 10, backgroundColor: 'red', padding: 8 }}
-                >
-                  <Text style={{ color: 'white', textAlign: 'center' }}>
-                    🗑 Cancelar pedido
-                  </Text>
-                </Pressable>
-              )}
+                  onViewDetails={() => {
+                    setSelectedOrder(order);
+                    setShowDetailsModal(true);
+                  }}
+                  onCancel={() => {}}
+                  onDiscard={() => handleDiscardOrder(order.id)}
+                />
+              ))}
             </View>
-          );
+          </View>
+        )}
+
+        {orders.length === 0 && (
+          <Text style={styles.empty}>
+            Você ainda não possui pedidos.
+          </Text>
+        )}
+
+      </ScrollView>
+
+      {/* MODAIS */}
+      <CancelOrderModal
+        visible={showCancelModal}
+        onCancel={() => {
+          setShowCancelModal(false);
+          setOrderToCancel(null);
+        }}
+        onConfirm={handleConfirmCancel}
+      />
+
+      <DeliveredOrderModal
+        visible={showDeliveredModal}
+        onClose={() => setShowDeliveredModal(false)}
+      />
+
+      <OrderDetailsModal
+        visible={showDetailsModal}
+        order={selectedOrder}
+        onClose={() => {
+          setShowDetailsModal(false);
+          setSelectedOrder(null);
         }}
       />
-
-      <CancelOrderModal
-        visible={modalVisible}
-        onCancel={() => setModalVisible(false)}
-        onConfirm={confirmCancel}
-      />
-    </View>
+    </>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    padding: 16,
+    paddingBottom: 40,
+  },
+
+  title: {
+    fontSize: 26,
+    fontWeight: '700',
+    marginBottom: 20,
+  },
+
+  section: {
+    marginTop: 24,
+  },
+
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    marginBottom: 12,
+    color: '#6B7280',
+  },
+
+  canceledContainer: {
+    opacity: 0.65,
+  },
+
+  empty: {
+    textAlign: 'center',
+    marginTop: 40,
+    color: '#9CA3AF',
+    fontSize: 16,
+  },
+});

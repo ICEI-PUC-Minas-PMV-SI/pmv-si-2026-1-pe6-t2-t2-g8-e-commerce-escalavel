@@ -8,25 +8,38 @@ export enum OrderStatus {
   FAILED = 'failed',
 }
 
-export interface OrderItem {
+export interface OrderItemResponse {
+  skuId: string;
   productId: string;
-  productName: string;
   unitPrice: number;
   quantity: number;
 }
 
+export interface CreateOrderItem {
+  skuId: string;
+  quantity: number;
+}
+
 export interface CreateOrderPayload {
-  userId: string;
-  items: OrderItem[];
+  customerId: string;
+  items: CreateOrderItem[];
 }
 
 export interface Order {
   id: string;
-  userId: string;
-  status: OrderStatus;
-  totalAmount: number;
-  createdAt: string;
-  items: OrderItem[];
+  customerId: string;
+  status: string;
+  items: OrderItemResponse[];
+}
+
+export interface CreateOrderItem {
+  skuId: string;
+  quantity: number;
+}
+
+export interface CreateOrderPayload {
+  customerId: string;
+  items: CreateOrderItem[];
 }
 
 class OrderService {
@@ -94,12 +107,12 @@ class OrderService {
 
   async updateOrderStatus(
     orderId: string,
-    status: OrderStatus,
+    status: string,
     signal?: AbortSignal
   ): Promise<Order> {
     return this.httpClient.patch<Order>(
-      `/orders/${orderId}/status`,
-      { status },
+      `/orders/${orderId}/status?status=${status}`,
+      undefined,
       {
         signal,
         headers: await authHeader(),

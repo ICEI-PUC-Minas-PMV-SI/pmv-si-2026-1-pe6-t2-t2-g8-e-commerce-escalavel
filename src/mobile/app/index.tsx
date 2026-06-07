@@ -5,17 +5,19 @@ import { useRouter } from 'expo-router';
 import { ServicesDrawer } from '@/src/components/ServicesDrawer';
 import { CatalogScreen } from '@/src/screens/CatalogScreen';
 
-type RouteKey = 'home' | 'profile' | 'menu';
+type RouteKey = 'home' | 'profile' | 'cart' | 'menu';
 
 const ROUTES: { key: RouteKey; title: string; focusedIcon: string; unfocusedIcon?: string }[] = [
   { key: 'home',    title: 'Início',  focusedIcon: 'home',    unfocusedIcon: 'home-outline' },
   { key: 'profile', title: 'Perfil',  focusedIcon: 'account', unfocusedIcon: 'account-outline' },
+  { key: 'cart',    title: 'Carrinho', focusedIcon: 'cart',    unfocusedIcon: 'cart-outline' },
   { key: 'menu',    title: 'Menu',    focusedIcon: 'menu' },
 ];
 
 const renderScene = BottomNavigation.SceneMap({
   home:    CatalogScreen,
   profile: () => null,
+  cart:    () => null,
   menu:    () => null,
 });
 
@@ -32,6 +34,10 @@ export default function AppShell() {
     }
     if (key === 'profile') {
       router.push('/profile');
+      return;
+    }
+    if (key === 'cart') {
+      router.push('/order/cart/cart');
       return;
     }
     setIndex(next);
