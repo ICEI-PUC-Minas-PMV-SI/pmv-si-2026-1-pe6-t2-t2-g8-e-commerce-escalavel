@@ -20,6 +20,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { resolveImageUri } from '@/shared/helpers';
 import { useAuth } from '@/src/contexts/AuthContext';
 import { catalogService } from '@/src/services/catalogService';
+import { stockService } from '@/src/services/stockService';
 import { spacing } from '@/src/theme';
 import type { Product, Sku, Variant } from '@/src/types/catalog';
 import { useCart } from '@/contexts/CartContext';
@@ -41,18 +42,37 @@ export default function ProductDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
   const { user } = useAuth();
-  const { addItem } = useCart();
+  const { addItem, items: cartItems } = useCart();
 
-  const [product, setProduct] = useState<Product | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [product, setProduct]           = useState<Product | null>(null);
+  const [loading, setLoading]           = useState(true);
+  const [error, setError]               = useState<string | null>(null);
   const [selectedVariant, setSelectedVariant] = useState<Variant | null>(null);
-  const [selectedSku, setSelectedSku] = useState<Sku | null>(null);
-  const [quantity, setQuantity] = useState(1);
-  const [imageFailed, setImageFailed] = useState(false);
-  const [added, setAdded] = useState(false);
+  const [selectedSku, setSelectedSku]   = useState<Sku | null>(null);
+  const [quantity, setQuantity]         = useState(1);
+  const [imageFailed, setImageFailed]   = useState(false);
+  const [added, setAdded]               = useState(false);
+  const [skuStock, setSkuStock]         = useState<Record<string, number>>({});
 
   const isAdmin = user?.role === 'admin';
+
+  const availableForSku = (skuId: string): number | null => {
+    const stock = skuStock[skuId];
+    if (stock === undefined) return null;
+    const inCart = cartItems.find(i => i.skuId === skuId)?.quantity ?? 0;
+    return Math.max(0, stock - inCart);
+  };
+
+  const isSkuDisabled = (sku: Sku) => {
+    const avail = availableForSku(sku.id);
+    return avail !== null && avail === 0;
+  };
+
+  const isVariantDisabled = (v: Variant) => {
+    const skus = v.skus ?? [];
+    if (skus.length === 0) return false;
+    return skus.every(sku => isSkuDisabled(sku));
+  };
 
   const load = useCallback(async (signal?: AbortSignal) => {
     if (!id) return;
@@ -62,6 +82,17 @@ export default function ProductDetailScreen() {
       setProduct(data);
       setSelectedVariant(null);
       setSelectedSku(null);
+      setQuantity(1);
+
+      const allSkus = (data.variants ?? []).flatMap(v => v.skus ?? []);
+      const entries = await Promise.all(
+        allSkus.map(sku =>
+          stockService.getBySku(sku.id, signal)
+            .then(s => [sku.id, s?.quantityAvailable ?? 0] as [string, number])
+            .catch(() => [sku.id, 0] as [string, number])
+        )
+      );
+      setSkuStock(Object.fromEntries(entries));
     } catch (err) {
       if ((err as Error).name === 'AbortError') return;
       setError((err as Error).message || 'Erro ao carregar produto.');
@@ -78,13 +109,24 @@ export default function ProductDetailScreen() {
   );
 
   const handleVariantSelect = (variant: Variant) => {
+    if (isVariantDisabled(variant)) return;
     setSelectedVariant(variant);
     setSelectedSku(null);
+    setQuantity(1);
+  };
+
+  const handleSkuSelect = (sku: Sku) => {
+    if (isSkuDisabled(sku)) return;
+    setSelectedSku(sku);
+    setQuantity(1);
   };
 
   const handleAddToCart = () => {
-    if (!product || !selectedSku) return;
+    if (!product || !selectedSku || !selectedVariant) return;
+    const avail = availableForSku(selectedSku.id);
+    if (avail !== null && quantity > avail) return;
     addItem({
+      skuId: selectedSku.id,
       skuId: selectedSku.id,
       productId: product.id,
       productName: product.name,
@@ -151,6 +193,8 @@ export default function ProductDetailScreen() {
   const variants = product.variants ?? [];
   const skus = selectedVariant?.skus ?? [];
 
+  const maxQty = selectedSku ? (availableForSku(selectedSku.id) ?? Infinity) : 1;
+
   return (
     <SafeAreaView style={s.root} edges={['bottom']}>
       <ScrollView contentContainerStyle={s.scroll} showsVerticalScrollIndicator={false}>
@@ -199,25 +243,24 @@ export default function ProductDetailScreen() {
               <Divider style={s.divider} />
               <Text style={s.sectionLabel}>Cor</Text>
               <View style={s.variantRow}>
-                {variants.map((v) => (
-                  <Pressable
-                    key={v.id}
-                    onPress={() => handleVariantSelect(v)}
-                    style={[
-                      s.variantBtn,
-                      selectedVariant?.id === v.id && s.variantBtnSelected,
-                    ]}
-                  >
-                    <Text
+                {variants.map((v) => {
+                  const disabled = isVariantDisabled(v);
+                  return (
+                    <Pressable
+                      key={v.id}
+                      onPress={() => handleVariantSelect(v)}
+                      disabled={disabled}
                       style={[
-                        s.variantBtnTxt,
-                        selectedVariant?.id === v.id && s.variantBtnTxtSelected,
+                        s.variantSwatch,
+                        { backgroundColor: v.color || '#E5E7EB' },
+                        selectedVariant?.id === v.id && s.variantSwatchSelected,
+                        disabled && s.variantSwatchDisabled,
                       ]}
                     >
-                      {v.color ?? `Opção ${variants.indexOf(v) + 1}`}
-                    </Text>
-                  </Pressable>
-                ))}
+                      {disabled && <View style={s.swatchStrike} />}
+                    </Pressable>
+                  );
+                })}
               </View>
             </>
           )}
@@ -228,19 +271,23 @@ export default function ProductDetailScreen() {
               <Divider style={s.divider} />
               <Text style={s.sectionLabel}>Tamanho</Text>
               <View style={s.skuRow}>
-                {skus.map((sku) => (
-                  <Chip
-                    key={sku.id}
-                    selected={selectedSku?.id === sku.id}
-                    onPress={() => setSelectedSku(sku)}
-                    style={s.skuChip}
-                    selectedColor={ACCENT}
-                  >
-                    {sku.size ?? sku.code ?? sku.id.slice(0, 6)}
-                    {' · '}
-                    {PRICE_FMT.format(sku.price)}
-                  </Chip>
-                ))}
+                {skus.map((sku) => {
+                  const disabled = isSkuDisabled(sku);
+                  return (
+                    <Chip
+                      key={sku.id}
+                      selected={selectedSku?.id === sku.id}
+                      onPress={() => handleSkuSelect(sku)}
+                      disabled={disabled}
+                      style={[s.skuChip, disabled && s.skuChipDisabled]}
+                      selectedColor={ACCENT}
+                    >
+                      {sku.size ?? sku.code ?? sku.id.slice(0, 6)}
+                      {' · '}
+                      {PRICE_FMT.format(sku.price)}
+                    </Chip>
+                  );
+                })}
               </View>
             </>
           )}
@@ -260,8 +307,9 @@ export default function ProductDetailScreen() {
                 </Pressable>
                 <Text style={s.qtyVal}>{quantity}</Text>
                 <Pressable
-                  style={s.qtyBtn}
-                  onPress={() => setQuantity(q => q + 1)}
+                  style={[s.qtyBtn, quantity >= maxQty && s.qtyBtnDisabled]}
+                  onPress={() => setQuantity(q => Math.min(q + 1, maxQty === Infinity ? q + 1 : maxQty))}
+                  disabled={quantity >= maxQty}
                 >
                   <Text style={s.qtyBtnTxt}>+</Text>
                 </Pressable>
@@ -303,11 +351,17 @@ export default function ProductDetailScreen() {
           mode="contained"
           style={s.cartBtn}
           contentStyle={s.cartBtnContent}
-          disabled={!selectedSku}
+          disabled={!selectedSku || maxQty === 0}
           onPress={handleAddToCart}
           buttonColor={added ? '#22C55E' : DARK}
         >
-          {added ? '✓  Adicionado ao carrinho' : selectedSku ? 'Adicionar ao carrinho' : 'Selecione uma opção'}
+          {added
+            ? '✓  Adicionado ao carrinho'
+            : !selectedSku
+              ? 'Selecione uma opção'
+              : maxQty === 0
+                ? 'Sem estoque'
+                : 'Adicionar ao carrinho'}
         </Button>
       </View>
     </SafeAreaView>
@@ -320,10 +374,10 @@ const s = StyleSheet.create({
   center: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: spacing.md, padding: spacing.xl },
 
   /* Imagem */
-  imageWrap:          { width: '100%', aspectRatio: 1, backgroundColor: '#FFF' },
-  image:              { width: '100%', height: '100%' },
-  imagePlaceholder:   { alignItems: 'center', justifyContent: 'center', backgroundColor: '#F3F4F6' },
-  imagePlaceholderTxt:{ fontSize: 64 },
+  imageWrap:           { width: '100%', aspectRatio: 1, backgroundColor: '#FFF' },
+  image:               { width: '100%', height: '100%' },
+  imagePlaceholder:    { alignItems: 'center', justifyContent: 'center', backgroundColor: '#F3F4F6' },
+  imagePlaceholderTxt: { fontSize: 64 },
 
   /* Body */
   body:         { backgroundColor: '#FFF', borderTopLeftRadius: 20, borderTopRightRadius: 20, marginTop: -20, padding: spacing.xl, gap: spacing.sm },
@@ -334,16 +388,17 @@ const s = StyleSheet.create({
   sectionLabel: { fontSize: 12, fontWeight: '700', color: '#6B7280', textTransform: 'uppercase', letterSpacing: 1, marginBottom: spacing.sm },
   description:  { fontSize: 14, color: '#374151', lineHeight: 22 },
 
-  /* Variantes */
-  variantRow:        { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
-  variantBtn:        { paddingHorizontal: spacing.lg, paddingVertical: spacing.sm, borderRadius: 8, borderWidth: 1.5, borderColor: '#E5E7EB', backgroundColor: '#F9FAFB' },
-  variantBtnSelected:{ borderColor: DARK, backgroundColor: DARK },
-  variantBtnTxt:     { fontSize: 13, fontWeight: '600', color: '#374151' },
-  variantBtnTxtSelected: { color: '#FFF' },
+  /* Variantes (cor) */
+  variantRow:            { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.md },
+  variantSwatch:         { width: 38, height: 38, borderRadius: 19, borderWidth: 2, borderColor: '#E5E7EB', overflow: 'hidden', alignItems: 'center', justifyContent: 'center' },
+  variantSwatchSelected: { borderWidth: 3, borderColor: DARK, transform: [{ scale: 1.18 }] },
+  variantSwatchDisabled: { opacity: 0.35 },
+  swatchStrike:          { position: 'absolute', width: '140%', height: 2, backgroundColor: '#6B7280', transform: [{ rotate: '-45deg' }] },
 
   /* SKUs */
-  skuRow:  { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
-  skuChip: { backgroundColor: '#F3F4F6' },
+  skuRow:         { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
+  skuChip:        { backgroundColor: '#F3F4F6' },
+  skuChipDisabled:{ opacity: 0.4 },
 
   /* Quantidade */
   qtyRow:        { flexDirection: 'row', alignItems: 'center', gap: spacing.xl },

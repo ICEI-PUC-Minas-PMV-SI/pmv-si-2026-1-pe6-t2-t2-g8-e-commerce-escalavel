@@ -30,7 +30,7 @@ const TYPE_COLOR: Record<StockMovementType, string> = {
 };
 
 export default function HistoryScreen() {
-  const { skuId, name } = useLocalSearchParams<{ skuId: string; name?: string }>();
+  const { skuId, name, color } = useLocalSearchParams<{ skuId: string; name?: string; color?: string }>();
   const [movements, setMovements] = useState<StockMovement[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -89,7 +89,12 @@ export default function HistoryScreen() {
   return (
     <SafeAreaView style={styles.safe} edges={['bottom']}>
       <View style={styles.header}>
-        {name ? <Text variant="titleMedium">{name}</Text> : null}
+        <View style={styles.headerRow}>
+          {!!color && (
+            <View style={[styles.colorDot, { backgroundColor: color }]} />
+          )}
+          {name ? <Text variant="titleMedium" style={styles.headerName}>{name}</Text> : null}
+        </View>
         <Text variant="bodySmall" style={styles.mono} numberOfLines={1}>
           {skuId}
         </Text>
@@ -129,6 +134,9 @@ const styles = StyleSheet.create({
     paddingTop: spacing.md,
     paddingBottom: spacing.sm,
   },
+  headerRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
+  headerName: { flex: 1 },
+  colorDot: { width: 22, height: 22, borderRadius: 11, borderWidth: 1.5, borderColor: '#E5E7EB', flexShrink: 0 },
   list: {
     paddingHorizontal: spacing.lg,
     paddingBottom: spacing.huge,

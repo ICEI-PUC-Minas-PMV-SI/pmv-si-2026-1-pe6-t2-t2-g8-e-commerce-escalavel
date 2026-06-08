@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { BottomNavigation } from 'react-native-paper';
-import { useRouter } from 'expo-router';
+import { useRouter, Redirect } from 'expo-router';
+import { useAuth } from '@/src/contexts/AuthContext';
 
 import { ServicesDrawer } from '@/src/components/ServicesDrawer';
 import { CatalogScreen } from '@/src/screens/CatalogScreen';
@@ -22,9 +23,12 @@ const renderScene = BottomNavigation.SceneMap({
 });
 
 export default function AppShell() {
+  const { isAuthenticated } = useAuth();
   const router = useRouter();
   const [index, setIndex]           = useState(0);
   const [drawerOpen, setDrawerOpen] = useState(false);
+
+  if (!isAuthenticated) return <Redirect href="/login" />;
 
   const onIndexChange = (next: number) => {
     const key = ROUTES[next].key;

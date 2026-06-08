@@ -2,9 +2,9 @@ import { useState } from 'react'
 import {
   StyleSheet, View, KeyboardAvoidingView, Platform,
   ScrollView, Dimensions, TouchableOpacity, StatusBar,
-  TextInput as RNInput, Pressable,
+  TextInput as RNInput, Pressable, ActivityIndicator,
 } from 'react-native'
-import { Text, Button, Snackbar } from 'react-native-paper'
+import { Text, Snackbar } from 'react-native-paper'
 import { useRouter, Redirect } from 'expo-router'
 import { useAuth } from '@/src/contexts/AuthContext'
 
@@ -55,42 +55,31 @@ export default function LoginScreen() {
     } finally { setLoading(false) }
   }
 
-  /* ── Painel esquerdo (hero) ── */
-  const HeroPanel = () => (
+  /* ── Hero JSX ── */
+  const heroJSX = (
     <View style={IS_WIDE ? s.heroWide : s.heroMobile}>
-      {/* Grade decorativa */}
       <View style={s.grid} pointerEvents="none">
         {Array.from({ length: 6 }).map((_, i) => (
           <View key={i} style={s.gridLine} />
         ))}
       </View>
-
-      {/* Conteúdo */}
       <View style={s.heroContent}>
         <Text style={[s.brand, { color: cur.accent }]}>INSIDER</Text>
-
-        {/* Número do slide */}
         <View style={s.slideNum}>
           <Text style={s.slideNumCur}>0{slide + 1}</Text>
           <Text style={s.slideNumSep}>/</Text>
           <Text style={s.slideNumTot}>0{SLIDES.length}</Text>
         </View>
-
         <Text style={IS_WIDE ? s.headlineWide : s.headlineMobile}>
           {cur.headline}
         </Text>
-
         <View style={[s.accentLine, { backgroundColor: cur.accent }]} />
         <Text style={s.heroSub}>{cur.sub}</Text>
-
-        {/* Tag */}
         <View style={[s.tagPill, { borderColor: cur.accent }]}>
           <Text style={[s.tagTxt, { color: cur.accent }]}>— {cur.tag}</Text>
         </View>
-
-        {/* Dots */}
         <View style={s.dots}>
-          {SLIDES.map((sl, i) => (
+          {SLIDES.map((_, i) => (
             <TouchableOpacity key={i} onPress={() => setSlide(i)}>
               <View style={[
                 s.dot,
@@ -105,22 +94,20 @@ export default function LoginScreen() {
     </View>
   )
 
-  /* ── Painel direito (form) ── */
-  const FormPanel = () => (
+  /* ── Form JSX ── */
+  const formJSX = (
     <ScrollView
       style={IS_WIDE ? s.formWide : s.formMobile}
       contentContainerStyle={s.formInner}
       keyboardShouldPersistTaps="handled"
       showsVerticalScrollIndicator={false}
     >
-      {/* Cabeçalho */}
       <View style={s.formHeader}>
         <Text style={s.formEyebrow}>Bem-vindo de volta</Text>
         <Text style={s.formTitle}>Entrar</Text>
         <Text style={s.formSub}>Acesse sua conta INSIDER</Text>
       </View>
 
-      {/* Campos */}
       <View style={s.fields}>
         <View style={s.inputWrap}>
           <Text style={s.inputLabel}>E-mail</Text>
@@ -163,40 +150,37 @@ export default function LoginScreen() {
         </View>
       </View>
 
-      {/* Botão principal */}
-      <Button
-        mode="contained"
-        onPress={handleLogin}
-        loading={loading}
-        disabled={loading}
-        style={s.btnPrimary}
-        contentStyle={s.btnContent}
-        buttonColor={DARK}
-        labelStyle={s.btnLabel}
-      >
-        {loading ? 'Entrando...' : 'Entrar'}
-      </Button>
+      {error ? (
+        <View style={s.errorBox}>
+          <Text style={s.errorTxt}>✕  {error}</Text>
+        </View>
+      ) : null}
 
-      {/* Divisor */}
+      <TouchableOpacity
+        onPress={handleLogin}
+        disabled={loading}
+        style={[s.btnPrimary, loading && { opacity: 0.7 }]}
+        activeOpacity={0.8}
+      >
+        {loading
+          ? <ActivityIndicator color="#FFF" size="small" />
+          : <Text style={s.btnLabel}>Entrar</Text>}
+      </TouchableOpacity>
+
       <View style={s.divRow}>
         <View style={s.divLine} />
         <Text style={s.divTxt}>ou</Text>
         <View style={s.divLine} />
       </View>
 
-      {/* Botão secundário */}
-      <Button
-        mode="outlined"
+      <TouchableOpacity
         onPress={() => router.push('/register')}
         style={s.btnOutline}
-        contentStyle={s.btnContent}
-        textColor={DARK}
-        labelStyle={s.btnLabel}
+        activeOpacity={0.8}
       >
-        Criar conta
-      </Button>
+        <Text style={s.btnLabelDark}>Criar conta</Text>
+      </TouchableOpacity>
 
-      {/* Rodapé */}
       <Text style={s.footerTxt}>
         Ao entrar, você concorda com nossos{' '}
         <Text style={s.footerLink}>Termos de Uso</Text>
@@ -212,13 +196,13 @@ export default function LoginScreen() {
       <StatusBar barStyle="light-content" />
       {IS_WIDE ? (
         <View style={s.wide}>
-          <HeroPanel />
-          <FormPanel />
+          {heroJSX}
+          {formJSX}
         </View>
       ) : (
         <>
-          <HeroPanel />
-          <FormPanel />
+          {heroJSX}
+          {formJSX}
         </>
       )}
 
@@ -239,12 +223,9 @@ const s = StyleSheet.create({
   root:          { flex: 1, backgroundColor: '#F8F9FA' },
   wide:          { flex: 1, flexDirection: 'row' },
 
-  /* Hero wide */
   heroWide:      { width: '44%', backgroundColor: DARK, overflow: 'hidden', position: 'relative' },
-  /* Hero mobile */
   heroMobile:    { backgroundColor: DARK, paddingTop: 56, paddingBottom: 36, overflow: 'hidden', position: 'relative' },
 
-  /* Grid decorativo */
   grid:          { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, flexDirection: 'column', justifyContent: 'space-evenly', opacity: 0.06 },
   gridLine:      { height: 1, backgroundColor: '#FFFFFF', width: '100%' },
 
@@ -268,7 +249,6 @@ const s = StyleSheet.create({
   dots:          { flexDirection: 'row', gap: 8, alignItems: 'center' },
   dot:           { height: 4, borderRadius: 2 },
 
-  /* Form */
   formWide:      { flex: 1, backgroundColor: '#F8F9FA' },
   formMobile:    { flex: 1, backgroundColor: '#F8F9FA' },
   formInner:     { flexGrow: 1, justifyContent: 'center', paddingHorizontal: 36, paddingVertical: 48 },
@@ -289,10 +269,10 @@ const s = StyleSheet.create({
   eyeIcon:       { fontSize: 16 },
   fieldErr:      { color: '#EF4444', fontSize: 12, marginLeft: 4 },
 
-  btnPrimary:    { borderRadius: 10, marginTop: 24, elevation: 0 },
-  btnOutline:    { borderRadius: 10, borderColor: '#D1D5DB', borderWidth: 1.5 },
-  btnContent:    { height: 54 },
-  btnLabel:      { fontSize: 15, fontWeight: '800', letterSpacing: 0.5 },
+  btnPrimary:    { borderRadius: 10, marginTop: 24, backgroundColor: DARK, height: 54, alignItems: 'center', justifyContent: 'center' },
+  btnOutline:    { borderRadius: 10, borderColor: '#D1D5DB', borderWidth: 1.5, height: 54, alignItems: 'center', justifyContent: 'center' },
+  btnLabel:      { fontSize: 15, fontWeight: '800', letterSpacing: 0.5, color: '#FFF' },
+  btnLabelDark:  { fontSize: 15, fontWeight: '800', letterSpacing: 0.5, color: DARK },
 
   divRow:        { flexDirection: 'row', alignItems: 'center', marginVertical: 20 },
   divLine:       { flex: 1, height: 1, backgroundColor: '#E5E7EB' },
@@ -302,4 +282,6 @@ const s = StyleSheet.create({
   footerLink:    { color: DARK, fontWeight: '600', textDecorationLine: 'underline' },
 
   snack:         { backgroundColor: '#1A1A1A', borderRadius: 10 },
+  errorBox:      { backgroundColor: '#FEF2F2', borderRadius: 8, padding: 12, marginTop: 12, borderWidth: 1, borderColor: '#FECACA' },
+  errorTxt:      { color: '#DC2626', fontSize: 13, fontWeight: '600' },
 })

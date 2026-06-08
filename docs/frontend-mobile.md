@@ -472,3 +472,474 @@ Testes funcionais manuais cobrindo o fluxo de pagamento no app mobile. Pré-cond
 - `src/mobile/app/order/checkout/checkout.tsx`
 - `src/mobile/src/services/orderService.ts`
 - `src/mobile/src/components/modals/OrderDetailsModal.tsx`
+
+---
+
+# Front-end Móvel — Módulo de Usuário
+
+O módulo de usuário é responsável por autenticação, cadastro e gerenciamento de perfil no aplicativo mobile. Consome a API REST do `UserService` (Node.js/Express) via `userService.ts`, com token JWT armazenado em memória via `tokenStore`.
+
+---
+
+## Projeto da Interface
+
+O módulo é composto pelas seguintes telas:
+
+- **`login.tsx`** — tela de autenticação com slideshow hero e formulário de e-mail/senha.
+- **`register.tsx`** — cadastro em dois passos: dados de acesso (nome, e-mail, senha) e dados pessoais (CPF, telefone).
+- **`profile.tsx`** — perfil completo do usuário com avatar, dados pessoais, endereço, segurança e zona de perigo.
+- **`profile/edit.tsx`** — edição dos dados do perfil com máscaras de input (CPF, telefone, CEP).
+- **`profile/password.tsx`** — alteração de senha com confirmação.
+- **`admin/users.tsx`** — listagem e gerenciamento de usuários (apenas administradores).
+
+### Wireframes
+
+#### Tela de Login — `/login`
+
+```
+┌─────────────────────────────────────┐
+│ ████████████  │  BEM-VINDO DE VOLTA │
+│ INSIDER        │                     │
+│ 01 / 03        │  Entrar             │
+│                │  Acesse sua conta   │
+│  Nova          │                     │
+│  Coleção       │  E-mail             │
+│ ──────         │  [ seu@email.com  ] │
+│ Tendências...  │                     │
+│ — SS 2026      │  Senha              │
+│ ●  ○  ○        │  [ ••••••••  👁 ]  │
+│                │                     │
+│                │  [   Entrar   ]     │
+│                │  ─────ou──────      │
+│                │  [ Criar conta ]    │
+└─────────────────────────────────────┘
+```
+
+Elementos da tela:
+- **Hero (esquerda):** painel escuro com slideshow de 3 slides, número do slide, headline, linha dourada, subtítulo, tag e dots de navegação.
+- **Formulário (direita):** eyebrow "Bem-vindo de volta", campos de e-mail e senha com validação inline, botão "Entrar" e botão "Criar conta".
+- **Erro inline:** caixa vermelha exibida acima do botão quando credenciais inválidas.
+
+#### Tela de Cadastro — `/register`
+
+```
+┌──────────────────────────────┐
+│ INSIDER                       │
+│ Crie sua                      │
+│ conta.                        │
+│ ──  [1]────[2]  Passo 1 de 2  │
+├──────────────────────────────┤
+│ PASSO 1 DE 2                  │
+│ Dados de acesso               │
+│                               │
+│ Nome completo                 │
+│ [ Seu nome completo        ]  │
+│ E-mail                        │
+│ [ seu@email.com            ]  │
+│ Senha                         │
+│ [ ••••••••            👁  ]  │
+│ ███░░ Média                   │
+│                               │
+│ [      Continuar →        ]   │
+│     Já tenho uma conta        │
+└──────────────────────────────┘
+```
+
+- **Passo 1:** nome, e-mail, senha com indicador de força (fraca/média/forte).
+- **Passo 2:** CPF e telefone (opcionais) + resumo da conta antes de confirmar.
+- **Validação de e-mail duplicado:** ao clicar "Continuar", consulta `GET /auth/check-email` antes de avançar.
+
+#### Tela de Perfil — `/profile`
+
+```
+┌──────────────────────────────┐
+│ ████████████████████████████ │
+│  [MV]  Marcos Vinicio        │
+│  ⚑ Administrador             │
+│  marcos@email.com            │
+│  📅 Membro desde 01/06/2026  │
+│ ─────────────────────────────│
+│  Marcos │ 000.000│ (00)00000 │
+│ ─────────────────────────────│
+│ [✏ Editar perfil] [Alterar ] │
+├──────────────────────────────┤
+│ 👤 Dados pessoais      Editar│
+│  NOME   Marcos Vinicio       │
+│  E-MAIL marcos@email.com     │
+│  CPF    Não informado        │
+├──────────────────────────────┤
+│ 📍 Endereço            Editar│
+│  + Adicionar endereço        │
+├──────────────────────────────┤
+│ 🔒 Segurança          Alterar│
+│  Senha de acesso             │
+├──────────────────────────────┤
+│ ⚠️ Zona de perigo             │
+│  [ Desativar minha conta ]   │
+└──────────────────────────────┘
+```
+
+#### Tela de Editar Perfil — `/profile/edit`
+
+```
+┌──────────────────────────────┐
+│ 👤 Dados pessoais             │
+│ [ Nome completo           ]  │
+│ [ E-mail                  ]  │
+│ [ CPF (opcional)          ]  │
+│ [ Telefone (opcional)     ]  │
+├──────────────────────────────┤
+│ 📍 Endereço                  │
+│ [ Rua / Logradouro        ]  │
+│ [ CEP       ] [ Cidade    ]  │
+│ [ UF ]                       │
+├──────────────────────────────┤
+│ [ Cancelar ] [   Salvar   ]  │
+└──────────────────────────────┘
+```
+
+#### Tela de Alterar Senha — `/profile/password`
+
+```
+┌──────────────────────────────┐
+│ 🔒 Alterar senha              │
+│ [ Nova senha          👁  ]  │
+│   Mínimo de 8 caracteres     │
+│ [ Confirmar senha     👁  ]  │
+│                               │
+│ [ Cancelar ] [   Salvar   ]  │
+└──────────────────────────────┘
+```
+
+#### Tela Admin — `/admin/users`
+
+```
+┌──────────────────────────────┐
+│ Usuários                 🔄  │
+│ [ 🔍 Buscar usuário...    ]  │
+│ [ Todos ▾ ] [ Ativos ▾ ]    │
+├──────────────────────────────┤
+│ [MA] Marcos Admin    admin   │
+│      marcos@email.com  ✓     │
+│      [Desativar] [Excluir]   │
+├──────────────────────────────┤
+│ [JO] João Cliente  customer  │
+│      joao@email.com    ✓     │
+│      [Desativar] [Excluir]   │
+└──────────────────────────────┘
+```
+
+---
+
+### Design Visual
+
+| Item | Definição |
+|---|---|
+| Fundo hero / header | `#0A0A0A` (preto) |
+| Fundo formulário | `#F8F9FA` (cinza claro) |
+| Cor de destaque (accent) | `#C9A96E` (dourado) |
+| Cards | `#FFFFFF` com sombra leve |
+| Botão primário | `#0A0A0A` com texto branco |
+| Botão perigo | `#EF4444` (vermelho) |
+| Texto principal | `#0A0A0A` |
+| Texto secundário | `#9CA3AF` |
+| Borda de input | `#E5E7EB` |
+| Input com erro | borda `#EF4444`, fundo `#FFF5F5` |
+| Status ativo | `#22C55E` (verde) |
+| Badge admin | dourado `#C9A96E` |
+
+Estilos aplicados via `StyleSheet` do React Native com componentes de `react-native-paper` (TextInput, Dialog, Snackbar).
+
+---
+
+## Fluxo de Dados
+
+```
+Backend (UserService :8080)
+        │
+        │  POST /auth/login
+        │  POST /auth/register
+        │  GET  /auth/check-email
+        │  GET  /users/:id
+        │  PUT  /users/:id
+        │  PUT  /users/:id/password
+        │  DELETE /users/:id
+        │  GET  /users/all          (admin)
+        │  PUT  /users/:id/reactivate (admin)
+        │  DELETE /users/:id/permanent (admin)
+        ▼
+App Mobile (React Native / Expo)
+        │
+        ├─► AuthContext      → estado global de autenticação
+        ├─► tokenStore       → token JWT em memória
+        ├─► login.tsx        → autenticação
+        ├─► register.tsx     → cadastro de novo usuário
+        ├─► profile.tsx      → visualização do perfil
+        ├─► profile/edit.tsx → edição de dados
+        ├─► profile/password.tsx → alteração de senha
+        └─► admin/users.tsx  → gestão de usuários (admin)
+```
+
+**Como funciona:**
+1. O usuário faz login via `POST /auth/login` → token JWT e dados do usuário são armazenados no `AuthContext` e `tokenStore`.
+2. Todas as requisições autenticadas enviam o token no header `Authorization: Bearer <token>`.
+3. O `AuthContext` expõe `isAuthenticated` — telas protegidas redirecionam para `/login` se falso.
+4. Ao desativar a conta, o usuário é deslogado imediatamente via `logout()`.
+
+---
+
+## Tecnologias Utilizadas
+
+| Tecnologia | Versão | Uso |
+|---|---|---|
+| React Native | 0.81+ | Framework mobile |
+| Expo | ~54.0 | Toolchain e runtime |
+| expo-router | ~6.0 | Roteamento por sistema de arquivos |
+| react-native-paper | ^5.15 | Componentes de UI (TextInput, Dialog, Snackbar) |
+| TypeScript | ~5.9 | Tipagem estática |
+| Fetch API nativa | — | Chamadas HTTP ao backend |
+| JWT | — | Autenticação stateless |
+
+---
+
+## Considerações de Segurança
+
+| Tópico | Estado atual |
+|---|---|
+| Autenticação | JWT gerado no backend, armazenado em memória (tokenStore) |
+| Persistência de sessão | Não persistida — logout automático ao fechar o app |
+| Senha | Hash bcrypt no backend; nunca trafega em texto plano após login |
+| Validação de e-mail duplicado | Verificação via `GET /auth/check-email` antes do cadastro |
+| Proteção de rotas | `isAuthenticated` no `AuthContext`; redirect para `/login` se não autenticado |
+| Transporte | HTTP em desenvolvimento; HTTPS recomendado em produção |
+| Desativação de conta | Soft delete — dados preservados, acesso bloqueado imediatamente |
+
+**Recomendação para produção:** substituir `tokenStore` em memória por `expo-secure-store` para persistência segura do token entre sessões.
+
+---
+
+## Implantação
+
+A aplicação mobile roda via Expo em ambiente local. Implantação em produção (APK/IPA) não foi configurada nesta etapa.
+
+**Execução local:**
+
+1. Pré-requisitos: Node.js 20+, Expo CLI instalado.
+2. Subir o serviço de usuário:
+   ```powershell
+   cd src/services/user
+   node src/server.js
+   ```
+3. Configurar a URL da API em `src/mobile/.env`:
+   ```
+   EXPO_PUBLIC_API_URL=http://localhost:8080
+   ```
+4. Subir o app mobile:
+   ```powershell
+   cd src/mobile
+   npx expo start
+   ```
+5. Pressionar **W** para abrir no navegador ou escanear o QR Code com o **Expo Go** no celular.
+
+---
+
+## Testes
+
+### Estratégia
+
+Testes funcionais manuais cobrindo as interações do **módulo de Usuário** no front-end móvel. Pré-condição global: serviço `UserService` ativo em `http://localhost:8080` e banco PostgreSQL acessível.
+
+---
+
+### Mapeamento de interações
+
+| ID | Interação | Componente | API back-end |
+|---|---|---|---|
+| M-U1 | Login com credenciais | `app/login.tsx` | `POST /auth/login` |
+| M-U2 | Cadastro de novo usuário | `app/register.tsx` | `POST /auth/register` |
+| M-U3 | Verificação de e-mail duplicado | `app/register.tsx` | `GET /auth/check-email` |
+| M-U4 | Visualizar perfil | `app/profile.tsx` | — (dados do AuthContext) |
+| M-U5 | Editar perfil | `app/profile/edit.tsx` | `PUT /users/:id` |
+| M-U6 | Alterar senha | `app/profile/password.tsx` | `PUT /users/:id/password` |
+| M-U7 | Desativar conta | `app/profile.tsx` | `DELETE /users/:id` |
+| M-U8 | Listar usuários (admin) | `app/admin/users.tsx` | `GET /users/all` |
+| M-U9 | Reativar usuário (admin) | `app/admin/users.tsx` | `PUT /users/:id/reactivate` |
+| M-U10 | Excluir permanentemente (admin) | `app/admin/users.tsx` | `DELETE /users/:id/permanent` |
+
+---
+
+### Casos de teste
+
+#### Usuário Mobile — M-U1: Login
+
+##### TC-M-U1-01 · Login com credenciais válidas
+
+- **Pré-condições:**
+  - Usuário cadastrado no banco.
+  - UserService ativo em `http://localhost:8080`.
+- **Passos:**
+  1. Abrir o app em `/login`.
+  2. Preencher e-mail e senha válidos.
+  3. Tocar em **Entrar**.
+- **Resultado esperado:**
+  - App redireciona para `/` (tela principal).
+  - `AuthContext` contém dados do usuário autenticado.
+
+---
+
+##### TC-M-U1-02 · Login com credenciais inválidas
+
+- **Pré-condições:**
+  - UserService ativo.
+- **Passos:**
+  1. Preencher e-mail válido e senha errada.
+  2. Tocar em **Entrar**.
+- **Resultado esperado:**
+  - Caixa de erro vermelha exibida: `"E-mail ou senha inválidos"`.
+  - Usuário permanece na tela de login.
+
+---
+
+##### TC-M-U1-03 · Login com campos vazios
+
+- **Passos:**
+  1. Tocar em **Entrar** sem preencher os campos.
+- **Resultado esperado:**
+  - Mensagem de erro exibida nos campos: `"E-mail inválido"` e `"Informe a senha"`.
+  - Nenhuma requisição ao backend.
+
+---
+
+#### Usuário Mobile — M-U2/U3: Cadastro
+
+##### TC-M-U2-01 · Cadastro com e-mail novo — fluxo completo
+
+- **Passos:**
+  1. Navegar para `/register`.
+  2. Preencher nome, e-mail novo, senha (≥8 caracteres).
+  3. Tocar em **Continuar →**.
+  4. Preencher CPF e telefone (opcionais).
+  5. Tocar em **Criar conta**.
+- **Resultado esperado:**
+  - Usuário criado, token salvo, redirecionado para `/`.
+
+---
+
+##### TC-M-U3-01 · Cadastro com e-mail já cadastrado — bloqueio no passo 1
+
+- **Pré-condições:**
+  - E-mail já existe no banco.
+- **Passos:**
+  1. Preencher e-mail já cadastrado no passo 1.
+  2. Tocar em **Continuar →**.
+- **Resultado esperado:**
+  - Chamada a `GET /auth/check-email` retorna `available: false`.
+  - Erro inline exibido no campo e-mail: `"Este e-mail já está cadastrado"`.
+  - Botão **Continuar** fica desabilitado.
+  - Não avança para o passo 2.
+
+---
+
+#### Usuário Mobile — M-U5: Editar Perfil
+
+##### TC-M-U5-01 · Salvar alterações de perfil
+
+- **Pré-condições:**
+  - Usuário autenticado.
+- **Passos:**
+  1. Navegar para `/profile/edit`.
+  2. Alterar o campo nome.
+  3. Tocar em **Salvar**.
+- **Resultado esperado:**
+  - Snackbar verde: `"Perfil atualizado com sucesso!"`.
+  - Dados atualizados no `AuthContext` e na tela de perfil.
+
+---
+
+#### Usuário Mobile — M-U6: Alterar Senha
+
+##### TC-M-U6-01 · Alterar senha com sucesso
+
+- **Passos:**
+  1. Navegar para `/profile/password`.
+  2. Preencher nova senha (≥8 caracteres) e confirmar.
+  3. Tocar em **Salvar**.
+- **Resultado esperado:**
+  - Snackbar verde: `"Senha alterada com sucesso!"`.
+  - Campos limpos.
+
+---
+
+##### TC-M-U6-02 · Senhas não coincidem
+
+- **Passos:**
+  1. Preencher senhas diferentes nos campos "Nova senha" e "Confirmar".
+  2. Tocar em **Salvar**.
+- **Resultado esperado:**
+  - Mensagem de erro: `"As senhas não coincidem"`.
+  - Botão **Salvar** permanece desabilitado.
+
+---
+
+#### Usuário Mobile — M-U7: Desativar Conta
+
+##### TC-M-U7-01 · Desativar conta com confirmação
+
+- **Passos:**
+  1. Na tela de perfil, tocar em **Desativar minha conta**.
+  2. Confirmar no dialog.
+- **Resultado esperado:**
+  - Conta desativada via `DELETE /users/:id`.
+  - Usuário deslogado e redirecionado para `/login`.
+
+---
+
+#### Usuário Mobile — M-U8/U9/U10: Admin
+
+##### TC-M-U8-01 · Listar todos os usuários (admin)
+
+- **Pré-condições:**
+  - Usuário autenticado com role `admin`.
+- **Passos:**
+  1. Navegar para `/admin/users`.
+- **Resultado esperado:**
+  - Lista de todos os usuários (ativos e inativos) exibida.
+  - Filtros de busca e status funcionando.
+
+---
+
+##### TC-M-U9-01 · Reativar usuário inativo
+
+- **Passos:**
+  1. Localizar usuário inativo na lista.
+  2. Tocar em **Reativar**.
+- **Resultado esperado:**
+  - Usuário reativado, status atualizado na lista.
+
+---
+
+##### TC-M-U10-01 · Excluir usuário permanentemente
+
+- **Passos:**
+  1. Localizar usuário na lista.
+  2. Tocar em **Excluir permanente** e confirmar.
+- **Resultado esperado:**
+  - Usuário removido do banco e da lista.
+
+---
+
+## Referências
+
+- [Expo Router — File-based routing](https://expo.github.io/router/docs)
+- [React Native — Documentação oficial](https://reactnative.dev/docs/getting-started)
+- [react-native-paper — Documentação](https://callstack.github.io/react-native-paper/)
+- `src/mobile/app/login.tsx`
+- `src/mobile/app/register.tsx`
+- `src/mobile/app/profile.tsx`
+- `src/mobile/app/profile/edit.tsx`
+- `src/mobile/app/profile/password.tsx`
+- `src/mobile/app/admin/users.tsx`
+- `src/mobile/src/contexts/AuthContext.tsx`
+- `src/mobile/src/services/userService.ts`
+- `src/services/user/src/controllers/authController.js`
+- `src/services/user/src/routes/auth.routes.js`

@@ -12,6 +12,7 @@ export interface CatalogProductInfo {
   urlImg: string | null;
   code: string | null;
   size: string | null;
+  color?: string | null;
 }
 
 export interface StockItemDetailed extends StockItem {
