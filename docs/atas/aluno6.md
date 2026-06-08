@@ -20,7 +20,7 @@
 | 11/05 - 17/05 | Desenvolvimento de Aplicações Móveis - Unidade 2 | ✅ | Implementação inicial do mobile no projeto (expo) | Implementação inicial do mobile no projeto (expo) |
 | 18/05 - 24/05 | Fundamentos de Projeto e Análise de Algoritmos - Unidade 1 | ✅  | Revisão de funcionalidades do projeto, correções de bugs | Revisão de funcionalidades do projeto, correções de bugs |
 | 25/05 - 31/05 | Fundamentos de Projeto e Análise de Algoritmos - Unidade 2 | ✅ | Melhorias de layout, correçoes de bugs, registros dos testes e2e de stock | Melhorias de layout, correçoes de bugs, registros dos testes e2e de stock |
-| 01/06 - 07/06 |  | ⬜ |  |  |
+| 01/06 - 07/06 |  | ✅ | Revisão, ajustes e testes de stock e projeto como um todo | Revisão, ajustes e testes de stock e projeto como um todo |
 | 08/06 - 14/06 |  | ⬜ |  |  |
 
 **Legenda:** ✅ Estudou | ⬜ Não estudou
