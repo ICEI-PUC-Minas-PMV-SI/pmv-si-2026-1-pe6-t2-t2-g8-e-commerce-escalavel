@@ -480,11 +480,123 @@ Testes funcionais manuais executados em ambiente local, cobrindo as interações
 - `src/mobile/src/screens/CatalogScreen.tsx`
 - `src/mobile/app/catalog/product/[id].tsx`
 - `src/mobile/app/catalog/categories.tsx`
+- `src/mobile/app/catalog/products.tsx`
 - `src/mobile/app/catalog/admin/product-form.tsx`
 - `src/mobile/src/components/ProductCard.tsx`
 - `src/mobile/src/services/catalogService.ts`
 - `src/mobile/src/services/stockService.ts`
 - `src/mobile/contexts/CartContext.tsx`
+- `src/mobile/src/types/catalog.ts`
+
+---
+
+## Tela de Produtos por Categoria — `/catalog/products`
+
+A tela `ProductsByCategoryScreen` é acessada ao tocar em um card na `CategoriesScreen`. Recebe `categoryId` e `categoryName` como parâmetros de URL e exibe somente os produtos daquela categoria. O título da navegação é definido dinamicamente com o nome da categoria.
+
+### Wireframe
+
+```
+┌─────────────────────────────┐
+│ ←  Camisetas                │  ← título dinâmico (categoryName)
+├─────────────────────────────┤
+│  3 produtos                 │
+│                             │
+│  ┌──────┐  ┌──────┐        │
+│  │ IMG  │  │ IMG  │        │
+│  │[Cat] │  │[Cat] │        │
+│  │Nome  │  │Nome  │        │
+│  │R$ XX │  │R$ XX │        │
+│  └──────┘  └──────┘        │
+│  ┌──────┐                  │
+│  │ IMG  │                  │
+│  └──────┘                  │
+└─────────────────────────────┘
+```
+
+**Diferenças em relação à `CatalogScreen`:**
+- Sem barra de busca por texto (filtro já é a categoria).
+- Sem chips de categoria (contexto já fixado).
+- Sem FAB de criação — tela somente leitura para qualquer perfil.
+- Contagem de produtos exibida acima da grade (`N produtos`).
+- Pull-to-refresh disponível.
+
+### Estados da tela
+
+| Estado | Comportamento |
+|---|---|
+| Carregando | 6 skeleton cards animados em grade 2×N |
+| Erro de backend | Banner com ícone 📡, mensagem e botão "⟳ Tentar novamente" |
+| Lista vazia | Ícone 🛍, "Nenhum produto nesta categoria" + hint de pull-to-refresh |
+| Lista carregada | Grade 2 colunas de `ProductCard`; toque navega para `/catalog/product/[id]` |
+
+---
+
+## Detalhes de Implementação do Módulo de Catálogo
+
+### Cancelamento de requisições com `AbortController`
+
+Todas as telas do módulo usam `AbortController` para cancelar chamadas HTTP pendentes ao sair da tela ou desmontar o componente. O padrão é aplicado via `useFocusEffect` (re-executa ao focar) e `useEffect` (executa uma vez):
+
+```ts
+useFocusEffect(
+  useCallback(() => {
+    const ctrl = new AbortController();
+    setLoading(true);
+    load(ctrl.signal).finally(() => setLoading(false));
+    return () => ctrl.abort();   // limpeza ao desfocar/desmontar
+  }, [load])
+);
+```
+
+### Cálculo de preço mínimo (`ProductDetailScreen`)
+
+Quando nenhum SKU está selecionado, o preço exibido é calculado como o menor valor entre todos os SKUs de todas as variantes do produto:
+
+```
+A partir de R$ XX,XX
+```
+
+Ao selecionar um SKU específico, o preço muda para o valor exato daquele SKU.
+
+### Feedback de adição ao carrinho (`ProductDetailScreen`)
+
+Ao adicionar um item, o botão "Adicionar ao carrinho" exibe "✓ Adicionado ao carrinho" (fundo verde `#22C55E`) por 2 segundos e retorna ao estado original automaticamente, sem navegar para o carrinho.
+
+### Endpoints adicionais do `catalogService`
+
+Os métodos abaixo estão implementados em `catalogService.ts` e cobrem o gerenciamento completo de variantes e SKUs em administração:
+
+| Método | Endpoint | Descrição |
+|---|---|---|
+| `deleteVariant(variantId)` | `DELETE /catalog/variants/{id}` | Remove variante e seus SKUs |
+| `deleteSku(skuId)` | `DELETE /catalog/skus/{id}` | Remove SKU individual |
+| `getProducts({ minPrice, maxPrice })` | `GET /catalog/products?minPrice=&maxPrice=` | Filtro de faixa de preço (parâmetros opcionais) |
+
+### Tipos TypeScript do domínio (`catalog.ts`)
+
+```ts
+interface Category  { id: string; name: string; description?: string | null; }
+interface Sku       { id: string; price: number; size?: string | null; code?: string | null; }
+interface Variant   { id: string; color?: string | null; skus?: Sku[]; }
+interface Product   { id: string; name: string; description?: string | null; urlImg?: string | null;
+                      active?: boolean; category?: Category | null; variants?: Variant[]; }
+interface ProductFilters { name?: string; categoryId?: string; minPrice?: number | string; maxPrice?: number | string; }
+```
+
+### Tokens de design reais (extraídos do código)
+
+| Token | Valor | Uso |
+|---|---|---|
+| `DARK` | `#0A0A0A` | Fundo da status bar em `CatalogScreen`, cor de botão primário |
+| `ACCENT` | `#C9A96E` | Cor dourada de destaque em swatches selecionados e badge de categoria |
+| Fundo principal | `#F3F4F6` | Background de todas as telas do catálogo |
+| Fundo header | `#FFFFFF` | Header flutuante da `CatalogScreen` |
+| Texto secundário | `#9CA3AF` | Saudação, contagem de resultados, hints |
+| Texto terciário | `#6B7280` | Mensagens de erro e descrições |
+| Skeleton | `#F3F4F6` | Cards de carregamento animados |
+| Swatch desabilitado | opacidade `0.35` | Variante completamente esgotada |
+| SKU desabilitado | opacidade `0.4` | Chip de tamanho sem estoque |
 
 ---
 
