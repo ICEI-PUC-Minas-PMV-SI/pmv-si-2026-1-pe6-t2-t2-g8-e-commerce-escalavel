@@ -600,6 +600,343 @@ interface ProductFilters { name?: string; categoryId?: string; minPrice?: number
 ---
 
 
+# Front-end Móvel — Módulo de Pedidos
+
+O módulo de pedidos é responsável pelo gerenciamento local de itens selecionados para compra, validação de disponibilidade de estoque em tempo real e acompanhamento do ciclo de vida dos pedidos realizados. Consome o `StockService` via `stockService.ts` para checagem de SKUs e o `OrderService` via `orderService.ts` para recuperar e atualizar o histórico de compras. Depende do `CartContext` para gerenciar os itens e do `AuthContext` para carregar as ordens vinculadas ao usuário autenticado.
+
+---
+
+## Projeto da Interface
+
+O subdomínio deste módulo é composto pelas seguintes telas e modais de controle:
+
+- **`cart.tsx`** — Gerenciamento quantitativo de itens no carrinho com verificação assíncrona de estoque em tempo real.
+- **`order/purchasedOrders/purchasedOrders.tsx`** — Painel de histórico segmentado entre pedidos ativos (em processamento/entregues) e cancelados.
+- Modais auxiliares: `CancelOrderModal.tsx`, `DeliveredOrderModal.tsx` e `OrderDetailsModal.tsx` para detalhamento e controle de fluxo do histórico.
+
+### Wireframes
+
+#### Tela de Carrinho — `/cart`
+
+```
+┌─────────────────────────────────────┐
+│ Carrinho                            │
+├─────────────────────────────────────┤
+│ ⚠ "Camiseta Minimalist" está sem    │
+│   estoque suficiente.               │
+├─────────────────────────────────────┤
+│ [✓] [IMG] Camiseta Minimalist       │
+│     M · R$ 120,00                   │
+│     [ - ]  2  [ + ]        [Excluir]│
+├─────────────────────────────────────┤
+│ Total                               │
+│ R$ 240,00                           │
+│                                     │
+│ [ X Finalizar Compra ]  (Desabilit.)│
+│ [ Continuar Comprando ]             │
+└─────────────────────────────────────┘
+```
+
+#### Elementos da tela:
+
+- **Banner de Alerta:** Exibido dinamicamente no topo caso a quantidade de qualquer SKU selecionado ultrapasse o limite disponível retornado pelo `stockService.getBySku`.
+- **Listagem Interactiva:** Permite selecionar/deselecionar itens via checkbox, incrementar ou decrementar quantidades e remoção direta.
+- **Footer de Ação:** Calcula a soma total baseada estritamente nos itens marcados e bloqueia o avanço para o checkout se houver alguma inconsistência de estoque.
+
+#### Tela de Meus Pedidos — `/order/purchasedOrders/purchasedOrders`
+```
+┌─────────────────────────────────────┐
+│ Meus pedidos                        │
+├─────────────────────────────────────┤
+│ #ORD-98432 · Processando            │
+│ Pedido - 2 itens        R$ 240,00   │
+│ [ Detalhes ] [ Cancelar Pedido ]    │
+├─────────────────────────────────────┤
+│ Pedidos cancelados                  │
+│ ┌─────────────────────────────────┐ │
+│ │ #ORD-91211 · Cancelado          │ │
+│ │ Pedido - item 412     R$ 120,00 │ │
+│ │ [ Detalhes ] [ Descartar ]      │ │
+│ └─────────────────────────────────┘ │
+└─────────────────────────────────────┘
+```
+#### Elementos da tela:
+- **Segregação de Estados:** Separa os pedidos em tempo de execução. A subseção inferior agrupa os registros com status "Cancelado" aplicando um efeito visual esmaecido.
+- **Interceptação de Ações:** O acionamento de "Cancelar Pedido" avalia o estado atual do registro; caso já conste como "Entregue", impede o cancelamento e desvia o fluxo para um modal informativo.
+- **Descarte Local:** A opção "Descartar" remove a visualização do card cancelado do estado local da lista do usuário.
+
+---
+
+## Design Visual
+
+| Item | Definição |
+|---|---|
+| Caixa de Alerta (Falta de Estoque) | Banner superior com ícone de atenção e texto de aviso |
+| Divisores e Bordas | Cor `#E5E7EB` para separação de itens e seções |
+| Seção Cancelada | Container inferior com opacidade reduzida (`opacity: 0.65`) |
+| Texto de Subtítulo/Status | Tons neutros `#6B7280` ou `#9CA3AF` |
+| Cards de Pedidos | Renderizados via componente especializado `OrderCard` |
+
+---
+
+## Fluxo de Dados
+
+```
+Backend (StockService :8081)  Backend (OrderService :8082)
+│                             │
+│ GET /stock/sku/:id          │ GET  /orders/user/:userId (Histórico)
+│ (Valida estoque disponível) │
+│                             │
+▼                             ▼
+App Mobile (React Native / Expo)
+│
+├─► CartContext ────► Provê os itens do carrinho, remoção e mutação de quantidade
+├─► AuthContext ────► Provê o user.id do usuário logado para carregar o histórico
+├─► cart.tsx ───────► Dispara Promise.all para checar estoque de todos os SKUs ao focar na tela
+└─► purchasedOrders.tsx ► Carrega ordens do usuário e gerencia modais de controle (detalhes/cancelamento)
+```
+
+---
+
+**Como funciona:**
+1. **Validação de Estoque:** Toda vez que a tela de carrinho recebe foco (`useFocusEffect`), o app mapeia todos os itens e dispara requisições paralelas para `GET /stock/sku/:id`. O resultado alimenta um dicionário local que valida se o estoque suporta a quantidade desejada.
+2. **Carregamento de Pedidos:** Ao montar a tela de histórico, o `user.id` ativo é capturado do `AuthContext` para buscar os dados em `GET /orders/user/:userId`.
+3. **Cálculo de Totais no Histórico:** Como o serviço de persistência retorna os preços unitários por item, a tela realiza uma normalização calculando o valor total de cada ordem dinamicamente somando o produto de `unitPrice * quantity`.
+
+---
+
+## Tecnologias Utilizadas
+
+| Tecnologia | Uso |
+|---|---|
+| useFocusEffect (expo-router) | Força a revalidação assíncrona do estoque do carrinho sempre que o usuário navega de volta para a tela. |
+| React Native Paper | Fornece componentes de layout estrutural (Banner) e os modais injetados na árvore de renderização. |
+
+---
+
+## Considerações de Consistência e Negócio
+
+| Tópico | Regra Implementada |
+|---|---|
+| Bloqueio de Segurança | O botão de avanço do carrinho é desabilitado em tempo real caso o volume de um item marcado exceda o saldo retornado pelo serviço de estoque. |
+| Integridade de Fluxo | Pedidos com status igual a "Entregue" possuem a rotina de cancelamento interceptada localmente, exibindo o `DeliveredOrderModal` em vez de disparar o fluxo de cancelamento. |
+| Mutação Local | O cancelamento aceito atualiza instantaneamente o status do objeto em memória para "Cancelado", movendo o card para a seção correspondente sem necessidade de recarga total da tela. |
+
+---
+
+## Implantação
+
+**Pré-requisitos:** Node.js 20+, Expo CLI e Docker Desktop instalados.
+
+1. Subir os backends de estoque (`StockService`) e de pedidos (`OrderService`):
+   ```
+   # Em terminais separados:
+   cd src/services/stock
+   dotnet run
+   
+   cd src/services/order
+   dotnet run
+
+
+2. Configurar as variáveis de ambiente em src/mobile/.env apontando para os serviços correspondentes:
+    ```EXPO_PUBLIC_STOCK_API_URL=[http://192.168.0.4:8081/api](http://192.168.0.4:8081/api)
+    EXPO_PUBLIC_ORDER_API_URL=[http://192.168.0.4:8082/api](http://192.168.0.4:8082/api)
+    ```
+
+
+3. Subir o app mobile:
+    ```
+    cd src/mobile
+    npx expo start
+    ```
+
+4. ressionar W para abrir no navegador ou escanear o QR Code com o Expo Go no celular.
+
+5. Acesse o ícone de sacola no menu inferior para gerenciar seu Carrinho ou acesse o perfil para checar Meus Pedidos.
+
+---
+
+## Testes
+
+### Estratégia
+
+Testes funcionais manuais executados em ambiente local, cobrindo as interações do **Módulo de Pedidos (Carrinho e Histórico)** no front-end móvel. Pré-condições globais: `StockService` e `OrderService` ativos, e usuário autenticado via `AuthContext`.
+
+---
+
+### Mapeamento de interações
+
+| ID | Interação | Componente | API back-end |
+|---|---|---|---|
+| M-P1 | Carregar itens do carrinho | `CartScreen` | — (CartContext local) |
+| M-P2 | Validar estoque assincronamente | `CartScreen` | `GET /stock/sku/:skuId` |
+| M-P3 | Manipular quantidades e seleção | `CartScreen` | — (Estado local e Context) |
+| M-P4 | Listar histórico de pedidos | `PurchasedOrders` | `GET /orders/user/:userId` |
+| M-P5 | Visualizar detalhes do pedido | `OrderDetailsModal` | — (Dados do card selecionado) |
+| M-P6 | Cancelar pedido pendente | `CancelOrderModal` | — (Mutação de estado em memória) |
+| M-P7 | Descartar pedido cancelado | `PurchasedOrders` | — (Remoção local da listagem) |
+
+---
+
+### Casos de teste
+
+#### Pedidos Mobile — M-P1/P2/P3: Carrinho de Compras
+
+##### TC-M-P1-01 · Exibir estado de carrinho vazio
+
+- **Pré-condições:**
+  - Nenum item adicionado ao `CartContext`.
+- **Passos:**
+  1. Navegar até a tela de Carrinho (`/cart`).
+- **Resultado esperado:**
+  - Texto informativa "Seu carrinho está vazio" é renderizada centralizada na tela.
+  - O botão **Voltar às compras** fica visível e funcional, redirecionando para `/` ao ser tocado.
+
+---
+
+##### TC-M-P2-01 · Carregar estoque com sucesso e liberar checkout
+
+- **Pré-condições:**
+  - Carrinho possui itens adicionados.
+  - `StockService` retorna `quantityAvailable` maior ou igual à quantidade solicitada pelo usuário.
+- **Passos:**
+  1. Entrar na tela de Carrinho (`/cart`).
+- **Resultado esperado:**
+  - O indicador de carregamento de estoque é desativado de forma fluida.
+  - Nenhum banner de alerta é exibido.
+  - O botão **Finalizar Compra** fica ativo habilitando a navegação para o checkout.
+
+---
+
+##### TC-M-P2-02 · Quantidade solicitada excede o limite do estoque
+
+- **Pré-condições:**
+  - O SKU de um produto adicionado possui apenas 1 unidade disponível no backend.
+  - O usuário possui quantidade configurada para `2` no carrinho.
+- **Passos:**
+  1. Acessar a tela de Carrinho (`/cart`).
+- **Resultado esperado:**
+  - O componente `Banner` torna-se visível no topo listando o nome exato do produto em falta.
+  - O botão **Finalizar Compra** assume propriedade desabilitada (`disabled={true}`).
+
+---
+
+##### TC-M-P3-01 · Alternar seleção de itens e recalcular valor total
+
+- **Pré-condições:**
+  - Carrinho carregado com pelo menos 2 produtos distintos de valores diferentes.
+- **Passos:**
+  1. Desmarcar o checkbox de seleção (`onToggleSelect`) do primeiro item da lista.
+- **Resultado esperado:**
+  - O valor total apresentado no footer fixo é recalculado instantaneamente subtraindo o preço total do item removido da seleção.
+
+---
+
+##### TC-M-P3-02 · Incrementar e decrementar quantidades com segurança
+
+- **Pré-condições:**
+  - Carrinho carregado com 1 item com quantidade igual a 2.
+- **Passos:**
+  1. Tocar no botão de decremento `[-]`.
+  2. Com a quantidade agora em 1, tocar no botão de decremento `[-]` novamente.
+- **Resultado esperado:**
+  - Ao executar o passo 1, a quantidade cai para 1 e o valor total atualiza.
+  - Ao executar o passo 2, a quantidade não zera negativamente nem remove o item; a quantidade mínima permanece estagnada em 1 unidade.
+
+---
+
+##### TC-M-P3-03 · Exclusão direta de item
+
+- **Pré-condições:**
+  - Pelo menos 1 item presente no carrinho.
+- **Passos:**
+  1. Tocar na ação de remoção (`onRemove`) do item do card.
+- **Resultado esperado:**
+  - O item desaparece visualmente da listagem imediatamente.
+  - O cálculo do footer zera e a tela comuta para o estado de carrinho vazio.
+
+---
+
+#### Pedidos Mobile — M-P4/P5/P6/P7: Histórico de Compras
+
+##### TC-M-P4-01 · Carregar histórico de pedidos ativos e cancelados
+
+- **Pré-condições:**
+  - Usuário autenticado possui ordens salvas (pelo menos 1 ativa e 1 cancelada).
+- **Passos:**
+  1. Entrar na tela `/order/purchasedOrders/purchasedOrders`.
+- **Resultado esperado:**
+  - O app dispara requisição para a API do backend passando o ID do usuário.
+  - Os cartões de ordens ativas aparecem listados na parte superior com os dados de totais calculados localmente.
+  - A seção "Pedidos cancelados" é renderizada de forma opaca (`0.65`) isolando os itens descontinuados.
+
+---
+
+##### TC-M-P4-02 · Estado vazio de histórico
+
+- **Pré-condições:**
+  - Usuário autenticado não possui nenhuma compra executada no banco de dados.
+- **Passos:**
+  1. Entrar na tela `/order/purchasedOrders/purchasedOrders`.
+- **Resultado esperado:**
+  - A mensagem "Você ainda não possui pedidos." é renderizada textualmente de forma centralizada.
+
+---
+
+##### TC-M-P5-01 · Disparar e fechar modal de detalhes do pedido
+
+- **Pré-condições:**
+  - Listagem de pedidos preenchida com sucesso.
+- **Passos:**
+  1. Tocar no botão **Detalhes** de qualquer card de pedido.
+  2. Analisar as informações exibidas e clicar na ação de fechar/retornar do modal.
+- **Resultado esperado:**
+  - O componente `OrderDetailsModal` abre via portal, injetando as propriedades do pedido correspondente.
+  - Ao executar o passo 2, o estado local limpa a referência e fecha o modal sem gerar travamentos na tela pai.
+
+---
+
+##### TC-M-P6-01 · Cancelamento com sucesso de pedido elegível
+
+- **Pré-condições:**
+  - O pedido selecionado possui o status inicial como `"Aprovado"` ou `"Processando"`.
+- **Passos:**
+  1. Tocar em **Cancelar Pedido** no card ativo.
+  2. No modal de confirmação `CancelOrderModal`, tocar em confirmar.
+- **Resultado esperado:**
+  - O modal é fechado.
+  - O objeto da ordem em memória sofre mutação instantânea mudando o atributo status para `"Cancelado"`.
+  - O respectivo card é deslocado automaticamente para a seção inferior de cancelados em tempo de execução.
+
+---
+
+##### TC-M-P6-02 · Bloqueio de cancelamento para pedidos já entregues
+
+- **Pré-condições:**
+  - O pedido selecionado possui a propriedade de status textualmente igual a `"Entregue"`.
+- **Passos:**
+  1. Tocar no botão de cancelamento do respectivo card.
+- **Resultado esperado:**
+  - O fluxo para `setOrderToCancel` é interceptado pela lógica condicional.
+  - O componente `DeliveredOrderModal` é renderizado na tela de forma exclusiva para notificar o usuário de que mercadorias entregues não permitem anulação imediata.
+
+---
+
+##### TC-M-P7-01 · Descartar pedido cancelado da interface local
+
+- **Pré-condições:**
+  - Existência de pelo menos 1 item na seção de pedidos cancelados.
+- **Passos:**
+  1. Tocar no botão **Descartar** do card correspondente.
+- **Resultado esperado:**
+  - O método `handleDiscardOrder` remove a referência do ID do array de estado da aplicação.
+  - O card some permanentemente da tela do usuário.
+
+
+
+---
+
+
 # Front-end Móvel — Módulo de Notificações
 
 O módulo de notificações do front-end móvel é responsável por exibir em tempo real as notificações geradas pelos demais serviços do e-commerce (pedidos, pagamentos e estoque) diretamente no aplicativo mobile. A interface consome a mesma API REST do `NotificationService` utilizada pelo front-end web, adaptada para o contexto mobile com React Native.
