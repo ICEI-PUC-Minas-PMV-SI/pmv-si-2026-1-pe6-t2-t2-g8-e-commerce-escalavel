@@ -175,7 +175,11 @@ export default function CheckoutScreen() {
           Confirmar e pagar
         </Button>
 
-        <Button mode="outlined" onPress={() => router.back()} style={styles.button}>
+        <Button
+          mode="outlined"
+          onPress={() => (router.canGoBack() ? router.back() : router.replace('/order/cart/cart'))}
+          style={styles.button}
+        >
           Voltar
         </Button>
       </View>
@@ -186,7 +190,6 @@ export default function CheckoutScreen() {
           <Dialog.Title>Pagamento aprovado!</Dialog.Title>
           <Dialog.Content>
             <Paragraph>Pedido: {paidOrder?.id}</Paragraph>
-            <Paragraph>Status: {paidOrder?.status}</Paragraph>
             {paidOrder?.transactionId && <Paragraph>Transação: {paidOrder.transactionId}</Paragraph>}
             {paidOrder && isPix && (
               <View style={styles.pixBox}>

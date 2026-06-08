@@ -1,4 +1,7 @@
-import React, { createContext, useContext, useMemo, useState } from 'react';
+import React, { createContext, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import { cartStorage } from './cartStorage';
+
+const CART_STORAGE_KEY = 'cart';
 
 export interface CartItem {
   skuId: string;
@@ -28,6 +31,30 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
 
   const [items, setItems] = useState<CartItem[]>([]);
+  // Evita gravar o estado inicial vazio por cima do carrinho salvo antes da carga.
+  const hydrated = useRef(false);
+
+  // Carregar carrinho salvo na montagem (kv-store é assíncrono, backed por SQLite).
+  useEffect(() => {
+    (async () => {
+      try {
+        const raw = await cartStorage.getItem(CART_STORAGE_KEY);
+        if (raw) setItems(JSON.parse(raw));
+      } catch {
+        // storage indisponível / JSON corrompido — começa com carrinho vazio.
+      } finally {
+        hydrated.current = true;
+      }
+    })();
+  }, []);
+
+  // Persistir carrinho a cada mudança, após a hidratação inicial.
+  useEffect(() => {
+    if (!hydrated.current) return;
+    cartStorage.setItem(CART_STORAGE_KEY, JSON.stringify(items)).catch(() => {
+      // falha de escrita — ignora, mantém estado em memória.
+    });
+  }, [items]);
 
   function addItem(item: CartItem) {
     setItems(prev => {

@@ -1,4 +1,5 @@
 import { HttpClient, authHeader } from './httpClient';
+import { API_URL } from '@/src/config/env';
 
 export enum OrderStatus {
   DRAFT = 'draft',
@@ -47,9 +48,7 @@ class OrderService {
   private httpClient: HttpClient;
 
   constructor() {
-    this.httpClient = new HttpClient(
-      process.env.EXPO_PUBLIC_API_URL!
-    );
+    this.httpClient = new HttpClient(API_URL);
   }
 
   async createOrder(
@@ -114,7 +113,7 @@ class OrderService {
     const headers = new Headers(await authHeader() as HeadersInit);
     headers.set('Content-Type', 'application/json');
     const res = await fetch(
-      `${process.env.EXPO_PUBLIC_API_URL}/orders/${orderId}/pay`,
+      `${API_URL}/orders/${orderId}/pay`,
       {
         method: 'POST',
         signal,

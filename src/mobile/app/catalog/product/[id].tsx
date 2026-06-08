@@ -85,10 +85,13 @@ export default function ProductDetailScreen() {
   const handleAddToCart = () => {
     if (!product || !selectedSku) return;
     addItem({
+      skuId: selectedSku.id,
       productId: product.id,
       productName: product.name,
       unitPrice: selectedSku.price,
       quantity,
+      size: selectedSku.size ?? '',
+      color: selectedVariant?.color ?? '',
     });
     setAdded(true);
     setTimeout(() => setAdded(false), 2000);

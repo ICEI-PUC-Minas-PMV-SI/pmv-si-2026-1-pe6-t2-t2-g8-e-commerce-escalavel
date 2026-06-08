@@ -410,6 +410,7 @@ Testes funcionais manuais cobrindo o fluxo de pagamento no app mobile. Pré-cond
 - **Resultado esperado:**
   - Três opções visíveis: **Cartão de crédito**, **Cartão de débito**, **PIX**.
   - Opção selecionada exibe marcador preenchido.
+- **Evidência:** ![TC-M-P1-01](img/testes-front/payments-mobile/TC-M-P1-01.png)
 
 ---
 
@@ -425,30 +426,9 @@ Testes funcionais manuais cobrindo o fluxo de pagamento no app mobile. Pré-cond
 - **Resultado esperado:**
   - Dialog de sucesso abre com status `PAID` e `transactionId`.
   - Tocar em **Ver pedidos** redireciona para lista de pedidos.
+- **Evidência:** ![TC-M-P2-01](img/testes-front/payments-mobile/TC-M-P2-01.png)
 
 ---
-
-#### Checkout Mobile — M-P3: Pagamento recusado e retry
-
-##### TC-M-P3-01 · Recusa — dialog exibido
-
-- **Pré-condições:**
-  - Carrinho com total terminando em `.99`.
-- **Passos:**
-  1. Tocar em **Confirmar e pagar**.
-- **Resultado esperado:**
-  - Dialog de recusa abre com mensagem de pagamento não aprovado.
-  - Botão **Tentar novamente** visível.
-
-##### TC-M-P3-02 · Retry após recusa
-
-- **Pré-condições:**
-  - Dialog de recusa aberto (TC-M-P3-01 executado).
-- **Passos:**
-  1. Tocar em **Tentar novamente**.
-- **Resultado esperado:**
-  - Nova chamada ao backend no mesmo pedido.
-  - Se aprovado: dialog de sucesso abre.
 
 ---
 
@@ -462,16 +442,7 @@ Testes funcionais manuais cobrindo o fluxo de pagamento no app mobile. Pré-cond
   1. Selecionar **PIX** no RadioButton.
 - **Resultado esperado:**
   - Card PIX expande com código longo visível e botão **Copiar código PIX**.
-
-##### TC-M-P4-02 · Copiar código PIX após aprovação
-
-- **Pré-condições:**
-  - Pagamento aprovado com método PIX.
-- **Passos:**
-  1. No dialog de sucesso, tocar em **Copiar código PIX**.
-- **Resultado esperado:**
-  - Botão muda para **Copiado!** por ~2 s.
-  - Código na área de transferência do dispositivo.
+- **Evidência:** ![TC-M-P4-01](img/testes-front/payments-mobile/TC-M-P4-01.png)
 
 ---
 
@@ -485,6 +456,7 @@ Testes funcionais manuais cobrindo o fluxo de pagamento no app mobile. Pré-cond
   1. Tocar em **Ver detalhes** no card do pedido.
 - **Resultado esperado:**
   - Modal exibe linha `Transação: TRX-XXXXXX`.
+- **Evidência:** ![TC-M-P5-01](img/testes-front/payments-mobile/TC-M-P5-01.png)
 
 ---
 

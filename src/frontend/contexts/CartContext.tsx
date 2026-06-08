@@ -1,4 +1,15 @@
-import { createContext, useContext, useState, useCallback } from 'react'
+import { createContext, useContext, useState, useCallback, useEffect } from 'react'
+
+const CART_STORAGE_KEY = 'cart'
+
+function loadCart(): CartItem[] {
+  try {
+    const raw = localStorage.getItem(CART_STORAGE_KEY)
+    return raw ? JSON.parse(raw) : []
+  } catch {
+    return []
+  }
+}
 
 export interface CartItem {
   id: string
@@ -23,7 +34,16 @@ export interface CartContextType {
 const CartContext = createContext<CartContextType | undefined>(undefined)
 
 export function CartProvider({ children }: { children: React.ReactNode }) {
-  const [items, setItems] = useState<CartItem[]>([])
+  const [items, setItems] = useState<CartItem[]>(loadCart)
+
+  // Persistir carrinho no localStorage a cada mudança.
+  useEffect(() => {
+    try {
+      localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(items))
+    } catch {
+      // localStorage indisponível (modo privado / quota) — ignora.
+    }
+  }, [items])
 
   const addItem = useCallback((item: Omit<CartItem, 'id'>) => {
     setItems(prev => {

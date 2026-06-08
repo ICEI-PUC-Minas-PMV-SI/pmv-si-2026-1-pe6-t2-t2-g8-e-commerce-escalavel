@@ -1,157 +1,150 @@
-import { useEffect, useState } from 'react';
-import { View, ScrollView, StyleSheet } from 'react-native';
-import { Button, Text } from 'react-native-paper';
-import { useRouter } from 'expo-router';
+import { useState } from 'react';
+import { View, StyleSheet } from 'react-native';
+import { Checkbox, IconButton, Text } from 'react-native-paper';
 
-import { useCart } from '@/contexts/CartContext';
-import CartItem from '@/src/components/CartItem';
+import type { CartItem as CartItemType } from '@/contexts/CartContext';
+import RemoveCartItemModal from '@/src/components/modals/RemoveCartItemModal';
 
-export default function CartScreen() {
-  const router = useRouter();
+type Props = {
+  item: CartItemType;
+  selected: boolean;
+  onToggleSelect: (id: string) => void;
+  onIncrease: (skuId: string) => void;
+  onDecrease: (skuId: string) => void;
+  onRemove: (skuId: string) => void;
+};
 
-  const {
-    items,
-    removeItem,
-    increaseQty,
-    decreaseQty,
-  } = useCart();
+export default function CartItem({
+  item,
+  selected,
+  onToggleSelect,
+  onIncrease,
+  onDecrease,
+  onRemove,
+}: Props) {
+  const [showRemoveModal, setShowRemoveModal] = useState(false);
 
-  const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set());
+  // chave de seleção alinhada à usada na tela do carrinho
+  const selectKey = `${item.productId}-${item.size}-${item.color}`;
 
-  // ✅ seleciona tudo APENAS quando entra na tela ou quando carrinho zera
-  useEffect(() => {
-    if (items.length === 0) {
-      setSelectedItems(new Set());
-      return;
-    }
-
-    setSelectedItems(new Set(items.map(item => item.productId)));
-  }, [items.length]);
-
-  function toggleSelect(id: string) {
-    setSelectedItems(prev => {
-      const next = new Set(prev);
-
-      if (next.has(id)) {
-        next.delete(id);
-      } else {
-        next.add(id);
-      }
-
-      return next;
-    });
-  }
-
-  const selectedTotal = items
-    .filter(item => selectedItems.has(item.productId))
-    .reduce((sum, item) => sum + item.unitPrice * item.quantity, 0);
-
-  if (items.length === 0) {
-    return (
-      <View style={styles.emptyContainer}>
-        <Text variant="headlineSmall">
-          Seu carrinho está vazio
-        </Text>
-
-        <Button
-          mode="contained"
-          onPress={() => router.push('/')}
-          style={{ marginTop: 20 }}
-        >
-          Voltar às compras
-        </Button>
-      </View>
-    );
-  }
+  const subtotal = item.unitPrice * item.quantity;
 
   return (
-    <View style={styles.container}>
+    <View style={styles.row}>
 
-      <ScrollView contentContainerStyle={styles.list}>
-        {items.map(item => (
-          <CartItem
-            key={`${item.productId}-${item.size}-${item.color}`}
-            item={item}
-            selected={selectedItems.has(item.productId)}
-            onToggleSelect={toggleSelect}
-            onIncrease={increaseQty}
-            onDecrease={decreaseQty}
-            onRemove={removeItem}
-          />
-        ))}
-      </ScrollView>
+      <Checkbox
+        status={selected ? 'checked' : 'unchecked'}
+        onPress={() => onToggleSelect(selectKey)}
+      />
 
-      <View style={styles.footer}>
-        <Text style={styles.totalLabel}>Total</Text>
-
-        <Text style={styles.totalValue}>
-          R$ {selectedTotal.toFixed(2)}
+      <View style={styles.info}>
+        <Text style={styles.name} numberOfLines={2}>
+          {item.productName}
         </Text>
 
-        <Button
-          mode="contained"
-          disabled={selectedTotal === 0}
-          onPress={() => router.push('/order/checkout/checkout')}
-          contentStyle={{ paddingVertical: 6, height: 48 }}
-          labelStyle={{ fontSize: 16, fontWeight: '600', marginTop: 6 }}
-          style={[styles.checkoutButton, { borderRadius: 12 }]}
-        >
-          Finalizar Compra
-        </Button>
+        <Text style={styles.meta}>
+          {item.color} · {item.size}
+        </Text>
 
-        <Button
-          mode="outlined"
-          onPress={() => router.push('/')}
-          labelStyle={{ fontSize: 16, fontWeight: '600' }}
-          style={[styles.continueButton, { borderRadius: 12 }]}
-        >
-          Continuar Comprando
-        </Button>
+        <Text style={styles.price}>
+          R$ {item.unitPrice.toFixed(2)}
+        </Text>
       </View>
+
+      <View style={styles.actions}>
+        <View style={styles.stepper}>
+          <IconButton
+            icon="minus"
+            size={16}
+            disabled={item.quantity <= 1}
+            onPress={() => onDecrease(item.skuId)}
+          />
+
+          <Text style={styles.qty}>{item.quantity}</Text>
+
+          <IconButton
+            icon="plus"
+            size={16}
+            onPress={() => onIncrease(item.skuId)}
+          />
+        </View>
+
+        <Text style={styles.subtotal}>
+          R$ {subtotal.toFixed(2)}
+        </Text>
+
+        <IconButton
+          icon="trash-can-outline"
+          size={18}
+          iconColor="#EF4444"
+          onPress={() => setShowRemoveModal(true)}
+        />
+      </View>
+
+      <RemoveCartItemModal
+        visible={showRemoveModal}
+        productName={item.productName}
+        onCancel={() => setShowRemoveModal(false)}
+        onConfirm={() => {
+          setShowRemoveModal(false);
+          onRemove(item.skuId);
+        }}
+      />
 
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1 },
-
-  list: {
-    padding: 16,
-    paddingBottom: 100,
-  },
-
-  footer: {
-    padding: 16,
-    borderTopWidth: 1,
-    borderColor: '#E5E7EB',
-    backgroundColor: '#FFFFFF',
-  },
-
-  totalLabel: {
-    fontSize: 14,
-    color: '#6B7280',
-  },
-
-  totalValue: {
-    fontSize: 24,
-    fontWeight: '700',
-    marginTop: 4,
-    marginBottom: 16,
-  },
-
-  checkoutButton: {
-    marginBottom: 10,
-  },
-
-  continueButton: {
-    marginBottom: 4,
-  },
-
-  emptyContainer: {
-    flex: 1,
-    justifyContent: 'center',
+  row: {
+    flexDirection: 'row',
     alignItems: 'center',
-    padding: 24,
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderColor: '#E5E7EB',
+  },
+
+  info: {
+    flex: 1,
+    paddingHorizontal: 4,
+  },
+
+  name: {
+    fontSize: 15,
+    fontWeight: '600',
+  },
+
+  meta: {
+    fontSize: 13,
+    color: '#6B7280',
+    marginTop: 2,
+  },
+
+  price: {
+    fontSize: 13,
+    color: '#6B7280',
+    marginTop: 4,
+  },
+
+  actions: {
+    alignItems: 'flex-end',
+  },
+
+  stepper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+
+  qty: {
+    fontSize: 15,
+    fontWeight: '600',
+    minWidth: 20,
+    textAlign: 'center',
+  },
+
+  subtotal: {
+    fontSize: 15,
+    fontWeight: '700',
+    marginVertical: 2,
   },
 });

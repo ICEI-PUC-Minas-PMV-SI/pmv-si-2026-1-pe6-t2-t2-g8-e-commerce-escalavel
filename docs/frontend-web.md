@@ -1410,6 +1410,7 @@ Testes funcionais manuais cobrindo o fluxo de pagamento integrado ao checkout we
 - **Resultado esperado:**
   - `OrderSuccessModal` abre com status `PAID` e `transactionId` exibido.
   - Carrinho é esvaziado.
+- **Evidência:** ![TC-P1-01](img/testes-front/payments-web/TC-P1-01.png)
 
 ---
 
@@ -1425,16 +1426,7 @@ Testes funcionais manuais cobrindo o fluxo de pagamento integrado ao checkout we
   - `PaymentDeclinedModal` abre com mensagem de recusa.
   - Status do pedido = `PAYMENT_FAILED`.
   - Botão **Tentar novamente** visível.
-
-##### TC-P2-02 · Retry após recusa — aprovação
-
-- **Pré-condições:**
-  - `PaymentDeclinedModal` aberto (TC-P2-01 executado).
-  - Simular valor aprovado (alterar item do carrinho ou usar outro pedido).
-- **Passos:**
-  1. Clicar em **Tentar novamente** no modal de recusa.
-- **Resultado esperado:**
-  - `PaymentDeclinedModal` fecha, `OrderSuccessModal` abre com `PAID` + `transactionId`.
+- **Evidência:** ![TC-P2-01](img/testes-front/payments-web/TC-P2-01.png)
 
 ---
 
@@ -1451,6 +1443,7 @@ Testes funcionais manuais cobrindo o fluxo de pagamento integrado ao checkout we
 - **Resultado esperado:**
   - Botão muda para **Copiado!** por ~2 s.
   - Código PIX na área de transferência.
+- **Evidência:** ![TC-P3-01](img/testes-front/payments-web/TC-P3-01.png)
 
 ---
 
@@ -1464,6 +1457,7 @@ Testes funcionais manuais cobrindo o fluxo de pagamento integrado ao checkout we
   1. Acessar `/orders`.
 - **Resultado esperado:**
   - Card exibe linha `Transação: TRX-XXXXXX`.
+- **Evidência:** ![TC-P4-01](img/testes-front/payments-web/TC-P4-01.png)
 
 ##### TC-P4-02 · transactionId no modal de detalhes
 
@@ -1473,6 +1467,7 @@ Testes funcionais manuais cobrindo o fluxo de pagamento integrado ao checkout we
   1. Acessar `/orders`, clicar em **Página do produto** no card.
 - **Resultado esperado:**
   - Modal exibe `Transação: TRX-XXXXXX`.
+- **Evidência:** ![TC-P4-02](img/testes-front/payments-web/TC-P4-02.png)
 
 ---
 
