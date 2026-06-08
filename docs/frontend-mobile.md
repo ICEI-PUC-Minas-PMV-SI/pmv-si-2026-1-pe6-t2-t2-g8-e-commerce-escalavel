@@ -26,7 +26,7 @@ O módulo é composto por quatro telas principais conectadas por navegação em 
 
 ```
 ┌─────────────────────────────┐
-│  Bom dia, Gabriel           │
+│  Bom dia, Nome usuário      │
 │  12 produtos encontrados    │
 │                             │
 │  [🔍 Buscar produto...]     │
@@ -47,7 +47,6 @@ O módulo é composto por quatro telas principais conectadas por navegação em 
 ```
 
 Elementos da tela:
-- **Saudação:** texto personalizado por horário (Bom dia / Boa tarde / Boa noite) com nome do usuário e badge de contagem de produtos.
 - **Barra de busca:** filtragem local em tempo real por nome do produto.
 - **Chips de categoria:** scroll horizontal; ao selecionar uma categoria, dispara nova requisição à API.
 - **Grade 2 colunas:** `ProductCard` clicável (navega ao detalhe) e com long-press para ações admin.
