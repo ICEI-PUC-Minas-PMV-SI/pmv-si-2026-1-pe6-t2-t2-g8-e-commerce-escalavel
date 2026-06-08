@@ -1,20 +1,25 @@
-import { Stack } from 'expo-router';
+import { Stack, usePathname } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
+import { View } from 'react-native';
 import { PaperProvider } from 'react-native-paper';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { paperTheme } from '@/src/theme';
 import { CartProvider } from '../contexts/CartContext';
 import { AuthProvider } from '@/src/contexts/AuthContext';
+import { BottomMenu } from '@/src/components/BottomMenu';
 
-export default function RootLayout() {
+// Telas onde a barra inferior não deve aparecer.
+const HIDDEN_BAR_ROUTES = ['/login', '/register'];
+
+function AppFrame() {
+  const pathname = usePathname();
+  const showBar = !HIDDEN_BAR_ROUTES.includes(pathname);
+
   return (
-    <SafeAreaProvider>
-      <StatusBar style="light" backgroundColor="#0A0A0A" translucent={false} />
-      <PaperProvider theme={paperTheme}>
-        <AuthProvider>
-          <CartProvider>
-            <Stack
+    <View style={{ flex: 1 }}>
+      <View style={{ flex: 1 }}>
+        <Stack
               screenOptions={{
                 headerStyle: { backgroundColor: paperTheme.colors.surface },
                 headerTitleStyle: { color: paperTheme.colors.onSurface },
@@ -50,6 +55,20 @@ export default function RootLayout() {
                {/* Notificações */}
               <Stack.Screen name="notification" options={{ title: 'Notificações' }} />
             </Stack>
+      </View>
+      {showBar && <BottomMenu />}
+    </View>
+  );
+}
+
+export default function RootLayout() {
+  return (
+    <SafeAreaProvider>
+      <StatusBar style="light" backgroundColor="#0A0A0A" translucent={false} />
+      <PaperProvider theme={paperTheme}>
+        <AuthProvider>
+          <CartProvider>
+            <AppFrame />
           </CartProvider>
         </AuthProvider>
       </PaperProvider>

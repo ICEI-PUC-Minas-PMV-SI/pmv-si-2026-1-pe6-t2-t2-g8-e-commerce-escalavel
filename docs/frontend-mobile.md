@@ -460,6 +460,146 @@ Testes funcionais manuais cobrindo o fluxo de pagamento no app mobile. Pré-cond
 
 ---
 
+## Testes — Módulo de Estoque (Stock Mobile)
+
+Testes funcionais manuais cobrindo as interações do módulo de Estoque no app mobile. Cada caso descreve apenas o caminho feliz. Pré-condição global: backend ativo, usuário admin autenticado.
+
+### Mapeamento de interações
+
+Origem: `app/stock.tsx`, `app/stock/`, `src/services/stockService.ts`.
+
+| ID   | Interação                          | Tela / Componente                   | API back-end                       |
+|------|------------------------------------|-------------------------------------|------------------------------------|
+| M-S1 | Listar itens com dados de produto  | `app/stock.tsx` (`StockListScreen`) | `GET /stock/detailed-items`        |
+| M-S2 | Buscar por SKU/nome/código         | `app/stock.tsx` (filtro client-side)| —                                  |
+| M-S3 | Copiar SKU                         | `app/stock.tsx` (`handleCopy`)      | —                                  |
+| M-S4 | Criar item de estoque              | `app/stock/create.tsx`              | `POST /stock`                      |
+| M-S5 | Reabastecer item                   | `app/stock/restock.tsx`             | `PUT /stock/{skuId}/restock`       |
+| M-S6 | Ajustar item (delta + motivo)      | `app/stock/adjust.tsx`              | `PUT /stock/{skuId}/adjust`        |
+| M-S7 | Visualizar histórico de movimentos | `app/stock/history.tsx`             | `GET /stock/{skuId}/history`       |
+
+### Casos de teste
+
+#### Stock Mobile — M-S1: Listagem
+
+##### TC-M-S1-01 · Carregar lista de itens
+
+- **Pré-condições:**
+  - Há ≥ 1 item de estoque cadastrado.
+- **Passos:**
+  1. Abrir a tela de Estoque pelo menu.
+- **Resultado esperado:**
+  - Cada card exibe nome do produto, código/tamanho, SKU e as métricas Disponível, Reservado e Custo (BRL).
+- **Evidência:** ![TC-M-S1-01](img/testes-front/stock-mobile/TC-M-S1-01.png)
+
+---
+
+#### Stock Mobile — M-S2: Busca
+
+##### TC-M-S2-01 · Filtrar por trecho do SKU
+
+- **Pré-condições:**
+  - Lista carregada com ≥ 2 itens de SKUs distintos.
+- **Passos:**
+  1. Digitar um trecho do SKU no campo de busca.
+- **Resultado esperado:**
+  - Lista mantém apenas cards cujo SKU contém o trecho.
+- **Evidência:** ![TC-M-S2-01](img/testes-front/stock-mobile/TC-M-S2-01.png)
+
+##### TC-M-S2-02 · Filtrar por nome do produto
+
+- **Pré-condições:**
+  - Lista carregada.
+- **Passos:**
+  1. Digitar parte do nome de um produto no campo de busca.
+- **Resultado esperado:**
+  - Lista exibe apenas cards cujo nome contém o trecho.
+- **Evidência:** ![TC-M-S2-02](img/testes-front/stock-mobile/TC-M-S2-02.png)
+
+---
+
+#### Stock Mobile — M-S3: Copiar SKU
+
+##### TC-M-S3-01 · Copiar SKU do card
+
+- **Pré-condições:**
+  - Lista carregada.
+- **Passos:**
+  1. Tocar sobre o SKU exibido em um card.
+- **Resultado esperado:**
+  - SKU gravado na área de transferência.
+  - Snackbar "SKU copiado." aparece.
+- **Evidência:** ![TC-M-S3-01](img/testes-front/stock-mobile/TC-M-S3-01.png)
+
+---
+
+#### Stock Mobile — M-S4: Criar item
+
+##### TC-M-S4-01 · Criar item com dados válidos
+
+- **Pré-condições:**
+  - Existe produto com SKU sem item de estoque associado.
+- **Passos:**
+  1. Tocar no FAB **Novo item**.
+  2. Selecionar produto, variante e tamanho (SKU).
+  3. Definir Quantidade inicial = `10`.
+  4. Definir Custo = `40`.
+  5. Confirmar.
+- **Resultado esperado:**
+  - Tela fecha e volta à lista.
+  - Lista recarregada exibe o novo item com `Disponível = 10`.
+- **Evidência:** ![TC-M-S4-01](img/testes-front/stock-mobile/TC-M-S4-01.png)
+
+---
+
+#### Stock Mobile — M-S5: Reabastecer
+
+##### TC-M-S5-01 · Reabastecer com quantidade positiva
+
+- **Pré-condições:**
+  - Item de estoque existente com `Disponível = N`.
+- **Passos:**
+  1. No card do item, tocar em **Reabastecer**.
+  2. Informar Quantidade a adicionar = `5`.
+  3. Confirmar.
+- **Resultado esperado:**
+  - Tela fecha e o card passa a exibir `Disponível = N + 5`.
+- **Evidência:** ![TC-M-S5-01](img/testes-front/stock-mobile/TC-M-S5-01.png)
+
+---
+
+#### Stock Mobile — M-S6: Ajustar
+
+##### TC-M-S6-01 · Ajuste negativo dentro do disponível
+
+- **Pré-condições:**
+  - Item com `Disponível = N ≥ 2`.
+- **Passos:**
+  1. No card do item, tocar em **Ajustar**.
+  2. Definir Delta = `-2`.
+  3. Informar Motivo = `contagem física`.
+  4. Confirmar.
+- **Resultado esperado:**
+  - Tela fecha e o card passa a exibir `Disponível = N - 2`.
+- **Evidência:** ![TC-M-S6-01](img/testes-front/stock-mobile/TC-M-S6-01.png)
+
+---
+
+#### Stock Mobile — M-S7: Histórico
+
+##### TC-M-S7-01 · Abrir histórico de um SKU
+
+- **Pré-condições:**
+  - Item com ≥ 1 movimento registrado.
+- **Passos:**
+  1. No card do item, tocar em **Histórico**.
+- **Resultado esperado:**
+  - Tela lista cada movimento com rótulo do tipo, quantidade com sinal e data em pt-BR.
+  - Movimentos com pedido exibem `Pedido: <uuid>`; ajustes exibem o motivo.
+- **Evidência:** ![TC-M-S7-01](img/testes-front/stock-mobile/TC-M-S7-01.png)
+
+---
+
 ## Referências
 
 - [Expo Router — File-based routing](https://expo.github.io/router/docs)

@@ -11,7 +11,7 @@ const fromExtra = (
 // Resolver prefixa IMAGE_BASE_URL em runtime — mesmo DB serve dev e prod.
 // Dev default: gateway proxy → MinIO bucket `products`.
 // Prod: override via EXPO_PUBLIC_IMAGE_BASE_URL=https://cdn.<host>/images/products
-const DEFAULT_BASE = 'http://192.168.0.4:7000/images/products';
+const DEFAULT_BASE = 'http://localhost:7000/images/products';
 
 export const IMAGE_BASE_URL = (fromEnv ?? fromExtra ?? DEFAULT_BASE).replace(
   /\/+$/,

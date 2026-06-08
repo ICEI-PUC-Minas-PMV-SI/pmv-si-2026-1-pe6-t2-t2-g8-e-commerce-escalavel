@@ -40,11 +40,11 @@ export function ServicesDrawer({ visible, onDismiss }: Props) {
 
   const CATALOG_ITEMS: MenuItem[] = [
     { icon: '🏷️', label: 'Categorias', href: '/catalog/categories' },
+    { icon: '📦', label: 'Estoque',  href: '/stock' },
   ]
 
   const ADMIN_ITEMS: MenuItem[] = [
     { icon: '👥', label: 'Usuários', href: '/admin/users' },
-    { icon: '📦', label: 'Estoque',  href: '/stock' },
   ]
 
   return (

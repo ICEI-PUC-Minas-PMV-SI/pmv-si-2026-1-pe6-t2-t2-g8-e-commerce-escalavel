@@ -127,7 +127,6 @@ export default function ProductDetailScreen() {
     if (avail !== null && quantity > avail) return;
     addItem({
       skuId: selectedSku.id,
-      skuId: selectedSku.id,
       productId: product.id,
       productName: product.name,
       unitPrice: selectedSku.price,
