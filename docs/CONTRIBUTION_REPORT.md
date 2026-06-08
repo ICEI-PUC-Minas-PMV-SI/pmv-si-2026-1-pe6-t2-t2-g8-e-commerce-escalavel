@@ -1,6 +1,6 @@
 # 📊 Relatório de Contribuições do Projeto
 
-**Última atualização:** 08/06/2026 01:13
+**Última atualização:** 08/06/2026 01:15
 
 ---
 
@@ -17,16 +17,16 @@
 | Vitor Linas           |        47 |      2220 |       711 |         23 |             20 |               4 |
 | gabriel               |        19 |      9124 |      1983 |        105 |              0 |               0 |
 | gabrielcambraia       |        25 |       958 |        56 |          4 |             12 |               3 |
-| github-actions[bot]   |       161 |      1310 |      1284 |          3 |            156 |               1 |
+| github-actions[bot]   |       162 |      1315 |      1289 |          3 |            157 |               1 |
 | github-classroom[bot] |         1 |      2152 |         0 |         45 |              1 |              13 |
-| nicolaspborges96      |        66 |     46492 |     18312 |        319 |             24 |               6 |
+| nicolaspborges96      |        68 |     46749 |     18386 |        330 |             26 |               7 |
 
 
 ## 📅 Contribuições Semanais (Todo o Semestre)
 
-**2026-06-01**: Dev-Vinicio: 3, HgBertani: 13, João Gabriel Perez: 7, Vitor Linas: 10, gabriel: 6, gabrielcambraia: 7, github-actions[bot]: 33, nicolaspborges96: 1
+**2026-06-01**: Dev-Vinicio: 3, HgBertani: 13, João Gabriel Perez: 7, Vitor Linas: 10, gabriel: 6, gabrielcambraia: 7, github-actions[bot]: 33, nicolaspborges96: 3
 
-**2026-05-25**: João Gabriel Perez: 4, Nicolas: 1, github-actions[bot]: 5, nicolaspborges96: 3
+**2026-05-25**: João Gabriel Perez: 4, Nicolas: 1, github-actions[bot]: 6, nicolaspborges96: 3
 
 **2026-05-18**: Vitor Linas: 11, github-actions[bot]: 11, nicolaspborges96: 2
 
