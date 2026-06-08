@@ -1,55 +1,493 @@
 # Front-end Móvel
 
-[Inclua uma breve descrição do projeto e seus objetivos.]
+O front-end móvel do e-commerce escalável é desenvolvido com **React Native via Expo**, entregando uma experiência nativa em iOS e Android a partir de uma única base de código. A aplicação cobre os principais domínios da plataforma — catálogo, notificações, pagamentos, estoque e usuários — organizados em módulos independentes que consomem cada microserviço de backend via API REST.
+
+---
+
+# Front-end Móvel — Módulo de Catálogo
+
+O módulo de catálogo é o coração da aplicação mobile: permite que clientes naveguem por produtos organizados em categorias, filtrem por nome, visualizem variantes de cor e tamanho com verificação de estoque em tempo real e adicionem itens ao carrinho. Administradores têm, na mesma interface, acesso a criação, edição e exclusão de produtos, variantes e SKUs.
+
+---
 
 ## Projeto da Interface
-[Descreva o projeto da interface móvel da aplicação, incluindo o design visual, layout das páginas, interações do usuário e outros aspectos relevantes.]
+
+O módulo é composto por quatro telas principais conectadas por navegação em pilha (Expo Router) e um formulário modal exclusivo para administradores:
+
+- **`CatalogScreen`** — tela inicial com busca, filtros por categoria e grade de produtos.
+- **`CategoriesScreen`** — listagem e gerenciamento de categorias.
+- **`ProductsByCategoryScreen`** — produtos filtrados por categoria selecionada.
+- **`ProductDetailScreen`** — detalhe completo com seleção de variante, SKU, quantidade e adição ao carrinho.
+- **`ProductFormScreen`** — formulário modal (admin) para criar e editar produtos com variantes e SKUs.
 
 ### Wireframes
 
-[Inclua os wireframes das páginas principais da interface, mostrando a disposição dos elementos na página.]
+#### Tela Principal — Catálogo (`/`)
+
+```
+┌─────────────────────────────┐
+│  Bom dia, Gabriel           │
+│  12 produtos encontrados    │
+│                             │
+│  [🔍 Buscar produto...]     │
+│                             │
+│  [Todos][Camisetas][Calças] │
+│                             │
+│  ┌──────┐  ┌──────┐        │
+│  │ IMG  │  │ IMG  │        │
+│  │[Cat] │  │[Cat] │        │
+│  │Nome  │  │Nome  │        │
+│  │R$ XX │  │R$ XX │        │
+│  └──────┘  └──────┘        │
+│  ┌──────┐  ┌──────┐        │
+│  │  ... │  │  ... │        │
+│  └──────┘  └──────┘        │
+│                          [+]│
+└─────────────────────────────┘
+```
+
+Elementos da tela:
+- **Saudação:** texto personalizado por horário (Bom dia / Boa tarde / Boa noite) com nome do usuário e badge de contagem de produtos.
+- **Barra de busca:** filtragem local em tempo real por nome do produto.
+- **Chips de categoria:** scroll horizontal; ao selecionar uma categoria, dispara nova requisição à API.
+- **Grade 2 colunas:** `ProductCard` clicável (navega ao detalhe) e com long-press para ações admin.
+- **FAB `+`:** visível apenas para administradores, abre o formulário de criação.
+
+#### Tela de Detalhe — `/catalog/product/[id]`
+
+```
+┌─────────────────────────────┐
+│ ←  Nome do Produto          │
+│                             │
+│  ┌─────────────────────┐   │
+│  │       IMAGEM         │   │
+│  └─────────────────────┘   │
+│  [Categoria]                │
+│  Nome do Produto            │
+│  Descrição do produto...    │
+│                             │
+│  Cor:                       │
+│  ●  ●  ○  (swatches)       │
+│                             │
+│  Tamanho:                   │
+│  [P R$50] [M R$55] [G R$60]│
+│                             │
+│  Quantidade:  [−] 1 [+]    │
+│                             │
+│  [ Adicionar ao Carrinho  ] │
+└─────────────────────────────┘
+```
+
+Elementos da tela:
+- **Imagem:** carregamento com `expo-image`; fallback para ícone `image-off` em caso de erro.
+- **Badge de categoria** e **preço dinâmico**: exibe menor preço sem seleção; atualiza ao selecionar SKU.
+- **Swatches de cor:** variantes esgotadas com opacidade reduzida e riscado.
+- **Chips de tamanho:** SKUs sem estoque desabilitados.
+- **Seletor de quantidade:** limitado ao estoque disponível menos itens já no carrinho.
+- **Botões admin:** editar e excluir, visíveis apenas para `role === 'admin'`.
+
+#### Formulário de Produto — `/catalog/admin/product-form` (modal)
+
+```
+┌─────────────────────────────┐
+│  Novo Produto            ✕  │
+│                             │
+│  Nome *                     │
+│  [ Nome do produto       ]  │
+│  Descrição                  │
+│  [ Descrição...          ]  │
+│  URL da imagem              │
+│  [ https://...           ]  │
+│  Categoria                  │
+│  [ Selecionar ▾          ]  │
+│                             │
+│  Variantes                  │
+│  ┌───────────────────────┐  │
+│  │ ● Azul         1 SKU  │  │
+│  │   [P  SKU-001  R$50 ] │  │
+│  │   [+ Adicionar SKU  ] │  │
+│  └───────────────────────┘  │
+│  [+ Adicionar variante    ]  │
+│                             │
+│  [  Cancelar  ] [  Salvar ] │
+└─────────────────────────────┘
+```
+
+---
 
 ### Design Visual
 
-[Descreva o estilo visual da interface, incluindo paleta de cores, tipografia, ícones e outros elementos gráficos.]
+| Item | Definição |
+|---|---|
+| Framework de UI | React Native Paper (Material Design 3) |
+| Fundo de tela | Branco / `#F8F9FA` |
+| Cards de produto | `Card` do Paper com sombra leve |
+| Badge de categoria | Fundo colorido arredondado, `labelSmall` |
+| Preço | Negrito, `20sp`, cor primária do tema |
+| Swatch de cor selecionado | Anel de borda dupla na cor escolhida |
+| Swatch esgotado | Opacidade `0.4`, linha riscada |
+| Chip de SKU desabilitado | Opacidade reduzida, não interativo |
+| Botão "Adicionar ao Carrinho" | Botão primário ocupando largura total |
+| FAB de criação | Ícone `+`, posição fixa inferior direita |
+| Skeleton loading | Retângulos animados no lugar dos cards |
+| Banner de erro | Fundo vermelho com mensagem e botão retry |
+
+Estilos aplicados via `StyleSheet` do React Native combinados com componentes do `react-native-paper`.
+
+---
 
 ## Fluxo de Dados
 
-[Diagrama ou descrição do fluxo de dados na aplicação.]
+```
+Backend (CatalogService :7000)
+        │
+        │  GET  /api/catalog/products          (lista com filtros)
+        │  GET  /api/catalog/products/{id}     (detalhe + variantes + SKUs)
+        │  POST /api/catalog/products          (admin)
+        │  PUT  /api/catalog/products/{id}     (admin)
+        │  DELETE /api/catalog/products/{id}   (admin)
+        │  GET  /api/catalog/categories
+        │  POST /api/catalog/categories        (admin)
+        │  PUT  /api/catalog/categories/{id}   (admin)
+        │  DELETE /api/catalog/categories/{id} (admin)
+        │  POST /api/catalog/products/{id}/variants  (admin)
+        │  POST /api/catalog/variants/{id}/skus      (admin)
+        │  PATCH /api/catalog/skus/{id}              (admin)
+        │
+Backend (StockService)
+        │  GET  /stock/{skuId}   → quantityAvailable (por SKU, paralelo)
+        │
+        ▼
+App Mobile (React Native / Expo)
+        │
+        ├─► CatalogScreen         → lista de produtos + busca + filtro categoria
+        ├─► CategoriesScreen      → gestão de categorias
+        ├─► ProductsByCategoryScreen → produtos filtrados
+        ├─► ProductDetailScreen   → detalhe + variante/SKU/qtd + carrinho
+        │        └─► CartContext.addItem()  → estado global do carrinho
+        └─► ProductFormScreen     → criação/edição (admin)
+```
+
+**Como funciona:**
+1. `CatalogScreen` carrega categorias e produtos em paralelo no `useEffect`.
+2. Ao selecionar uma categoria, dispara `getProducts({ categoryId })` — nova requisição à API.
+3. A busca por nome filtra localmente o array já carregado.
+4. `ProductDetailScreen` busca o produto pelo id e, em paralelo, consulta o estoque de cada SKU via `stockService.getBySku()`.
+5. `handleAddToCart()` grava no `CartContext` (estado em memória) com `skuId`, `productId`, `unitPrice`, `size`, `color` e `quantity`.
+6. O formulário admin encadeia criação de produto → variantes → SKUs em sequência.
+
+---
 
 ## Tecnologias Utilizadas
 
-[Lista das tecnologias principais que serão utilizadas no projeto.]
+| Tecnologia | Versão | Uso |
+|---|---|---|
+| React Native | 0.81.5 | Framework base para UI nativa |
+| Expo | ~54 | Toolchain, build e APIs nativas |
+| expo-router | 6.0.23 | Navegação file-based com rotas tipadas |
+| react-native-paper | 5.15.2 | Componentes Material Design 3 |
+| expo-image | — | Carregamento otimizado de imagens |
+| @expo/vector-icons | — | Ícones MaterialCommunityIcons |
+| TypeScript | ~5.8 | Tipagem estática em todo o projeto |
+| React Context API | — | Estado global (CartContext, AuthContext) |
+| Fetch API nativa | — | Chamadas HTTP via httpClient customizado |
+
+---
 
 ## Considerações de Segurança
 
-[Discuta as considerações de segurança relevantes para a aplicação distribuída, como autenticação, autorização, proteção contra ataques, etc.]
+| Tópico | Estado atual |
+|---|---|
+| Autenticação | Requisições de escrita enviam `Authorization: Bearer <token>` via `httpClient.ts` |
+| Autorização | Controle de visibilidade de ações admin por `user?.role === 'admin'` no front-end; validação real no backend |
+| Validação de formulários | Nome obrigatório, preço ≥ 0, variante sem cor bloqueia envio |
+| Proteção de URLs de imagem | Caminhos relativos são prefixados com `IMAGE_BASE_URL` configurado; sem carregamento de conteúdo externo arbitrário |
+| Limite de quantidade | Máximo adicionável ao carrinho restringido ao `quantityAvailable` retornado pelo StockService |
+| Erros de API | Mensagens de erro exibidas sem expor detalhes internos; respostas HTML inesperadas detectadas e traduzidas |
+| Transporte | HTTP em desenvolvimento; HTTPS obrigatório em produção |
+
+---
 
 ## Implantação
 
-[Instruções para implantar a aplicação distribuída em um ambiente de produção.]
+**Pré-requisitos:** Node.js 20+, Expo CLI e Docker Desktop instalados.
 
-1. Defina os requisitos de hardware e software necessários para implantar a aplicação em um ambiente de produção.
-2. Escolha uma plataforma de hospedagem adequada, como um provedor de nuvem ou um servidor dedicado.
-3. Configure o ambiente de implantação, incluindo a instalação de dependências e configuração de variáveis de ambiente.
-4. Faça o deploy da aplicação no ambiente escolhido, seguindo as instruções específicas da plataforma de hospedagem.
-5. Realize testes para garantir que a aplicação esteja funcionando corretamente no ambiente de produção.
+1. Subir o banco e o backend de catálogo:
+   ```powershell
+   cd src/services/catalog
+   dotnet run
+   ```
+2. Configurar as variáveis de ambiente em `src/mobile/.env`:
+   ```
+   EXPO_PUBLIC_API_URL=http://192.168.0.4:7000/api
+   EXPO_PUBLIC_IMAGE_BASE_URL=http://192.168.0.4:7000/images/products
+   ```
+3. Subir o app mobile:
+   ```powershell
+   cd src/mobile
+   npx expo start
+   ```
+4. Pressionar **W** para abrir no navegador ou escanear o QR Code com o **Expo Go** no celular.
+5. A aba **Home** já exibe o catálogo ao iniciar.
+
+---
 
 ## Testes
 
-[Descreva a estratégia de teste, incluindo os tipos de teste a serem realizados (unitários, integração, carga, etc.) e as ferramentas a serem utilizadas.]
+### Estratégia
 
-1. Crie casos de teste para cobrir todos os requisitos funcionais e não funcionais da aplicação.
-2. Implemente testes unitários para testar unidades individuais de código, como funções e classes.
-3. Realize testes de integração para verificar a interação correta entre os componentes da aplicação.
-4. Execute testes de carga para avaliar o desempenho da aplicação sob carga significativa.
-5. Utilize ferramentas de teste adequadas, como frameworks de teste e ferramentas de automação de teste, para agilizar o processo de teste.
+Testes funcionais manuais executados em ambiente local, cobrindo as interações do **módulo de Catálogo** no front-end móvel. Pré-condição global: `CatalogService` ativo e ao menos um produto cadastrado.
 
-# Referências
+---
 
-Inclua todas as referências (livros, artigos, sites, etc) utilizados no desenvolvimento do trabalho.
+### Mapeamento de interações
 
---- 
+| ID | Interação | Componente | API back-end |
+|---|---|---|---|
+| M-C1 | Listar produtos com busca e filtro | `CatalogScreen` | `GET /catalog/products` |
+| M-C2 | Filtrar produtos por categoria | `CatalogScreen` | `GET /catalog/products?categoryId=` |
+| M-C3 | Visualizar detalhe do produto | `ProductDetailScreen` | `GET /catalog/products/{id}` |
+| M-C4 | Verificar estoque por SKU | `ProductDetailScreen` | `GET /stock/{skuId}` |
+| M-C5 | Adicionar produto ao carrinho | `ProductDetailScreen` | — (CartContext local) |
+| M-C6 | Gerenciar categorias (admin) | `CategoriesScreen` | `GET/POST/PUT/DELETE /catalog/categories` |
+| M-C7 | Criar/editar produto com variantes (admin) | `ProductFormScreen` | `POST/PUT /catalog/products` + variants + skus |
+
+---
+
+### Casos de teste
+
+#### Catálogo Mobile — M-C1: Listagem e busca
+
+##### TC-M-C1-01 · Carregar lista de produtos
+
+- **Pré-condições:**
+  - Backend ativo, ao menos 1 produto cadastrado.
+- **Passos:**
+  1. Abrir o app na tela inicial (aba Home).
+- **Resultado esperado:**
+  - Grade de cards exibida com imagem, categoria, nome e preço.
+  - Contagem de produtos atualizada no header.
+  - Skeleton cards visíveis durante o carregamento.
+
+---
+
+##### TC-M-C1-02 · Buscar produto por nome
+
+- **Pré-condições:**
+  - Lista de produtos carregada com ≥ 2 itens de nomes distintos.
+- **Passos:**
+  1. Digitar parte do nome de um produto no campo de busca.
+- **Resultado esperado:**
+  - Lista reduzida em tempo real aos produtos cujo nome contém o texto digitado.
+  - Limpar o campo restaura a lista completa.
+
+---
+
+##### TC-M-C1-03 · Estado vazio
+
+- **Pré-condições:**
+  - Nenhum produto cadastrado ou busca sem resultado.
+- **Passos:**
+  1. Abrir a tela ou digitar texto sem correspondência na busca.
+- **Resultado esperado:**
+  - Mensagem de estado vazio exibida no lugar da grade.
+
+---
+
+##### TC-M-C1-04 · Pull-to-refresh
+
+- **Pré-condições:**
+  - Lista carregada.
+- **Passos:**
+  1. Arrastar a lista para baixo (gesto pull-to-refresh).
+- **Resultado esperado:**
+  - Indicador de carregamento exibido brevemente.
+  - Lista atualizada com dados mais recentes do backend.
+
+---
+
+#### Catálogo Mobile — M-C2: Filtro por categoria
+
+##### TC-M-C2-01 · Filtrar por categoria selecionada
+
+- **Pré-condições:**
+  - Ao menos 2 categorias e produtos em cada uma.
+- **Passos:**
+  1. Tocar em um chip de categoria na barra horizontal.
+- **Resultado esperado:**
+  - Lista recarregada exibindo apenas produtos da categoria selecionada.
+  - Chip selecionado com estado visual ativo.
+
+---
+
+##### TC-M-C2-02 · Remover filtro voltando para "Todos"
+
+- **Passos:**
+  1. Com filtro de categoria ativo, tocar no chip "Todos".
+- **Resultado esperado:**
+  - Lista recarregada com todos os produtos sem filtro.
+
+---
+
+#### Catálogo Mobile — M-C3/C4: Detalhe do produto e estoque
+
+##### TC-M-C3-01 · Abrir detalhe do produto
+
+- **Passos:**
+  1. Tocar em um card de produto na grade.
+- **Resultado esperado:**
+  - Navega para `/catalog/product/[id]`.
+  - Imagem, categoria, nome, descrição e preço mínimo exibidos.
+  - Swatches de cor e chips de tamanho visíveis se o produto tiver variantes.
+
+---
+
+##### TC-M-C4-01 · SKU esgotado desabilitado
+
+- **Pré-condições:**
+  - Produto com ao menos um SKU com `quantityAvailable = 0`.
+- **Passos:**
+  1. Abrir o detalhe do produto.
+- **Resultado esperado:**
+  - Chip do SKU esgotado exibido como desabilitado (opacidade reduzida).
+  - Não é possível selecioná-lo.
+
+---
+
+##### TC-M-C4-02 · Variante inteiramente esgotada desabilitada
+
+- **Pré-condições:**
+  - Variante cujos todos os SKUs têm `quantityAvailable = 0`.
+- **Passos:**
+  1. Abrir o detalhe do produto.
+- **Resultado esperado:**
+  - Swatch da variante exibido com opacidade reduzida e riscado.
+  - Não é possível selecioná-lo.
+
+---
+
+##### TC-M-C4-03 · Preço atualiza ao selecionar SKU
+
+- **Passos:**
+  1. No detalhe do produto, selecionar variante e depois um chip de tamanho.
+- **Resultado esperado:**
+  - Preço exibido atualiza para o valor exato do SKU selecionado.
+
+---
+
+#### Catálogo Mobile — M-C5: Adicionar ao carrinho
+
+##### TC-M-C5-01 · Adicionar item com variante e tamanho selecionados
+
+- **Pré-condições:**
+  - Produto com variante e SKU com estoque disponível.
+- **Passos:**
+  1. Selecionar cor (variante) e tamanho (SKU).
+  2. Ajustar quantidade para `2`.
+  3. Tocar em **Adicionar ao Carrinho**.
+- **Resultado esperado:**
+  - Botão exibe feedback visual de confirmação.
+  - `CartContext` contém item com `skuId`, `color`, `size`, `quantity = 2`.
+
+---
+
+##### TC-M-C5-02 · Quantidade limitada ao estoque disponível
+
+- **Pré-condições:**
+  - SKU com `quantityAvailable = 3`.
+- **Passos:**
+  1. Selecionar o SKU.
+  2. Tentar aumentar a quantidade além de `3`.
+- **Resultado esperado:**
+  - Botão `+` bloqueado ao atingir o limite de estoque.
+  - Valor máximo exibido é `3`.
+
+---
+
+#### Catálogo Mobile — M-C6: Gerenciar categorias (admin)
+
+##### TC-M-C6-01 · Criar nova categoria
+
+- **Pré-condições:**
+  - Usuário autenticado com `role = admin`.
+- **Passos:**
+  1. Navegar para `/catalog/categories`.
+  2. Tocar no FAB `+`.
+  3. Preencher nome e descrição.
+  4. Tocar em **Criar**.
+- **Resultado esperado:**
+  - Modal fecha, nova categoria aparece na grade.
+
+---
+
+##### TC-M-C6-02 · Excluir categoria com confirmação
+
+- **Passos:**
+  1. Long-press em um card de categoria.
+  2. Selecionar **Excluir** no menu de contexto.
+  3. Confirmar no dialog.
+- **Resultado esperado:**
+  - Categoria removida da grade sem reload manual.
+
+---
+
+#### Catálogo Mobile — M-C7: Formulário de produto (admin)
+
+##### TC-M-C7-01 · Criar produto com variante e SKU
+
+- **Pré-condições:**
+  - Usuário autenticado com `role = admin`.
+- **Passos:**
+  1. Tocar no FAB `+` no catálogo.
+  2. Preencher nome, descrição, URL de imagem e selecionar categoria.
+  3. Tocar em **Adicionar variante**, escolher cor.
+  4. Tocar em **Adicionar SKU**, preencher tamanho, código e preço.
+  5. Tocar em **Salvar**.
+- **Resultado esperado:**
+  - Modal fecha, produto aparece no catálogo.
+  - Variante e SKU associados e visíveis no detalhe do produto.
+
+---
+
+##### TC-M-C7-02 · Validação — nome obrigatório
+
+- **Passos:**
+  1. Abrir formulário de criação e deixar o campo nome vazio.
+  2. Tocar em **Salvar**.
+- **Resultado esperado:**
+  - Banner de erro exibido: campo nome é obrigatório.
+  - Nenhuma requisição ao backend.
+
+---
+
+##### TC-M-C7-03 · Validação — preço negativo bloqueado
+
+- **Passos:**
+  1. No formulário, adicionar variante e SKU com preço `-5`.
+  2. Tocar em **Salvar**.
+- **Resultado esperado:**
+  - Banner de erro: preço deve ser maior ou igual a zero.
+  - Envio bloqueado.
+
+---
+
+## Referências
+
+- [Expo Documentation](https://docs.expo.dev/)
+- [Expo Router — File-based routing](https://docs.expo.dev/router/introduction/)
+- [React Native Paper](https://callstack.github.io/react-native-paper/)
+- [React Native — Documentação oficial](https://reactnative.dev/docs/getting-started)
+- `src/mobile/src/screens/CatalogScreen.tsx`
+- `src/mobile/app/catalog/product/[id].tsx`
+- `src/mobile/app/catalog/categories.tsx`
+- `src/mobile/app/catalog/admin/product-form.tsx`
+- `src/mobile/src/components/ProductCard.tsx`
+- `src/mobile/src/services/catalogService.ts`
+- `src/mobile/src/services/stockService.ts`
+- `src/mobile/contexts/CartContext.tsx`
+
+---
+
 
 # Front-end Móvel — Módulo de Notificações
 
