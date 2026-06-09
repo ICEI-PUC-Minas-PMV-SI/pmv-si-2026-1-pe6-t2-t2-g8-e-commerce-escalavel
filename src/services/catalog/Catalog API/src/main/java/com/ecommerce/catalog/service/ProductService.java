@@ -99,6 +99,7 @@ public class ProductService {
         dto.setId(variant.getId());
         dto.setProductId(variant.getProduct().getId());
         dto.setColor(variant.getColor());
+        dto.setUrlImg(variant.getUrlImg());
         List<Sku> skus = variant.getSkus() != null ? variant.getSkus() : Collections.emptyList();
         dto.setSkus(skus.stream().map(this::toSkuDTO).toList());
         return dto;

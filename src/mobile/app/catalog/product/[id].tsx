@@ -113,6 +113,7 @@ export default function ProductDetailScreen() {
     setSelectedVariant(variant);
     setSelectedSku(null);
     setQuantity(1);
+    setImageFailed(false); // reseta erro p/ tentar carregar a imagem da nova cor
   };
 
   const handleSkuSelect = (sku: Sku) => {
@@ -181,7 +182,8 @@ export default function ProductDetailScreen() {
     );
   }
 
-  const imageUri = resolveImageUri(product.urlImg);
+  // Imagem da variante selecionada; cai pra do produto se a variante não tiver.
+  const imageUri = resolveImageUri(selectedVariant?.urlImg) ?? resolveImageUri(product.urlImg);
   const showImage = !!imageUri && !imageFailed;
   const displayPrice = selectedSku
     ? PRICE_FMT.format(selectedSku.price)

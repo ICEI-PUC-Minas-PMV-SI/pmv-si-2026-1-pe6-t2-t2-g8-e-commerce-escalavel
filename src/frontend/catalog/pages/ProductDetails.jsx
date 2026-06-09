@@ -129,12 +129,17 @@ export default function ProductDetails() {
     return (
         <div className="max-w-6xl mx-auto p-10 grid grid-cols-1 md:grid-cols-2 gap-10">
 
-            {/* IMAGEM */}
-            <div className="border bg-gray-50 aspect-square flex items-center justify-center">
-                {resolveImageUri(product.urlImg)
-                    ? <img src={resolveImageUri(product.urlImg)} alt={product.name} className="w-full h-full object-cover" />
-                    : <span className="text-gray-300 text-6xl">◻</span>}
-            </div>
+            {/* IMAGEM — usa a imagem da variante selecionada; cai pra do produto */}
+            {(() => {
+                const imgSrc = resolveImageUri(selectedVariant?.urlImg) ?? resolveImageUri(product.urlImg)
+                return (
+                    <div className="border bg-gray-50 aspect-square flex items-center justify-center">
+                        {imgSrc
+                            ? <img src={imgSrc} alt={product.name} className="w-full h-full object-cover" />
+                            : <span className="text-gray-300 text-6xl">◻</span>}
+                    </div>
+                )
+            })()}
 
             {/* INFO */}
             <div className="flex flex-col gap-4">
