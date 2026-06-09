@@ -16,5 +16,9 @@ export function resolveImageUri(raw) {
   if (!trimmed) return null
   if (ABSOLUTE_URL_RE.test(trimmed)) return trimmed
   if (!IMAGE_BASE_URL) return null
-  return `${IMAGE_BASE_URL}/${encodeURI(trimmed.replace(/^\/+/, ''))}`
+  // Normaliza key: tira barras iniciais e um prefixo `assets/` legado
+  // (variants do catálogo gravam `/assets/<file>`, mas o objeto fica na
+  // raiz do bucket `products`). Mantém o filename igual ao do produto.
+  const key = trimmed.replace(/^\/+/, '').replace(/^assets\//i, '')
+  return `${IMAGE_BASE_URL}/${encodeURI(key)}`
 }

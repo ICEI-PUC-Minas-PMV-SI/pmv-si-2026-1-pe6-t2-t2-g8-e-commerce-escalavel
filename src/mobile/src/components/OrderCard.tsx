@@ -15,13 +15,32 @@ type Props = {
   onDiscard: () => void;
 };
 
+// label + cores por status (chave normalizada em UPPERCASE p/ casar com backend).
+const STATUS_META: Record<string, { label: string; fg: string; bg: string }> = {
+  CREATED:        { label: 'Criado',    fg: '#1D4ED8', bg: '#DBEAFE' },
+  PAID:           { label: 'Pago',      fg: '#047857', bg: '#D1FAE5' },
+  CANCELLED:      { label: 'Cancelado', fg: '#B91C1C', bg: '#FEE2E2' },
+  PAYMENT_FAILED: { label: 'Falhou',    fg: '#B45309', bg: '#FEF3C7' },
+};
+
+function statusMeta(status: string) {
+  return (
+    STATUS_META[status?.toUpperCase()] ?? {
+      label: status,
+      fg: '#374151',
+      bg: '#E5E7EB',
+    }
+  );
+}
+
 export default function OrderCard({
   order,
   onViewDetails,
   onCancel,
   onDiscard,
 }: Props) {
-  const isCanceled = order.status.toLowerCase() === 'cancelado';
+  const isCanceled = order.status?.toUpperCase() === 'CANCELLED';
+  const meta = statusMeta(order.status);
 
   return (
     <Card style={styles.card}>
@@ -33,14 +52,11 @@ export default function OrderCard({
             {order.productName}
           </Text>
 
-          <Text
-            style={[
-              styles.status,
-              isCanceled && { color: 'red' },
-            ]}
-          >
-            {order.status}
-          </Text>
+          <View style={[styles.badge, { backgroundColor: meta.bg }]}>
+            <Text style={[styles.badgeTxt, { color: meta.fg }]}>
+              {meta.label}
+            </Text>
+          </View>
         </View>
 
         {/* TOTAL */}
@@ -100,10 +116,19 @@ const styles = StyleSheet.create({
     flex: 1,
   },
 
-  status: {
-    fontSize: 12,
-    color: '#6B7280',
-    fontWeight: '600',
+  badge: {
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 999,
+    alignSelf: 'flex-start',
+    marginLeft: 8,
+  },
+
+  badgeTxt: {
+    fontSize: 11,
+    fontWeight: '700',
+    letterSpacing: 0.3,
+    textTransform: 'uppercase',
   },
 
   total: {

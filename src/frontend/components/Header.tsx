@@ -56,7 +56,7 @@ export default function Header() {
     <header className={`header${scrolled ? ' header-scrolled' : ''}${loggingOut ? ' header-logout-fade' : ''}`}>
       <div className="header-inner">
         <Link to={isAuthenticated ? '/perfil' : '/'} className="header-logo">
-          INSIDER
+          OUTSIDER
         </Link>
 
         <nav className="header-catalog-nav">

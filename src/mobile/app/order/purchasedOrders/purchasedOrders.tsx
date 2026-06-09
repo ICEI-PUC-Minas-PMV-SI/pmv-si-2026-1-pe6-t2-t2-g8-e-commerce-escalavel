@@ -8,7 +8,7 @@ import DeliveredOrderModal from '@/src/components/modals/DeliveredOrderModal';
 import OrderDetailsModal from '@/src/components/modals/OrderDetailsModal';
 
 import { useAuth } from '@/src/contexts/AuthContext';
-import { orderService } from '@/src/services/orderService';
+import { orderService, OrderStatus } from '@/src/services/orderService';
 
 type OrderItem = {
   skuId: string;
@@ -62,36 +62,37 @@ export default function PurchasedOrders() {
   }, [user]);
 
   const activeOrders = orders.filter(
-    order => order.status !== 'Cancelado'
+    order => order.status !== OrderStatus.CANCELLED
   );
 
   const canceledOrders = orders.filter(
-    order => order.status === 'Cancelado'
+    order => order.status === OrderStatus.CANCELLED
   );
 
   function handleCancelOrder(order: Order) {
-    if (order.status === 'Entregue') {
-      setShowDeliveredModal(true);
-      return;
-    }
-
     setOrderToCancel(order.id);
     setShowCancelModal(true);
   }
 
-  function handleConfirmCancel() {
+  async function handleConfirmCancel() {
     if (!orderToCancel) return;
 
-    setOrders(prev =>
-      prev.map(order =>
-        order.id === orderToCancel
-          ? { ...order, status: 'Cancelado' }
-          : order
-      )
-    );
-
+    const id = orderToCancel;
     setOrderToCancel(null);
     setShowCancelModal(false);
+
+    try {
+      await orderService.cancelOrder(id);
+      setOrders(prev =>
+        prev.map(order =>
+          order.id === id
+            ? { ...order, status: OrderStatus.CANCELLED }
+            : order
+        )
+      );
+    } catch (err) {
+      console.log('Erro ao cancelar pedido:', err);
+    }
   }
 
   function handleDiscardOrder(orderId: string) {
@@ -144,7 +145,7 @@ export default function PurchasedOrders() {
                     status: order.status,
                     productName:
                       order.items.length === 1
-                        ? order.items[0].productName
+                        ? `Pedido - item ${order.items[0].productId}`
                         : `Pedido - ${order.items.length} itens`,
                     total: order.total,
                   }}

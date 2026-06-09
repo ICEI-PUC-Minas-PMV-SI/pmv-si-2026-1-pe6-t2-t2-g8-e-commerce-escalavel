@@ -167,7 +167,7 @@ export default function LoginPage() {
 
         {/* marca */}
         <div className="lv2-brand">
-          <span className="lv2-brand-text">INSIDER</span>
+          <span className="lv2-brand-text">OUTSIDER</span>
           <span className="lv2-brand-dot" style={{ background: cur.accent }} />
         </div>
 
@@ -228,7 +228,7 @@ export default function LoginPage() {
               <div className="lv2-head">
                 <p className="lv2-eyebrow">Bem-vindo</p>
                 <h1 className="lv2-title">Entrar</h1>
-                <p className="lv2-desc">Acesse sua conta INSIDER</p>
+                <p className="lv2-desc">Acesse sua conta OUTSIDER</p>
               </div>
 
               {/* erro global da API */}
@@ -312,6 +312,9 @@ export default function LoginPage() {
               <p className="lv2-footer">
                 Não tem conta?{' '}
                 <Link to="/cadastro" className="lv2-link">Criar conta grátis</Link>
+              </p>
+              <p className="lv2-footer">
+                <Link to="/" className="lv2-link">← Continuar para a loja</Link>
               </p>
             </>
           )}

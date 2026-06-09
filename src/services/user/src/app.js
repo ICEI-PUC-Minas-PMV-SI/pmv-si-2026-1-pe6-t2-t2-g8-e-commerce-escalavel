@@ -3,14 +3,10 @@
 const express = require('express');
 const app = express();
 
-// CORS — permite chamadas do frontend web e mobile (Expo)
-app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', '*');
-  res.header('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,PATCH,OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-  if (req.method === 'OPTIONS') return res.sendStatus(200);
-  next();
-});
+// CORS é tratado de forma centralizada pelo gateway (nginx). Não setar aqui:
+// o gateway usa add_header, que ACRESCENTA ao header do upstream, gerando
+// dois Access-Control-Allow-Origin na resposta ("*, http://origin") e o
+// browser rejeita com "Failed to fetch" mesmo em 200/201.
 
 app.use(express.json());
 

@@ -2,11 +2,10 @@ import { HttpClient, authHeader } from './httpClient';
 import { API_URL } from '@/src/config/env';
 
 export enum OrderStatus {
-  DRAFT = 'draft',
-  PENDING = 'pending',
-  CONFIRMED = 'confirmed',
-  CANCELLED = 'cancelled',
-  FAILED = 'failed',
+  CREATED = 'CREATED',
+  PAID = 'PAID',
+  CANCELLED = 'CANCELLED',
+  PAYMENT_FAILED = 'PAYMENT_FAILED',
 }
 
 export interface OrderItemResponse {

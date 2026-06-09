@@ -24,7 +24,6 @@ const PRICE_FORMATTER = new Intl.NumberFormat('pt-BR', {
   style: 'currency',
   currency: 'BRL',
 });
-
 export default function StockListScreen() {
   const router = useRouter();
   const [items, setItems] = useState<StockItemDetailed[]>([]);
@@ -76,8 +75,8 @@ export default function StockListScreen() {
   const renderItem = useCallback(
     ({ item }: { item: StockItemDetailed }) => {
       const p = item.product;
-      const subtitle = [p?.code, p?.size].filter(Boolean).join(' · ');
       const color = p?.color ?? '';
+      const size = p?.size ?? '';
       const params = {
         skuId: item.skuId,
         name: p?.name ?? '',
@@ -91,15 +90,23 @@ export default function StockListScreen() {
               <Text variant="titleMedium" numberOfLines={1} style={styles.titleText}>
                 {p?.name ?? 'Produto não encontrado'}
               </Text>
-              {!!color && (
-                <View style={[styles.colorDot, { backgroundColor: color }]} />
-              )}
             </View>
-            {subtitle ? (
+
+            {!!size && (
+              <View style={styles.attrRow}>
+                <View style={styles.sizeChip}>
+                  <Text style={styles.sizeChipLabel}>TAM</Text>
+                  <Text style={styles.sizeChipValue}>{size}</Text>
+                </View>
+              </View>
+            )}
+
+            {!!p?.code && (
               <Text variant="bodySmall" style={styles.muted}>
-                {subtitle}
+                Cód: {p.code}
               </Text>
-            ) : null}
+            )}
+
             <Text
               variant="bodySmall"
               style={styles.sku}
@@ -230,7 +237,22 @@ const styles = StyleSheet.create({
   cardBody: { gap: spacing.xxs },
   titleRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
   titleText: { flex: 1 },
-  colorDot: { width: 18, height: 18, borderRadius: 9, borderWidth: 1, borderColor: '#E5E7EB', flexShrink: 0 },
+
+  attrRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, marginTop: spacing.xs },
+
+  // Tamanho: chip sutil (cinza claro), valor em destaque suave.
+  sizeChip: {
+    flexDirection: 'row',
+    alignItems: 'baseline',
+    gap: 5,
+    backgroundColor: '#F3F4F6',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 8,
+  },
+  sizeChipLabel: { color: '#9CA3AF', fontSize: 9, fontWeight: '700', letterSpacing: 1 },
+  sizeChipValue: { color: '#374151', fontSize: 14, fontWeight: '800' },
+
   muted: { opacity: 0.6 },
   sku: {
     fontFamily: 'monospace',

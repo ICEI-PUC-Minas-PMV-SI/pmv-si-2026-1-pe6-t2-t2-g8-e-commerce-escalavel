@@ -62,7 +62,7 @@ export function ServicesDrawer({ visible, onDismiss }: Props) {
 
             {/* ── Cabeçalho ── */}
             <View style={s.header}>
-              <Text style={s.headerLabel}>INSIDER</Text>
+              <Text style={s.headerLabel}>OUTSIDER</Text>
               <Pressable onPress={onDismiss} style={s.closeBtn}>
                 <Text style={s.closeTxt}>✕</Text>
               </Pressable>
@@ -156,7 +156,7 @@ export function ServicesDrawer({ visible, onDismiss }: Props) {
               </Pressable>
             </View>
 
-            <Text style={s.version}>INSIDER · v1.0.0</Text>
+            <Text style={s.version}>OUTSIDER · v1.0.0</Text>
 
           </ScrollView>
         </View>

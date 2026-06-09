@@ -203,7 +203,7 @@ export default function AdminUsersScreen() {
         </View>
         <View style={s.heroTop}>
           <View>
-            <Text style={s.heroLabel}>INSIDER · ADMIN</Text>
+            <Text style={s.heroLabel}>OUTSIDER · ADMIN</Text>
             <Text style={s.heroTitle}>Gestão de{'\n'}Usuários</Text>
           </View>
           <Pressable

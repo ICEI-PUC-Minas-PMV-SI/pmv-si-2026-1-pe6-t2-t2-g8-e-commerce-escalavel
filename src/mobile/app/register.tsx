@@ -157,7 +157,7 @@ export default function RegisterScreen() {
         </View>
 
         <View style={s.heroContent}>
-          <Text style={s.brand}>INSIDER</Text>
+          <Text style={s.brand}>OUTSIDER</Text>
           <Text style={s.heroTitle}>Crie sua{'\n'}conta.</Text>
           <View style={s.accentLine} />
 

@@ -110,4 +110,4 @@ export class HttpClient {
     return payload as T;
   }
 
-}console.log('API URL:', process.env.EXPO_PUBLIC_API_URL);
+}

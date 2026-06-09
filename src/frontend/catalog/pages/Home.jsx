@@ -68,7 +68,7 @@ export default function Home() {
         <div className="hero-grid" />
 
         {/* marca */}
-        <div className="hero-brand">INSIDER</div>
+        <div className="hero-brand">OUTSIDER</div>
 
         {/* texto ambiente gigante */}
         <div
@@ -159,7 +159,7 @@ export default function Home() {
           {user ? (
             <>
               <div>
-                <p className="text-xs tracking-[0.25em] uppercase text-gray-400 mb-3">Insider</p>
+                <p className="text-xs tracking-[0.25em] uppercase text-gray-400 mb-3">Outsider</p>
                 <h2 className="text-3xl sm:text-4xl font-bold leading-tight">
                   Olá, {user.name.split(' ')[0]}.<br />
                   <span className="text-gray-300 text-2xl sm:text-3xl font-normal">O que você busca hoje?</span>
@@ -183,7 +183,7 @@ export default function Home() {
           ) : (
             <>
               <div>
-                <p className="text-xs tracking-[0.25em] uppercase text-gray-400 mb-3">Insider</p>
+                <p className="text-xs tracking-[0.25em] uppercase text-gray-400 mb-3">Outsider</p>
                 <h2 className="text-3xl sm:text-4xl font-bold leading-tight">
                   Crie sua conta<br />e aproveite mais.
                 </h2>

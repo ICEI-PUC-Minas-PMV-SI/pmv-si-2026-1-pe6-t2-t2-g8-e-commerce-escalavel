@@ -64,7 +64,7 @@ export default function LoginScreen() {
         ))}
       </View>
       <View style={s.heroContent}>
-        <Text style={[s.brand, { color: cur.accent }]}>INSIDER</Text>
+        <Text style={[s.brand, { color: cur.accent }]}>OUTSIDER</Text>
         <View style={s.slideNum}>
           <Text style={s.slideNumCur}>0{slide + 1}</Text>
           <Text style={s.slideNumSep}>/</Text>
@@ -105,7 +105,7 @@ export default function LoginScreen() {
       <View style={s.formHeader}>
         <Text style={s.formEyebrow}>Bem-vindo de volta</Text>
         <Text style={s.formTitle}>Entrar</Text>
-        <Text style={s.formSub}>Acesse sua conta INSIDER</Text>
+        <Text style={s.formSub}>Acesse sua conta OUTSIDER</Text>
       </View>
 
       <View style={s.fields}>
@@ -179,6 +179,14 @@ export default function LoginScreen() {
         activeOpacity={0.8}
       >
         <Text style={s.btnLabelDark}>Criar conta</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        onPress={() => router.replace('/')}
+        style={s.btnGhost}
+        activeOpacity={0.7}
+      >
+        <Text style={s.btnLabelGhost}>← Continuar para a loja</Text>
       </TouchableOpacity>
 
       <Text style={s.footerTxt}>
@@ -273,6 +281,8 @@ const s = StyleSheet.create({
   btnOutline:    { borderRadius: 10, borderColor: '#D1D5DB', borderWidth: 1.5, height: 54, alignItems: 'center', justifyContent: 'center' },
   btnLabel:      { fontSize: 15, fontWeight: '800', letterSpacing: 0.5, color: '#FFF' },
   btnLabelDark:  { fontSize: 15, fontWeight: '800', letterSpacing: 0.5, color: DARK },
+  btnGhost:      { height: 48, alignItems: 'center', justifyContent: 'center', marginTop: 12 },
+  btnLabelGhost: { fontSize: 14, fontWeight: '700', letterSpacing: 0.3, color: '#6B7280' },
 
   divRow:        { flexDirection: 'row', alignItems: 'center', marginVertical: 20 },
   divLine:       { flex: 1, height: 1, backgroundColor: '#E5E7EB' },

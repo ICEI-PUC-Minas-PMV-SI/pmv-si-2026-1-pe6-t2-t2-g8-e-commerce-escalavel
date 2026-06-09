@@ -244,19 +244,27 @@ export default function ProductDetailScreen() {
               <View style={s.variantRow}>
                 {variants.map((v) => {
                   const disabled = isVariantDisabled(v);
+                  const selected = selectedVariant?.id === v.id;
                   return (
                     <Pressable
                       key={v.id}
                       onPress={() => handleVariantSelect(v)}
                       disabled={disabled}
                       style={[
-                        s.variantSwatch,
-                        { backgroundColor: v.color || '#E5E7EB' },
-                        selectedVariant?.id === v.id && s.variantSwatchSelected,
-                        disabled && s.variantSwatchDisabled,
+                        s.variantChip,
+                        selected && s.variantChipSelected,
+                        disabled && s.variantChipDisabled,
                       ]}
                     >
-                      {disabled && <View style={s.swatchStrike} />}
+                      <Text
+                        style={[
+                          s.variantChipTxt,
+                          selected && s.variantChipTxtSelected,
+                          disabled && s.variantChipTxtDisabled,
+                        ]}
+                      >
+                        {v.color}
+                      </Text>
                     </Pressable>
                   );
                 })}
@@ -389,10 +397,12 @@ const s = StyleSheet.create({
 
   /* Variantes (cor) */
   variantRow:            { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.md },
-  variantSwatch:         { width: 38, height: 38, borderRadius: 19, borderWidth: 2, borderColor: '#E5E7EB', overflow: 'hidden', alignItems: 'center', justifyContent: 'center' },
-  variantSwatchSelected: { borderWidth: 3, borderColor: DARK, transform: [{ scale: 1.18 }] },
-  variantSwatchDisabled: { opacity: 0.35 },
-  swatchStrike:          { position: 'absolute', width: '140%', height: 2, backgroundColor: '#6B7280', transform: [{ rotate: '-45deg' }] },
+  variantChip:           { paddingHorizontal: 16, height: 40, borderRadius: 20, borderWidth: 1.5, borderColor: '#D1D5DB', backgroundColor: '#FFF', alignItems: 'center', justifyContent: 'center' },
+  variantChipSelected:   { borderColor: DARK, backgroundColor: DARK },
+  variantChipDisabled:   { opacity: 0.4, borderStyle: 'dashed' },
+  variantChipTxt:        { fontSize: 14, fontWeight: '700', color: DARK },
+  variantChipTxtSelected:{ color: '#FFF' },
+  variantChipTxtDisabled:{ textDecorationLine: 'line-through', color: '#9CA3AF' },
 
   /* SKUs */
   skuRow:         { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },

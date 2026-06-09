@@ -205,7 +205,7 @@ export default function RegisterPage() {
         <div className="lv2-grid" />
 
         <div className="lv2-brand">
-          <span className="lv2-brand-text">INSIDER</span>
+          <span className="lv2-brand-text">OUTSIDER</span>
           <span className="lv2-brand-dot" style={{ background: cur.accent }} />
         </div>
 
@@ -246,7 +246,7 @@ export default function RegisterPage() {
                 </svg>
               </div>
               <p className="lv2-success-title">Conta criada!</p>
-              <p className="lv2-success-sub">Bem-vindo à INSIDER.</p>
+              <p className="lv2-success-sub">Bem-vindo à OUTSIDER.</p>
             </div>
           ) : (
             <>

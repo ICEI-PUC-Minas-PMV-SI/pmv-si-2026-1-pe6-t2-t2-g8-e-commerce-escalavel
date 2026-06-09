@@ -12,7 +12,7 @@ function Navbar() {
     <nav className="sticky top-0 z-50 bg-gray-900 border-b border-gray-700">
       <div className="px-6 h-16 flex items-center justify-between">
         <Link to="/" className="text-white font-bold text-lg tracking-widest uppercase hover:text-blue-400 transition-colors">
-          Insider
+          Outsider
         </Link>
         <div className="flex items-center gap-8">
           <Link to="/" className={linkClass('/')}>Home</Link>

@@ -80,7 +80,7 @@ export default function LoginModal() {
             <div className="lm-header">
               <span className="lm-eyebrow">Bem-vindo</span>
               <h2 className="lm-title">Entrar</h2>
-              <p className="lm-desc">Acesse sua conta INSIDER</p>
+              <p className="lm-desc">Acesse sua conta OUTSIDER</p>
             </div>
 
             {error && (

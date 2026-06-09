@@ -31,7 +31,7 @@ export const stockService = {
   async list(signal?: AbortSignal): Promise<StockItem[]> {
     const raw = await http.get<StockItem[] | Envelope<StockItem[]>>('/stock/', {
       signal,
-      headers: authHeader(),
+      headers: await authHeader(),
     });
     return unwrapArray<StockItem>(raw);
   },
@@ -39,7 +39,7 @@ export const stockService = {
   async listDetailed(signal?: AbortSignal): Promise<StockItemDetailed[]> {
     const raw = await http.get<StockItemDetailed[] | Envelope<StockItemDetailed[]>>(
       '/stock/detailed-items',
-      { signal, headers: authHeader() }
+      { signal, headers: await authHeader() }
     );
     return unwrapArray<StockItemDetailed>(raw);
   },
@@ -48,7 +48,7 @@ export const stockService = {
     try {
       const raw = await http.get<StockItem | Envelope<StockItem>>(`/stock/${skuId}`, {
         signal,
-        headers: authHeader(),
+        headers: await authHeader(),
       });
       return unwrapObject<StockItem>(raw, null as unknown as StockItem) || null;
     } catch (err) {
@@ -59,7 +59,7 @@ export const stockService = {
 
   async create(payload: CreateStockPayload): Promise<StockItem> {
     const raw = await http.post<StockItem | Envelope<StockItem>>('/stock/', payload, {
-      headers: authHeader(),
+      headers: await authHeader(),
     });
     return unwrapObject<StockItem>(raw, raw as StockItem);
   },
@@ -68,7 +68,7 @@ export const stockService = {
     const raw = await http.put<StockItem | Envelope<StockItem>>(
       `/stock/${skuId}/restock`,
       payload,
-      { headers: authHeader() }
+      { headers: await authHeader() }
     );
     return unwrapObject<StockItem>(raw, raw as StockItem);
   },
@@ -77,7 +77,7 @@ export const stockService = {
     const raw = await http.put<StockItem | Envelope<StockItem>>(
       `/stock/${skuId}/adjust`,
       payload,
-      { headers: authHeader() }
+      { headers: await authHeader() }
     );
     return unwrapObject<StockItem>(raw, raw as StockItem);
   },
@@ -85,7 +85,7 @@ export const stockService = {
   async history(skuId: string, signal?: AbortSignal): Promise<StockMovement[]> {
     const raw = await http.get<StockMovement[] | Envelope<StockMovement[]>>(
       `/stock/${skuId}/history`,
-      { signal, headers: authHeader() }
+      { signal, headers: await authHeader() }
     );
     return unwrapArray<StockMovement>(raw);
   },

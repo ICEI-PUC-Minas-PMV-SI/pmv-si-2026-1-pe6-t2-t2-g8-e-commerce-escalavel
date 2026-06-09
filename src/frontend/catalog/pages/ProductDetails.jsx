@@ -30,18 +30,6 @@ async function fetchSkuStock(skuId) {
     }
 }
 
-// Retorna se a cor do CSS é válida no browser atual
-function isCssColor(value) {
-    if (!value) return false
-    try {
-        const el = document.createElement('span')
-        el.style.color = value
-        return el.style.color !== ''
-    } catch {
-        return false
-    }
-}
-
 export default function ProductDetails() {
     const { id } = useParams()
     const navigate = useNavigate()
@@ -172,7 +160,6 @@ export default function ProductDetails() {
                     <div className="flex gap-3 flex-wrap items-center">
                         {product.variants?.map(v => {
                             const isSelected = selectedVariant?.id === v.id
-                            const validCss = isCssColor(v.color)
                             const available = isVariantAvailable(v)
                             return (
                                 <button
@@ -180,21 +167,12 @@ export default function ProductDetails() {
                                     onClick={() => handleSelectVariant(v)}
                                     title={available ? v.color : `${v.color} — esgotado`}
                                     disabled={!available}
-                                    className={`relative flex items-center justify-center rounded-full border-2 transition-all focus:outline-none
-                                        ${validCss ? 'w-9 h-9' : 'px-3 py-1 h-9 text-xs font-medium'}
-                                        ${isSelected ? 'border-black scale-110 shadow-md' : 'border-gray-300'}
-                                        ${available ? 'hover:border-gray-600' : 'opacity-40 cursor-not-allowed'}
+                                    className={`flex items-center justify-center rounded-full border-2 px-4 py-1.5 text-sm font-medium whitespace-nowrap transition-all focus:outline-none
+                                        ${isSelected ? 'border-black bg-black text-white shadow-md' : 'border-gray-300 text-gray-800'}
+                                        ${available ? 'hover:border-gray-600' : 'opacity-40 cursor-not-allowed line-through'}
                                     `}
-                                    style={validCss ? { backgroundColor: v.color } : { backgroundColor: '#f3f4f6' }}
                                 >
-                                    {!validCss && (
-                                        <span className="text-gray-700 whitespace-nowrap">{v.color}</span>
-                                    )}
-                                    {!available && (
-                                        <span className="absolute inset-0 rounded-full flex items-center justify-center overflow-hidden">
-                                            <span className="block w-[140%] h-px bg-gray-600 rotate-45 opacity-70" />
-                                        </span>
-                                    )}
+                                    {v.color}
                                 </button>
                             )
                         })}
