@@ -1,55 +1,941 @@
 # Front-end Móvel
 
-[Inclua uma breve descrição do projeto e seus objetivos.]
+O front-end móvel do e-commerce escalável é desenvolvido com **React Native via Expo**, entregando uma experiência nativa em iOS e Android a partir de uma única base de código. A aplicação cobre os principais domínios da plataforma — catálogo, notificações, pagamentos, estoque e usuários — organizados em módulos independentes que consomem cada microserviço de backend via API REST.
+
+---
+
+# Front-end Móvel — Módulo de Catálogo
+
+O módulo de catálogo é o coração da aplicação mobile: permite que clientes naveguem por produtos organizados em categorias, filtrem por nome, visualizem variantes de cor e tamanho com verificação de estoque em tempo real e adicionem itens ao carrinho. Administradores têm, na mesma interface, acesso a criação, edição e exclusão de produtos, variantes e SKUs.
+
+---
 
 ## Projeto da Interface
-[Descreva o projeto da interface móvel da aplicação, incluindo o design visual, layout das páginas, interações do usuário e outros aspectos relevantes.]
+
+O módulo é composto por quatro telas principais conectadas por navegação em pilha (Expo Router) e um formulário modal exclusivo para administradores:
+
+- **`CatalogScreen`** — tela inicial com busca, filtros por categoria e grade de produtos.
+- **`CategoriesScreen`** — listagem e gerenciamento de categorias.
+- **`ProductsByCategoryScreen`** — produtos filtrados por categoria selecionada.
+- **`ProductDetailScreen`** — detalhe completo com seleção de variante, SKU, quantidade e adição ao carrinho.
+- **`ProductFormScreen`** — formulário modal (admin) para criar e editar produtos com variantes e SKUs.
 
 ### Wireframes
 
-[Inclua os wireframes das páginas principais da interface, mostrando a disposição dos elementos na página.]
+#### Tela Principal — Catálogo (`/`)
+
+```
+┌─────────────────────────────┐
+│  Bom dia, Nome usuário      │
+│  12 produtos encontrados    │
+│                             │
+│  [🔍 Buscar produto...]     │
+│                             │
+│  [Todos][Camisetas][Calças] │
+│                             │
+│  ┌──────┐  ┌──────┐        │
+│  │ IMG  │  │ IMG  │        │
+│  │[Cat] │  │[Cat] │        │
+│  │Nome  │  │Nome  │        │
+│  │R$ XX │  │R$ XX │        │
+│  └──────┘  └──────┘        │
+│  ┌──────┐  ┌──────┐        │
+│  │  ... │  │  ... │        │
+│  └──────┘  └──────┘        │
+│                          [+]│
+└─────────────────────────────┘
+```
+
+Elementos da tela:
+- **Barra de busca:** filtragem local em tempo real por nome do produto.
+- **Chips de categoria:** scroll horizontal; ao selecionar uma categoria, dispara nova requisição à API.
+- **Grade 2 colunas:** `ProductCard` clicável (navega ao detalhe) e com long-press para ações admin.
+- **FAB `+`:** visível apenas para administradores, abre o formulário de criação.
+
+#### Tela de Detalhe — `/catalog/product/[id]`
+
+```
+┌─────────────────────────────┐
+│ ←  Nome do Produto          │
+│                             │
+│  ┌─────────────────────┐   │
+│  │       IMAGEM         │   │
+│  └─────────────────────┘   │
+│  [Categoria]                │
+│  Nome do Produto            │
+│  Descrição do produto...    │
+│                             │
+│  Cor:                       │
+│  ●  ●  ○  (swatches)       │
+│                             │
+│  Tamanho:                   │
+│  [P R$50] [M R$55] [G R$60]│
+│                             │
+│  Quantidade:  [−] 1 [+]    │
+│                             │
+│  [ Adicionar ao Carrinho  ] │
+└─────────────────────────────┘
+```
+
+Elementos da tela:
+- **Imagem:** carregamento com `expo-image`; fallback para ícone `image-off` em caso de erro.
+- **Badge de categoria** e **preço dinâmico**: exibe menor preço sem seleção; atualiza ao selecionar SKU.
+- **Swatches de cor:** variantes esgotadas com opacidade reduzida e riscado.
+- **Chips de tamanho:** SKUs sem estoque desabilitados.
+- **Seletor de quantidade:** limitado ao estoque disponível menos itens já no carrinho.
+- **Botões admin:** editar e excluir, visíveis apenas para `role === 'admin'`.
+
+#### Formulário de Produto — `/catalog/admin/product-form` (modal)
+
+```
+┌─────────────────────────────┐
+│  Novo Produto            ✕  │
+│                             │
+│  Nome *                     │
+│  [ Nome do produto       ]  │
+│  Descrição                  │
+│  [ Descrição...          ]  │
+│  URL da imagem              │
+│  [ https://...           ]  │
+│  Categoria                  │
+│  [ Selecionar ▾          ]  │
+│                             │
+│  Variantes                  │
+│  ┌───────────────────────┐  │
+│  │ ● Azul         1 SKU  │  │
+│  │   [P  SKU-001  R$50 ] │  │
+│  │   [+ Adicionar SKU  ] │  │
+│  └───────────────────────┘  │
+│  [+ Adicionar variante    ]  │
+│                             │
+│  [  Cancelar  ] [  Salvar ] │
+└─────────────────────────────┘
+```
+
+---
 
 ### Design Visual
 
-[Descreva o estilo visual da interface, incluindo paleta de cores, tipografia, ícones e outros elementos gráficos.]
+| Item | Definição |
+|---|---|
+| Framework de UI | React Native Paper (Material Design 3) |
+| Fundo de tela | Branco / `#F8F9FA` |
+| Cards de produto | `Card` do Paper com sombra leve |
+| Badge de categoria | Fundo colorido arredondado, `labelSmall` |
+| Preço | Negrito, `20sp`, cor primária do tema |
+| Swatch de cor selecionado | Anel de borda dupla na cor escolhida |
+| Swatch esgotado | Opacidade `0.4`, linha riscada |
+| Chip de SKU desabilitado | Opacidade reduzida, não interativo |
+| Botão "Adicionar ao Carrinho" | Botão primário ocupando largura total |
+| FAB de criação | Ícone `+`, posição fixa inferior direita |
+| Skeleton loading | Retângulos animados no lugar dos cards |
+| Banner de erro | Fundo vermelho com mensagem e botão retry |
+
+Estilos aplicados via `StyleSheet` do React Native combinados com componentes do `react-native-paper`.
+
+---
 
 ## Fluxo de Dados
 
-[Diagrama ou descrição do fluxo de dados na aplicação.]
+```
+Backend (CatalogService :7000)
+        │
+        │  GET  /api/catalog/products          (lista com filtros)
+        │  GET  /api/catalog/products/{id}     (detalhe + variantes + SKUs)
+        │  POST /api/catalog/products          (admin)
+        │  PUT  /api/catalog/products/{id}     (admin)
+        │  DELETE /api/catalog/products/{id}   (admin)
+        │  GET  /api/catalog/categories
+        │  POST /api/catalog/categories        (admin)
+        │  PUT  /api/catalog/categories/{id}   (admin)
+        │  DELETE /api/catalog/categories/{id} (admin)
+        │  POST /api/catalog/products/{id}/variants  (admin)
+        │  POST /api/catalog/variants/{id}/skus      (admin)
+        │  PATCH /api/catalog/skus/{id}              (admin)
+        │
+Backend (StockService)
+        │  GET  /stock/{skuId}   → quantityAvailable (por SKU, paralelo)
+        │
+        ▼
+App Mobile (React Native / Expo)
+        │
+        ├─► CatalogScreen         → lista de produtos + busca + filtro categoria
+        ├─► CategoriesScreen      → gestão de categorias
+        ├─► ProductsByCategoryScreen → produtos filtrados
+        ├─► ProductDetailScreen   → detalhe + variante/SKU/qtd + carrinho
+        │        └─► CartContext.addItem()  → estado global do carrinho
+        └─► ProductFormScreen     → criação/edição (admin)
+```
+
+**Como funciona:**
+1. `CatalogScreen` carrega categorias e produtos em paralelo no `useEffect`.
+2. Ao selecionar uma categoria, dispara `getProducts({ categoryId })` — nova requisição à API.
+3. A busca por nome filtra localmente o array já carregado.
+4. `ProductDetailScreen` busca o produto pelo id e, em paralelo, consulta o estoque de cada SKU via `stockService.getBySku()`.
+5. `handleAddToCart()` grava no `CartContext` (estado em memória) com `skuId`, `productId`, `unitPrice`, `size`, `color` e `quantity`.
+6. O formulário admin encadeia criação de produto → variantes → SKUs em sequência.
+
+---
 
 ## Tecnologias Utilizadas
 
-[Lista das tecnologias principais que serão utilizadas no projeto.]
+| Tecnologia | Versão | Uso |
+|---|---|---|
+| React Native | 0.81.5 | Framework base para UI nativa |
+| Expo | ~54 | Toolchain, build e APIs nativas |
+| expo-router | 6.0.23 | Navegação file-based com rotas tipadas |
+| react-native-paper | 5.15.2 | Componentes Material Design 3 |
+| expo-image | — | Carregamento otimizado de imagens |
+| @expo/vector-icons | — | Ícones MaterialCommunityIcons |
+| TypeScript | ~5.8 | Tipagem estática em todo o projeto |
+| React Context API | — | Estado global (CartContext, AuthContext) |
+| Fetch API nativa | — | Chamadas HTTP via httpClient customizado |
+
+---
 
 ## Considerações de Segurança
 
-[Discuta as considerações de segurança relevantes para a aplicação distribuída, como autenticação, autorização, proteção contra ataques, etc.]
+| Tópico | Estado atual |
+|---|---|
+| Autenticação | Requisições de escrita enviam `Authorization: Bearer <token>` via `httpClient.ts` |
+| Autorização | Controle de visibilidade de ações admin por `user?.role === 'admin'` no front-end; validação real no backend |
+| Validação de formulários | Nome obrigatório, preço ≥ 0, variante sem cor bloqueia envio |
+| Proteção de URLs de imagem | Caminhos relativos são prefixados com `IMAGE_BASE_URL` configurado; sem carregamento de conteúdo externo arbitrário |
+| Limite de quantidade | Máximo adicionável ao carrinho restringido ao `quantityAvailable` retornado pelo StockService |
+| Erros de API | Mensagens de erro exibidas sem expor detalhes internos; respostas HTML inesperadas detectadas e traduzidas |
+| Transporte | HTTP em desenvolvimento; HTTPS obrigatório em produção |
+
+---
 
 ## Implantação
 
-[Instruções para implantar a aplicação distribuída em um ambiente de produção.]
+**Pré-requisitos:** Node.js 20+, Expo CLI e Docker Desktop instalados.
 
-1. Defina os requisitos de hardware e software necessários para implantar a aplicação em um ambiente de produção.
-2. Escolha uma plataforma de hospedagem adequada, como um provedor de nuvem ou um servidor dedicado.
-3. Configure o ambiente de implantação, incluindo a instalação de dependências e configuração de variáveis de ambiente.
-4. Faça o deploy da aplicação no ambiente escolhido, seguindo as instruções específicas da plataforma de hospedagem.
-5. Realize testes para garantir que a aplicação esteja funcionando corretamente no ambiente de produção.
+1. Subir o banco e o backend de catálogo:
+   ```powershell
+   cd src/services/catalog
+   dotnet run
+   ```
+2. Configurar as variáveis de ambiente em `src/mobile/.env`:
+   ```
+   EXPO_PUBLIC_API_URL=http://192.168.0.4:7000/api
+   EXPO_PUBLIC_IMAGE_BASE_URL=http://192.168.0.4:7000/images/products
+   ```
+3. Subir o app mobile:
+   ```powershell
+   cd src/mobile
+   npx expo start
+   ```
+4. Pressionar **W** para abrir no navegador ou escanear o QR Code com o **Expo Go** no celular.
+5. A aba **Home** já exibe o catálogo ao iniciar.
+
+---
 
 ## Testes
 
-[Descreva a estratégia de teste, incluindo os tipos de teste a serem realizados (unitários, integração, carga, etc.) e as ferramentas a serem utilizadas.]
+### Estratégia
 
-1. Crie casos de teste para cobrir todos os requisitos funcionais e não funcionais da aplicação.
-2. Implemente testes unitários para testar unidades individuais de código, como funções e classes.
-3. Realize testes de integração para verificar a interação correta entre os componentes da aplicação.
-4. Execute testes de carga para avaliar o desempenho da aplicação sob carga significativa.
-5. Utilize ferramentas de teste adequadas, como frameworks de teste e ferramentas de automação de teste, para agilizar o processo de teste.
+Testes funcionais manuais executados em ambiente local, cobrindo as interações do **módulo de Catálogo** no front-end móvel. Pré-condição global: `CatalogService` ativo e ao menos um produto cadastrado.
 
-# Referências
+---
 
-Inclua todas as referências (livros, artigos, sites, etc) utilizados no desenvolvimento do trabalho.
+### Mapeamento de interações
 
---- 
+| ID | Interação | Componente | API back-end |
+|---|---|---|---|
+| M-C1 | Listar produtos com busca e filtro | `CatalogScreen` | `GET /catalog/products` |
+| M-C2 | Filtrar produtos por categoria | `CatalogScreen` | `GET /catalog/products?categoryId=` |
+| M-C3 | Visualizar detalhe do produto | `ProductDetailScreen` | `GET /catalog/products/{id}` |
+| M-C4 | Verificar estoque por SKU | `ProductDetailScreen` | `GET /stock/{skuId}` |
+| M-C5 | Adicionar produto ao carrinho | `ProductDetailScreen` | — (CartContext local) |
+| M-C6 | Gerenciar categorias (admin) | `CategoriesScreen` | `GET/POST/PUT/DELETE /catalog/categories` |
+| M-C7 | Criar/editar produto com variantes (admin) | `ProductFormScreen` | `POST/PUT /catalog/products` + variants + skus |
+
+---
+
+### Casos de teste
+
+#### Catálogo Mobile — M-C1: Listagem e busca
+
+##### TC-M-C1-01 · Carregar lista de produtos
+
+- **Pré-condições:**
+  - Backend ativo, ao menos 1 produto cadastrado.
+- **Passos:**
+  1. Abrir o app na tela inicial (aba Home).
+- **Resultado esperado:**
+  - Grade de cards exibida com imagem, categoria, nome e preço.
+  - Contagem de produtos atualizada no header.
+  - Skeleton cards visíveis durante o carregamento.
+
+---
+
+##### TC-M-C1-02 · Buscar produto por nome
+
+- **Pré-condições:**
+  - Lista de produtos carregada com ≥ 2 itens de nomes distintos.
+- **Passos:**
+  1. Digitar parte do nome de um produto no campo de busca.
+- **Resultado esperado:**
+  - Lista reduzida em tempo real aos produtos cujo nome contém o texto digitado.
+  - Limpar o campo restaura a lista completa.
+
+---
+
+##### TC-M-C1-03 · Estado vazio
+
+- **Pré-condições:**
+  - Nenhum produto cadastrado ou busca sem resultado.
+- **Passos:**
+  1. Abrir a tela ou digitar texto sem correspondência na busca.
+- **Resultado esperado:**
+  - Mensagem de estado vazio exibida no lugar da grade.
+
+---
+
+##### TC-M-C1-04 · Pull-to-refresh
+
+- **Pré-condições:**
+  - Lista carregada.
+- **Passos:**
+  1. Arrastar a lista para baixo (gesto pull-to-refresh).
+- **Resultado esperado:**
+  - Indicador de carregamento exibido brevemente.
+  - Lista atualizada com dados mais recentes do backend.
+
+---
+
+#### Catálogo Mobile — M-C2: Filtro por categoria
+
+##### TC-M-C2-01 · Filtrar por categoria selecionada
+
+- **Pré-condições:**
+  - Ao menos 2 categorias e produtos em cada uma.
+- **Passos:**
+  1. Tocar em um chip de categoria na barra horizontal.
+- **Resultado esperado:**
+  - Lista recarregada exibindo apenas produtos da categoria selecionada.
+  - Chip selecionado com estado visual ativo.
+
+---
+
+##### TC-M-C2-02 · Remover filtro voltando para "Todos"
+
+- **Passos:**
+  1. Com filtro de categoria ativo, tocar no chip "Todos".
+- **Resultado esperado:**
+  - Lista recarregada com todos os produtos sem filtro.
+
+---
+
+#### Catálogo Mobile — M-C3/C4: Detalhe do produto e estoque
+
+##### TC-M-C3-01 · Abrir detalhe do produto
+
+- **Passos:**
+  1. Tocar em um card de produto na grade.
+- **Resultado esperado:**
+  - Navega para `/catalog/product/[id]`.
+  - Imagem, categoria, nome, descrição e preço mínimo exibidos.
+  - Swatches de cor e chips de tamanho visíveis se o produto tiver variantes.
+
+---
+
+##### TC-M-C4-01 · SKU esgotado desabilitado
+
+- **Pré-condições:**
+  - Produto com ao menos um SKU com `quantityAvailable = 0`.
+- **Passos:**
+  1. Abrir o detalhe do produto.
+- **Resultado esperado:**
+  - Chip do SKU esgotado exibido como desabilitado (opacidade reduzida).
+  - Não é possível selecioná-lo.
+
+---
+
+##### TC-M-C4-02 · Variante inteiramente esgotada desabilitada
+
+- **Pré-condições:**
+  - Variante cujos todos os SKUs têm `quantityAvailable = 0`.
+- **Passos:**
+  1. Abrir o detalhe do produto.
+- **Resultado esperado:**
+  - Swatch da variante exibido com opacidade reduzida e riscado.
+  - Não é possível selecioná-lo.
+
+---
+
+##### TC-M-C4-03 · Preço atualiza ao selecionar SKU
+
+- **Passos:**
+  1. No detalhe do produto, selecionar variante e depois um chip de tamanho.
+- **Resultado esperado:**
+  - Preço exibido atualiza para o valor exato do SKU selecionado.
+
+---
+
+#### Catálogo Mobile — M-C5: Adicionar ao carrinho
+
+##### TC-M-C5-01 · Adicionar item com variante e tamanho selecionados
+
+- **Pré-condições:**
+  - Produto com variante e SKU com estoque disponível.
+- **Passos:**
+  1. Selecionar cor (variante) e tamanho (SKU).
+  2. Ajustar quantidade para `2`.
+  3. Tocar em **Adicionar ao Carrinho**.
+- **Resultado esperado:**
+  - Botão exibe feedback visual de confirmação.
+  - `CartContext` contém item com `skuId`, `color`, `size`, `quantity = 2`.
+
+---
+
+##### TC-M-C5-02 · Quantidade limitada ao estoque disponível
+
+- **Pré-condições:**
+  - SKU com `quantityAvailable = 3`.
+- **Passos:**
+  1. Selecionar o SKU.
+  2. Tentar aumentar a quantidade além de `3`.
+- **Resultado esperado:**
+  - Botão `+` bloqueado ao atingir o limite de estoque.
+  - Valor máximo exibido é `3`.
+
+---
+
+#### Catálogo Mobile — M-C6: Gerenciar categorias (admin)
+
+##### TC-M-C6-01 · Criar nova categoria
+
+- **Pré-condições:**
+  - Usuário autenticado com `role = admin`.
+- **Passos:**
+  1. Navegar para `/catalog/categories`.
+  2. Tocar no FAB `+`.
+  3. Preencher nome e descrição.
+  4. Tocar em **Criar**.
+- **Resultado esperado:**
+  - Modal fecha, nova categoria aparece na grade.
+
+---
+
+##### TC-M-C6-02 · Excluir categoria com confirmação
+
+- **Passos:**
+  1. Long-press em um card de categoria.
+  2. Selecionar **Excluir** no menu de contexto.
+  3. Confirmar no dialog.
+- **Resultado esperado:**
+  - Categoria removida da grade sem reload manual.
+
+---
+
+#### Catálogo Mobile — M-C7: Formulário de produto (admin)
+
+##### TC-M-C7-01 · Criar produto com variante e SKU
+
+- **Pré-condições:**
+  - Usuário autenticado com `role = admin`.
+- **Passos:**
+  1. Tocar no FAB `+` no catálogo.
+  2. Preencher nome, descrição, URL de imagem e selecionar categoria.
+  3. Tocar em **Adicionar variante**, escolher cor.
+  4. Tocar em **Adicionar SKU**, preencher tamanho, código e preço.
+  5. Tocar em **Salvar**.
+- **Resultado esperado:**
+  - Modal fecha, produto aparece no catálogo.
+  - Variante e SKU associados e visíveis no detalhe do produto.
+
+---
+
+##### TC-M-C7-02 · Validação — nome obrigatório
+
+- **Passos:**
+  1. Abrir formulário de criação e deixar o campo nome vazio.
+  2. Tocar em **Salvar**.
+- **Resultado esperado:**
+  - Banner de erro exibido: campo nome é obrigatório.
+  - Nenhuma requisição ao backend.
+
+---
+
+##### TC-M-C7-03 · Validação — preço negativo bloqueado
+
+- **Passos:**
+  1. No formulário, adicionar variante e SKU com preço `-5`.
+  2. Tocar em **Salvar**.
+- **Resultado esperado:**
+  - Banner de erro: preço deve ser maior ou igual a zero.
+  - Envio bloqueado.
+
+---
+
+## Referências
+
+- [Expo Documentation](https://docs.expo.dev/)
+- [Expo Router — File-based routing](https://docs.expo.dev/router/introduction/)
+- [React Native Paper](https://callstack.github.io/react-native-paper/)
+- [React Native — Documentação oficial](https://reactnative.dev/docs/getting-started)
+- `src/mobile/src/screens/CatalogScreen.tsx`
+- `src/mobile/app/catalog/product/[id].tsx`
+- `src/mobile/app/catalog/categories.tsx`
+- `src/mobile/app/catalog/products.tsx`
+- `src/mobile/app/catalog/admin/product-form.tsx`
+- `src/mobile/src/components/ProductCard.tsx`
+- `src/mobile/src/services/catalogService.ts`
+- `src/mobile/src/services/stockService.ts`
+- `src/mobile/contexts/CartContext.tsx`
+- `src/mobile/src/types/catalog.ts`
+
+---
+
+## Tela de Produtos por Categoria — `/catalog/products`
+
+A tela `ProductsByCategoryScreen` é acessada ao tocar em um card na `CategoriesScreen`. Recebe `categoryId` e `categoryName` como parâmetros de URL e exibe somente os produtos daquela categoria. O título da navegação é definido dinamicamente com o nome da categoria.
+
+### Wireframe
+
+```
+┌─────────────────────────────┐
+│ ←  Camisetas                │  ← título dinâmico (categoryName)
+├─────────────────────────────┤
+│  3 produtos                 │
+│                             │
+│  ┌──────┐  ┌──────┐        │
+│  │ IMG  │  │ IMG  │        │
+│  │[Cat] │  │[Cat] │        │
+│  │Nome  │  │Nome  │        │
+│  │R$ XX │  │R$ XX │        │
+│  └──────┘  └──────┘        │
+│  ┌──────┐                  │
+│  │ IMG  │                  │
+│  └──────┘                  │
+└─────────────────────────────┘
+```
+
+**Diferenças em relação à `CatalogScreen`:**
+- Sem barra de busca por texto (filtro já é a categoria).
+- Sem chips de categoria (contexto já fixado).
+- Sem FAB de criação — tela somente leitura para qualquer perfil.
+- Contagem de produtos exibida acima da grade (`N produtos`).
+- Pull-to-refresh disponível.
+
+### Estados da tela
+
+| Estado | Comportamento |
+|---|---|
+| Carregando | 6 skeleton cards animados em grade 2×N |
+| Erro de backend | Banner com ícone 📡, mensagem e botão "⟳ Tentar novamente" |
+| Lista vazia | Ícone 🛍, "Nenhum produto nesta categoria" + hint de pull-to-refresh |
+| Lista carregada | Grade 2 colunas de `ProductCard`; toque navega para `/catalog/product/[id]` |
+
+---
+
+## Detalhes de Implementação do Módulo de Catálogo
+
+### Cancelamento de requisições com `AbortController`
+
+Todas as telas do módulo usam `AbortController` para cancelar chamadas HTTP pendentes ao sair da tela ou desmontar o componente. O padrão é aplicado via `useFocusEffect` (re-executa ao focar) e `useEffect` (executa uma vez):
+
+```ts
+useFocusEffect(
+  useCallback(() => {
+    const ctrl = new AbortController();
+    setLoading(true);
+    load(ctrl.signal).finally(() => setLoading(false));
+    return () => ctrl.abort();   // limpeza ao desfocar/desmontar
+  }, [load])
+);
+```
+
+### Cálculo de preço mínimo (`ProductDetailScreen`)
+
+Quando nenhum SKU está selecionado, o preço exibido é calculado como o menor valor entre todos os SKUs de todas as variantes do produto:
+
+```
+A partir de R$ XX,XX
+```
+
+Ao selecionar um SKU específico, o preço muda para o valor exato daquele SKU.
+
+### Feedback de adição ao carrinho (`ProductDetailScreen`)
+
+Ao adicionar um item, o botão "Adicionar ao carrinho" exibe "✓ Adicionado ao carrinho" (fundo verde `#22C55E`) por 2 segundos e retorna ao estado original automaticamente, sem navegar para o carrinho.
+
+### Endpoints adicionais do `catalogService`
+
+Os métodos abaixo estão implementados em `catalogService.ts` e cobrem o gerenciamento completo de variantes e SKUs em administração:
+
+| Método | Endpoint | Descrição |
+|---|---|---|
+| `deleteVariant(variantId)` | `DELETE /catalog/variants/{id}` | Remove variante e seus SKUs |
+| `deleteSku(skuId)` | `DELETE /catalog/skus/{id}` | Remove SKU individual |
+| `getProducts({ minPrice, maxPrice })` | `GET /catalog/products?minPrice=&maxPrice=` | Filtro de faixa de preço (parâmetros opcionais) |
+
+### Tipos TypeScript do domínio (`catalog.ts`)
+
+```ts
+interface Category  { id: string; name: string; description?: string | null; }
+interface Sku       { id: string; price: number; size?: string | null; code?: string | null; }
+interface Variant   { id: string; color?: string | null; skus?: Sku[]; }
+interface Product   { id: string; name: string; description?: string | null; urlImg?: string | null;
+                      active?: boolean; category?: Category | null; variants?: Variant[]; }
+interface ProductFilters { name?: string; categoryId?: string; minPrice?: number | string; maxPrice?: number | string; }
+```
+
+### Tokens de design reais (extraídos do código)
+
+| Token | Valor | Uso |
+|---|---|---|
+| `DARK` | `#0A0A0A` | Fundo da status bar em `CatalogScreen`, cor de botão primário |
+| `ACCENT` | `#C9A96E` | Cor dourada de destaque em swatches selecionados e badge de categoria |
+| Fundo principal | `#F3F4F6` | Background de todas as telas do catálogo |
+| Fundo header | `#FFFFFF` | Header flutuante da `CatalogScreen` |
+| Texto secundário | `#9CA3AF` | Saudação, contagem de resultados, hints |
+| Texto terciário | `#6B7280` | Mensagens de erro e descrições |
+| Skeleton | `#F3F4F6` | Cards de carregamento animados |
+| Swatch desabilitado | opacidade `0.35` | Variante completamente esgotada |
+| SKU desabilitado | opacidade `0.4` | Chip de tamanho sem estoque |
+
+---
+
+
+# Front-end Móvel — Módulo de Pedidos
+
+O módulo de pedidos é responsável pelo gerenciamento local de itens selecionados para compra, validação de disponibilidade de estoque em tempo real e acompanhamento do ciclo de vida dos pedidos realizados. Consome o `StockService` via `stockService.ts` para checagem de SKUs e o `OrderService` via `orderService.ts` para recuperar e atualizar o histórico de compras. Depende do `CartContext` para gerenciar os itens e do `AuthContext` para carregar as ordens vinculadas ao usuário autenticado.
+
+---
+
+## Projeto da Interface
+
+O subdomínio deste módulo é composto pelas seguintes telas e modais de controle:
+
+- **`cart.tsx`** — Gerenciamento quantitativo de itens no carrinho com verificação assíncrona de estoque em tempo real.
+- **`order/purchasedOrders/purchasedOrders.tsx`** — Painel de histórico segmentado entre pedidos ativos (em processamento/entregues) e cancelados.
+- Modais auxiliares: `CancelOrderModal.tsx`, `DeliveredOrderModal.tsx` e `OrderDetailsModal.tsx` para detalhamento e controle de fluxo do histórico.
+
+### Wireframes
+
+#### Tela de Carrinho — `/cart`
+
+```
+┌─────────────────────────────────────┐
+│ Carrinho                            │
+├─────────────────────────────────────┤
+│ ⚠ "Camiseta Minimalist" está sem    │
+│   estoque suficiente.               │
+├─────────────────────────────────────┤
+│ [✓] [IMG] Camiseta Minimalist       │
+│     M · R$ 120,00                   │
+│     [ - ]  2  [ + ]        [Excluir]│
+├─────────────────────────────────────┤
+│ Total                               │
+│ R$ 240,00                           │
+│                                     │
+│ [ X Finalizar Compra ]  (Desabilit.)│
+│ [ Continuar Comprando ]             │
+└─────────────────────────────────────┘
+```
+
+#### Elementos da tela:
+
+- **Banner de Alerta:** Exibido dinamicamente no topo caso a quantidade de qualquer SKU selecionado ultrapasse o limite disponível retornado pelo `stockService.getBySku`.
+- **Listagem Interactiva:** Permite selecionar/deselecionar itens via checkbox, incrementar ou decrementar quantidades e remoção direta.
+- **Footer de Ação:** Calcula a soma total baseada estritamente nos itens marcados e bloqueia o avanço para o checkout se houver alguma inconsistência de estoque.
+
+#### Tela de Meus Pedidos — `/order/purchasedOrders/purchasedOrders`
+```
+┌─────────────────────────────────────┐
+│ Meus pedidos                        │
+├─────────────────────────────────────┤
+│ #ORD-98432 · Processando            │
+│ Pedido - 2 itens        R$ 240,00   │
+│ [ Detalhes ] [ Cancelar Pedido ]    │
+├─────────────────────────────────────┤
+│ Pedidos cancelados                  │
+│ ┌─────────────────────────────────┐ │
+│ │ #ORD-91211 · Cancelado          │ │
+│ │ Pedido - item 412     R$ 120,00 │ │
+│ │ [ Detalhes ] [ Descartar ]      │ │
+│ └─────────────────────────────────┘ │
+└─────────────────────────────────────┘
+```
+#### Elementos da tela:
+- **Segregação de Estados:** Separa os pedidos em tempo de execução. A subseção inferior agrupa os registros com status "Cancelado" aplicando um efeito visual esmaecido.
+- **Interceptação de Ações:** O acionamento de "Cancelar Pedido" avalia o estado atual do registro; caso já conste como "Entregue", impede o cancelamento e desvia o fluxo para um modal informativo.
+- **Descarte Local:** A opção "Descartar" remove a visualização do card cancelado do estado local da lista do usuário.
+
+---
+
+## Design Visual
+
+| Item | Definição |
+|---|---|
+| Caixa de Alerta (Falta de Estoque) | Banner superior com ícone de atenção e texto de aviso |
+| Divisores e Bordas | Cor `#E5E7EB` para separação de itens e seções |
+| Seção Cancelada | Container inferior com opacidade reduzida (`opacity: 0.65`) |
+| Texto de Subtítulo/Status | Tons neutros `#6B7280` ou `#9CA3AF` |
+| Cards de Pedidos | Renderizados via componente especializado `OrderCard` |
+
+---
+
+## Fluxo de Dados
+
+```
+Backend (StockService :8081)  Backend (OrderService :8082)
+│                             │
+│ GET /stock/sku/:id          │ GET  /orders/user/:userId (Histórico)
+│ (Valida estoque disponível) │
+│                             │
+▼                             ▼
+App Mobile (React Native / Expo)
+│
+├─► CartContext ────► Provê os itens do carrinho, remoção e mutação de quantidade
+├─► AuthContext ────► Provê o user.id do usuário logado para carregar o histórico
+├─► cart.tsx ───────► Dispara Promise.all para checar estoque de todos os SKUs ao focar na tela
+└─► purchasedOrders.tsx ► Carrega ordens do usuário e gerencia modais de controle (detalhes/cancelamento)
+```
+
+---
+
+**Como funciona:**
+1. **Validação de Estoque:** Toda vez que a tela de carrinho recebe foco (`useFocusEffect`), o app mapeia todos os itens e dispara requisições paralelas para `GET /stock/sku/:id`. O resultado alimenta um dicionário local que valida se o estoque suporta a quantidade desejada.
+2. **Carregamento de Pedidos:** Ao montar a tela de histórico, o `user.id` ativo é capturado do `AuthContext` para buscar os dados em `GET /orders/user/:userId`.
+3. **Cálculo de Totais no Histórico:** Como o serviço de persistência retorna os preços unitários por item, a tela realiza uma normalização calculando o valor total de cada ordem dinamicamente somando o produto de `unitPrice * quantity`.
+
+---
+
+## Tecnologias Utilizadas
+
+| Tecnologia | Uso |
+|---|---|
+| useFocusEffect (expo-router) | Força a revalidação assíncrona do estoque do carrinho sempre que o usuário navega de volta para a tela. |
+| React Native Paper | Fornece componentes de layout estrutural (Banner) e os modais injetados na árvore de renderização. |
+
+---
+
+## Considerações de Consistência e Negócio
+
+| Tópico | Regra Implementada |
+|---|---|
+| Bloqueio de Segurança | O botão de avanço do carrinho é desabilitado em tempo real caso o volume de um item marcado exceda o saldo retornado pelo serviço de estoque. |
+| Integridade de Fluxo | Pedidos com status igual a "Entregue" possuem a rotina de cancelamento interceptada localmente, exibindo o `DeliveredOrderModal` em vez de disparar o fluxo de cancelamento. |
+| Mutação Local | O cancelamento aceito atualiza instantaneamente o status do objeto em memória para "Cancelado", movendo o card para a seção correspondente sem necessidade de recarga total da tela. |
+
+---
+
+## Implantação
+
+**Pré-requisitos:** Node.js 20+, Expo CLI e Docker Desktop instalados.
+
+1. Subir os backends de estoque (`StockService`) e de pedidos (`OrderService`):
+   ```
+   # Em terminais separados:
+   cd src/services/stock
+   dotnet run
+   
+   cd src/services/order
+   dotnet run
+
+
+2. Configurar as variáveis de ambiente em src/mobile/.env apontando para os serviços correspondentes:
+    ```EXPO_PUBLIC_STOCK_API_URL=[http://192.168.0.4:8081/api](http://192.168.0.4:8081/api)
+    EXPO_PUBLIC_ORDER_API_URL=[http://192.168.0.4:8082/api](http://192.168.0.4:8082/api)
+    ```
+
+
+3. Subir o app mobile:
+    ```
+    cd src/mobile
+    npx expo start
+    ```
+
+4. ressionar W para abrir no navegador ou escanear o QR Code com o Expo Go no celular.
+
+5. Acesse o ícone de sacola no menu inferior para gerenciar seu Carrinho ou acesse o perfil para checar Meus Pedidos.
+
+---
+
+## Testes
+
+### Estratégia
+
+Testes funcionais manuais executados em ambiente local, cobrindo as interações do **Módulo de Pedidos (Carrinho e Histórico)** no front-end móvel. Pré-condições globais: `StockService` e `OrderService` ativos, e usuário autenticado via `AuthContext`.
+
+---
+
+### Mapeamento de interações
+
+| ID | Interação | Componente | API back-end |
+|---|---|---|---|
+| M-P1 | Carregar itens do carrinho | `CartScreen` | — (CartContext local) |
+| M-P2 | Validar estoque assincronamente | `CartScreen` | `GET /stock/sku/:skuId` |
+| M-P3 | Manipular quantidades e seleção | `CartScreen` | — (Estado local e Context) |
+| M-P4 | Listar histórico de pedidos | `PurchasedOrders` | `GET /orders/user/:userId` |
+| M-P5 | Visualizar detalhes do pedido | `OrderDetailsModal` | — (Dados do card selecionado) |
+| M-P6 | Cancelar pedido pendente | `CancelOrderModal` | — (Mutação de estado em memória) |
+| M-P7 | Descartar pedido cancelado | `PurchasedOrders` | — (Remoção local da listagem) |
+
+---
+
+### Casos de teste
+
+#### Pedidos Mobile — M-P1/P2/P3: Carrinho de Compras
+
+##### TC-M-P1-01 · Exibir estado de carrinho vazio
+
+- **Pré-condições:**
+  - Nenum item adicionado ao `CartContext`.
+- **Passos:**
+  1. Navegar até a tela de Carrinho (`/cart`).
+- **Resultado esperado:**
+  - Texto informativa "Seu carrinho está vazio" é renderizada centralizada na tela.
+  - O botão **Voltar às compras** fica visível e funcional, redirecionando para `/` ao ser tocado.
+
+---
+
+##### TC-M-P2-01 · Carregar estoque com sucesso e liberar checkout
+
+- **Pré-condições:**
+  - Carrinho possui itens adicionados.
+  - `StockService` retorna `quantityAvailable` maior ou igual à quantidade solicitada pelo usuário.
+- **Passos:**
+  1. Entrar na tela de Carrinho (`/cart`).
+- **Resultado esperado:**
+  - O indicador de carregamento de estoque é desativado de forma fluida.
+  - Nenhum banner de alerta é exibido.
+  - O botão **Finalizar Compra** fica ativo habilitando a navegação para o checkout.
+
+---
+
+##### TC-M-P2-02 · Quantidade solicitada excede o limite do estoque
+
+- **Pré-condições:**
+  - O SKU de um produto adicionado possui apenas 1 unidade disponível no backend.
+  - O usuário possui quantidade configurada para `2` no carrinho.
+- **Passos:**
+  1. Acessar a tela de Carrinho (`/cart`).
+- **Resultado esperado:**
+  - O componente `Banner` torna-se visível no topo listando o nome exato do produto em falta.
+  - O botão **Finalizar Compra** assume propriedade desabilitada (`disabled={true}`).
+
+---
+
+##### TC-M-P3-01 · Alternar seleção de itens e recalcular valor total
+
+- **Pré-condições:**
+  - Carrinho carregado com pelo menos 2 produtos distintos de valores diferentes.
+- **Passos:**
+  1. Desmarcar o checkbox de seleção (`onToggleSelect`) do primeiro item da lista.
+- **Resultado esperado:**
+  - O valor total apresentado no footer fixo é recalculado instantaneamente subtraindo o preço total do item removido da seleção.
+
+---
+
+##### TC-M-P3-02 · Incrementar e decrementar quantidades com segurança
+
+- **Pré-condições:**
+  - Carrinho carregado com 1 item com quantidade igual a 2.
+- **Passos:**
+  1. Tocar no botão de decremento `[-]`.
+  2. Com a quantidade agora em 1, tocar no botão de decremento `[-]` novamente.
+- **Resultado esperado:**
+  - Ao executar o passo 1, a quantidade cai para 1 e o valor total atualiza.
+  - Ao executar o passo 2, a quantidade não zera negativamente nem remove o item; a quantidade mínima permanece estagnada em 1 unidade.
+
+---
+
+##### TC-M-P3-03 · Exclusão direta de item
+
+- **Pré-condições:**
+  - Pelo menos 1 item presente no carrinho.
+- **Passos:**
+  1. Tocar na ação de remoção (`onRemove`) do item do card.
+- **Resultado esperado:**
+  - O item desaparece visualmente da listagem imediatamente.
+  - O cálculo do footer zera e a tela comuta para o estado de carrinho vazio.
+
+---
+
+#### Pedidos Mobile — M-P4/P5/P6/P7: Histórico de Compras
+
+##### TC-M-P4-01 · Carregar histórico de pedidos ativos e cancelados
+
+- **Pré-condições:**
+  - Usuário autenticado possui ordens salvas (pelo menos 1 ativa e 1 cancelada).
+- **Passos:**
+  1. Entrar na tela `/order/purchasedOrders/purchasedOrders`.
+- **Resultado esperado:**
+  - O app dispara requisição para a API do backend passando o ID do usuário.
+  - Os cartões de ordens ativas aparecem listados na parte superior com os dados de totais calculados localmente.
+  - A seção "Pedidos cancelados" é renderizada de forma opaca (`0.65`) isolando os itens descontinuados.
+
+---
+
+##### TC-M-P4-02 · Estado vazio de histórico
+
+- **Pré-condições:**
+  - Usuário autenticado não possui nenhuma compra executada no banco de dados.
+- **Passos:**
+  1. Entrar na tela `/order/purchasedOrders/purchasedOrders`.
+- **Resultado esperado:**
+  - A mensagem "Você ainda não possui pedidos." é renderizada textualmente de forma centralizada.
+
+---
+
+##### TC-M-P5-01 · Disparar e fechar modal de detalhes do pedido
+
+- **Pré-condições:**
+  - Listagem de pedidos preenchida com sucesso.
+- **Passos:**
+  1. Tocar no botão **Detalhes** de qualquer card de pedido.
+  2. Analisar as informações exibidas e clicar na ação de fechar/retornar do modal.
+- **Resultado esperado:**
+  - O componente `OrderDetailsModal` abre via portal, injetando as propriedades do pedido correspondente.
+  - Ao executar o passo 2, o estado local limpa a referência e fecha o modal sem gerar travamentos na tela pai.
+
+---
+
+##### TC-M-P6-01 · Cancelamento com sucesso de pedido elegível
+
+- **Pré-condições:**
+  - O pedido selecionado possui o status inicial como `"Aprovado"` ou `"Processando"`.
+- **Passos:**
+  1. Tocar em **Cancelar Pedido** no card ativo.
+  2. No modal de confirmação `CancelOrderModal`, tocar em confirmar.
+- **Resultado esperado:**
+  - O modal é fechado.
+  - O objeto da ordem em memória sofre mutação instantânea mudando o atributo status para `"Cancelado"`.
+  - O respectivo card é deslocado automaticamente para a seção inferior de cancelados em tempo de execução.
+
+---
+
+##### TC-M-P6-02 · Bloqueio de cancelamento para pedidos já entregues
+
+- **Pré-condições:**
+  - O pedido selecionado possui a propriedade de status textualmente igual a `"Entregue"`.
+- **Passos:**
+  1. Tocar no botão de cancelamento do respectivo card.
+- **Resultado esperado:**
+  - O fluxo para `setOrderToCancel` é interceptado pela lógica condicional.
+  - O componente `DeliveredOrderModal` é renderizado na tela de forma exclusiva para notificar o usuário de que mercadorias entregues não permitem anulação imediata.
+
+---
+
+##### TC-M-P7-01 · Descartar pedido cancelado da interface local
+
+- **Pré-condições:**
+  - Existência de pelo menos 1 item na seção de pedidos cancelados.
+- **Passos:**
+  1. Tocar no botão **Descartar** do card correspondente.
+- **Resultado esperado:**
+  - O método `handleDiscardOrder` remove a referência do ID do array de estado da aplicação.
+  - O card some permanentemente da tela do usuário.
+
+
+
+---
+
 
 # Front-end Móvel — Módulo de Notificações
 
