@@ -21,6 +21,6 @@
 | 18/05 - 24/05 | Fundamentos de Projeto e Análise de Algoritmos - Unidade 1 | ✅ | Orquestração do pagamento no pedido | Orquestração do pagamento no pedido (criação do pedido → cobrança → atualização de status) |
 | 25/05 - 31/05 | Fundamentos de Projeto e Análise de Algoritmos - Unidade 2 | ✅ | Fluxo de pagamento no checkout web e mobile | Fluxo de pagamento integrado ao checkout web e mobile — métodos cartão de crédito/débito e PIX, modais de sucesso e de recusa com "Tentar novamente" |
 | 01/06 - 07/06 | Desenvolvimento de Aplicações Móveis - Unidade 2 | ✅ | Testes de payments e correções | Registro dos testes de payments (web e mobile) com evidências nos docs e correções de bugs no checkout |
-| 08/06 - 14/06 |  | ⬜ |  |  |
+| 08/06 - 14/06 | Tpdos microfundamentos já foram realizados| ✅ | Elaboração de artefatos para etapa 5 | Ajustes finais para entrega da Etapa 5  |
 
 **Legenda:** ✅ Estudou | ⬜ Não estudou
