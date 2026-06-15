@@ -95,7 +95,7 @@ Abaixo descrevemos os principais focos de desenvolvimento e atuação para cada 
 - **Hugo Freitas da Cruz**: Criação da API "Payment" (Back-end, Front-end, Mobile e  elaboração da documentação relacionada.)
 - **Carlos Alberto Morais Junior**: (Preencher atividades aqui)
 - **Gabriel Freitas Cambraia**: (Preencher atividades aqui)
-- **João Gabriel Perez Monteiro**: (Preencher atividades aqui)
+- **João Gabriel Perez Monteiro**: Desenvolvimento, testes e documentação da API "Order" (Back-end, Front-end e Mobile.)
 - **Marcos Vinício Araújo Almeida**: (Preencher atividades aqui)
 - **Nicolas Pontes Borges**: Bootstrap do projeto, definição da arquitetura, implementação da pipeline docker das API, implementação do gateway, min IO (CDN) e implementação da feature Stock (mobile, front, API e documentação correspondente)
 - **Vitor Gabriel Linas**: (Preencher atividades aqui)
