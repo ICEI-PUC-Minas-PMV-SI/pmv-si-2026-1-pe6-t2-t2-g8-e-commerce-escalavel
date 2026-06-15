@@ -93,9 +93,9 @@ Abaixo descrevemos os principais focos de desenvolvimento e atuação para cada 
 
 
 - **Hugo Freitas da Cruz**: Criação da API "Payment" (Back-end, Front-end, Mobile e  elaboração da documentação relacionada.)
-- **Carlos Alberto Morais Junior**: (Preencher atividades aqui)
-- **Gabriel Freitas Cambraia**: (Preencher atividades aqui)
+- **Carlos Alberto Morais Junior**: Sem contribuições de desenvolvimento. Atuou apenas na seção inicial "Problema" da documentação (Etapa 1), sem entregas de código nas etapas seguintes.
+- **Gabriel Freitas Cambraia**: Criação da API "Catalog" (Back-end, Front-end, Mobile e elaboração da documentação relacionada.)
 - **João Gabriel Perez Monteiro**: Desenvolvimento, testes e documentação da API "Order" (Back-end, Front-end e Mobile.)
-- **Marcos Vinício Araújo Almeida**: (Preencher atividades aqui)
+- **Marcos Vinício Araújo Almeida**: Criação da API "Users" (Back-end, Front-end, Mobile e elaboração da documentação relacionada.)
 - **Nicolas Pontes Borges**: Bootstrap do projeto, definição da arquitetura, implementação da pipeline docker das API, implementação do gateway, min IO (CDN) e implementação da feature Stock (mobile, front, API e documentação correspondente)
-- **Vitor Gabriel Linas**: (Preencher atividades aqui)
+- **Vitor Gabriel Linas**: Criação do Worker "Notification" (Back-end, Front-end, Mobile e elaboração da documentação relacionada.)
