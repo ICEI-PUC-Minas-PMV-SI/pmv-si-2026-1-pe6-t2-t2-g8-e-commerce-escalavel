@@ -21,6 +21,6 @@
 | 18/05 - 24/05 | Fundamentos de Projeto e Análise de Algoritmos - Unidade 1 | ✅ | Início do mobile de catálogo | Início do mobile de catálogo |
 | 25/05 - 31/05 | Fundamentos de Projeto e Análise de Algoritmos - Unidade 2 | ✅ | Finalização do mobile de catálogo | Finalização do mobile de catálogo |
 | 01/06 - 07/06 |  | ✅ | Documentação e testes | Documentação e testes |
-| 08/06 - 14/06 |  | ⬜ |  |  |
+| 08/06 - 14/06 |  | ✅ | Apresentação do trabalho e gravação do web frontend | Apresentação do trabalho e gravação do web frontend|
 
 **Legenda:** ✅ Estudou | ⬜ Não estudou
