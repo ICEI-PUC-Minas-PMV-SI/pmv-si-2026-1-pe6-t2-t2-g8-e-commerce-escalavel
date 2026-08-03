@@ -1,6 +1,6 @@
 # 📊 Relatório de Contribuições do Projeto
 
-**Última atualização:** 27/07/2026 00:49
+**Última atualização:** 03/08/2026 00:48
 
 ---
 
@@ -17,16 +17,20 @@
 | Vitor Linas           |        47 |      2220 |       711 |         23 |             20 |               4 |
 | gabriel               |        22 |     10110 |      2055 |        106 |              3 |               1 |
 | gabrielcambraia       |        27 |       960 |        59 |          5 |             14 |               4 |
-| github-actions[bot]   |       183 |      1479 |      1441 |          3 |            178 |               1 |
+| github-actions[bot]   |       184 |      1484 |      1446 |          3 |            179 |               1 |
 | github-classroom[bot] |         1 |      2152 |         0 |         45 |              1 |              13 |
 | nicolaspborges96      |        78 |     47103 |     18538 |        343 |             30 |               8 |
 
 
 ## 📅 Contribuições Semanais (Todo o Semestre)
 
+**2026-07-27**: github-actions[bot]: 1
+
+**2026-07-20**: github-actions[bot]: 1
+
 **2026-07-13**: github-actions[bot]: 1
 
-**2026-07-06**: github-actions[bot]: 2
+**2026-07-06**: github-actions[bot]: 1
 
 **2026-06-29**: github-actions[bot]: 1
 
@@ -52,11 +56,11 @@
 
 **2026-04-13**: Dev-Vinicio: 1, github-actions[bot]: 2
 
-**2026-04-06**: Dev-Vinicio: 1, Hugo Freitas: 16, João Gabriel Perez: 7, Vitor Linas: 5, gabriel: 2, gabrielcambraia: 7, github-actions[bot]: 36, nicolaspborges96: 18
+**2026-04-06**: Dev-Vinicio: 1, Hugo Freitas: 16, João Gabriel Perez: 7, Vitor Linas: 5, gabriel: 2, gabrielcambraia: 7, github-actions[bot]: 37, nicolaspborges96: 18
 
 **2026-03-30**: Carlos Morais: 1, Dev-Vinicio: 2, João Gabriel Perez: 1, Vitor Linas: 1, gabriel: 2, gabrielcambraia: 1, github-actions[bot]: 9, nicolaspborges96: 3
 
-**2026-03-23**: Nicolas: 1, Vitor Linas: 8, github-actions[bot]: 9, nicolaspborges96: 3
+**2026-03-23**: Nicolas: 1, Vitor Linas: 8, github-actions[bot]: 8, nicolaspborges96: 3
 
 **2026-03-16**: Dev-Vinicio: 1, Hugo Freitas: 1, github-actions[bot]: 4, nicolaspborges96: 3
 
