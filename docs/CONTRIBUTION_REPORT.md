@@ -1,6 +1,6 @@
 # 📊 Relatório de Contribuições do Projeto
 
-**Última atualização:** 12/10/2026 00:56
+**Última atualização:** 19/10/2026 00:46
 
 ---
 
@@ -17,12 +17,16 @@
 | Vitor Linas           |        47 |      2220 |       711 |         23 |             20 |               4 |
 | gabriel               |        22 |     10110 |      2055 |        106 |              3 |               1 |
 | gabrielcambraia       |        27 |       960 |        59 |          5 |             14 |               4 |
-| github-actions[bot]   |       194 |      1552 |      1512 |          3 |            189 |               1 |
+| github-actions[bot]   |       195 |      1559 |      1519 |          3 |            190 |               1 |
 | github-classroom[bot] |         1 |      2152 |         0 |         45 |              1 |              13 |
 | nicolaspborges96      |        78 |     47103 |     18538 |        343 |             30 |               8 |
 
 
 ## 📅 Contribuições Semanais (Todo o Semestre)
+
+**2026-10-12**: github-actions[bot]: 1
+
+**2026-10-05**: github-actions[bot]: 1
 
 **2026-09-28**: github-actions[bot]: 1
 
@@ -34,13 +38,11 @@
 
 **2026-08-31**: github-actions[bot]: 1
 
-**2026-08-24**: github-actions[bot]: 1
-
 **2026-08-17**: github-actions[bot]: 1
 
 **2026-08-10**: github-actions[bot]: 1
 
-**2026-08-03**: github-actions[bot]: 1
+**2026-08-03**: github-actions[bot]: 2
 
 **2026-07-27**: github-actions[bot]: 1
 
@@ -50,7 +52,7 @@
 
 **2026-07-06**: github-actions[bot]: 1
 
-**2026-06-29**: github-actions[bot]: 2
+**2026-06-29**: github-actions[bot]: 1
 
 **2026-06-22**: github-actions[bot]: 1
 
@@ -67,8 +69,6 @@
 **2026-05-11**: Dev-Vinicio: 3, João Gabriel Perez: 2, gabriel: 1, gabrielcambraia: 3, github-actions[bot]: 10, nicolaspborges96: 4
 
 **2026-05-04**: Dev-Vinicio: 3, João Gabriel Perez: 8, Vitor Linas: 12, gabriel: 2, gabrielcambraia: 2, github-actions[bot]: 27, nicolaspborges96: 6
-
-**2026-04-27**: Dev-Vinicio: 4, João Gabriel Perez: 4, Nicolas: 1, gabriel: 6, gabrielcambraia: 1, github-actions[bot]: 11, nicolaspborges96: 14
 
 
 
